@@ -30,7 +30,7 @@ void test_api::alloc_nd_matrix() {
 	std::cout << "========== Updated: op: diag(matrix) = 0 ============\n";
 
 	for (max_size_t i = 0; i < 3; i++) {
-		mat.assign( { 0, 0 }, 0);
+		mat.assign( { i, i }, 0);
 	}
 
 	mat.print_matrix();

@@ -7,8 +7,8 @@
 #include "./matrix.hpp"
 
 template<typename T>
-void nd::matrix<T>::chunk_at(vec1d<std::shared_ptr<T>> &chunk_data,
-		big_size_t begin, big_size_t end) {
+void nd::matrix<T>::chunk_at(vec1d<ref_t<T>> &chunk_data, big_size_t begin,
+		big_size_t end) {
 
 	for (big_size_t i = begin; i < end; i++) {
 		chunk_data[i - begin] = this->data[i];

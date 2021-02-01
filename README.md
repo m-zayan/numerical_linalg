@@ -67,70 +67,70 @@ Generated Test Case - TXT - File :test_api/gen_test_cases.txt
 
 ```c++
 
-shape_t shape = { 3, 3 };
+	shape_t shape = { 3, 3 };
 
-nd::matrix<int> mat = nd::random::uniform<int>(1, 10, shape); // low = 1, high = 10
+	nd::matrix<int> mat = nd::random::uniform<int>(1, 10, shape); // low = 1, high = 10
 
-std::cout << "shape :" << mat.shape() << ln;
-std::cout << "Chunk storage size :" << mat.size() << ln;
+	std::cout << "shape :" << mat.shape() << ln;
+	std::cout << "Chunk storage size :" << mat.size() << ln;
 
-std::cout << "=======================\n";
-mat.print_matrix();
+	std::cout << "=======================\n";
+	mat.print_matrix();
 
-std::cout << "========== matrix[0] ============\n";
-mat[0].print_matrix();
+	std::cout << "========== matrix[0] ============\n";
+	mat[0].print_matrix();
 
-std::cout << "========== matrix[1] ============\n";
-mat[1].print_matrix();
+	std::cout << "========== matrix[1] ============\n";
+	mat[1].print_matrix();
 
-std::cout << "========== matrix[2] ============\n";
-mat[2].print_matrix();
+	std::cout << "========== matrix[2] ============\n";
+	mat[2].print_matrix();
 
-std::cout << "========== Updated: op: diag(matrix) = 0 ============\n";
+	std::cout << "========== Updated: op: diag(matrix) = 0 ============\n";
 
-for (max_size_t i = 0; i < 3; i++) {
-	mat.assign( { 0, 0 }, 0);
-}
+	for (max_size_t i = 0; i < 3; i++) {
+		mat.assign( { i, i }, 0);
+	}
 
-mat.print_matrix();
+	mat.print_matrix();
 
-std::cout
-		<< "============ op: matrix * matrix - matrix + matrix =========\n";
-(mat * mat - mat + mat).print_matrix();
+	std::cout
+			<< "============ op: (matrix * matrix) - (matrix + matrix) =========\n";
+	((mat * mat) - (mat + mat)).print_matrix();
 
-std::cout << "============ Matrix (3, 3, 2)==========\n";
+	std::cout << "============ Matrix (3, 3, 2)==========\n";
 
-shape_t shape2 = { 3, 3, 2 };
+	shape_t shape2 = { 3, 3, 2 };
 
-nd::matrix<int> mat2 = nd::random::uniform(1, 10, shape2); // low = 1, high = 10
-mat2.print_matrix();
+	nd::matrix<int> mat2 = nd::random::uniform(1, 10, shape2); // low = 1, high = 10
+	mat2.print_matrix();
 
-std::cout << "----------------\n";
+	std::cout << "----------------\n";
 
-std::cout << std::boolalpha;
-std::cout << "mat2 - own-data :" << mat2.own_data() << ln;
-std::cout << "mat2[0] - own-data :" << mat2[0].own_data() << ln;
+	std::cout << std::boolalpha;
+	std::cout << "mat2 - own-data :" << mat2.own_data() << ln;
+	std::cout << "mat2[0] - own-data :" << mat2[0].own_data() << ln;
 
-std::cout << "========== [1]: Identity - {3, 3} =======\n";
+	std::cout << "========== [1]: Identity - {3, 3} =======\n";
 
-shape_t shape_01 = { 3, 3 };
-nd::matrix<int> mat_01 = nd::linalg::eye<int>(shape_01);
+	shape_t shape_01 = { 3, 3 };
+	nd::matrix<int> mat_01 = nd::linalg::eye<int>(shape_01);
 
-mat_01.print_matrix();
+	mat_01.print_matrix();
 
-std::cout << "========== [2]: Diag(matrix) = 3 - {3, 3} =======\n";
+	std::cout << "========== [2]: Diag(matrix) = 3 - {3, 3} =======\n";
 
-shape_t shape_02 = { 3, 3 };
-nd::matrix<int> mat_02 = nd::linalg::eye<int>(shape_02);
+	shape_t shape_02 = { 3, 3 };
+	nd::matrix<int> mat_02 = nd::linalg::eye<int>(shape_02);
 
-mat_02 *= 3;
-mat_02.print_matrix();
+	mat_02 *= 3;
+	mat_02.print_matrix();
 
-std::cout << "========== Stack [1], [2] =======\n";
+	std::cout << "========== Stack [1], [2] =======\n";
 
-nd::matrix<int> result = nd::stack<int>( { mat_01, mat_02 });
+	nd::matrix<int> result = nd::stack<int>( { mat_01, mat_02 });
 
-result.print_matrix();
+	result.print_matrix();
 
 ```
   
@@ -138,51 +138,50 @@ result.print_matrix();
   ```c++
 
 shape :(3,3)
-size :9
-
+Chunk storage size :9
 =======================
 
-[[3, 1, 7]
-[4, 5, 6]
-[6, 8, 7]]
+[[2, 5, 7]
+[2, 9, 3]
+[10, 10, 2]]
 
 ========== matrix[0] ============
 
-[3, 1, 7]
+[2, 5, 7]
 
 ========== matrix[1] ============
 
-[4, 5, 6]
+[2, 9, 3]
 
 ========== matrix[2] ============
 
-[6, 8, 7]
+[10, 10, 2]
 
 ========== Updated: op: diag(matrix) = 0 ============
 
-[[0, 1, 7]
-[4, 0, 6]
-[6, 8, 0]]
+[[0, 5, 7]
+[2, 0, 3]
+[10, 10, 0]]
 
-============ op: matrix * matrix - matrix + matrix =========
+============ op: (matrix * matrix) - (matrix + matrix) =========
 
-[[0, 1, 49]
-[16, 0, 36]
-[36, 64, 0]]
+[[0, 15, 35]
+[0, 0, 3]
+[80, 80, 0]]
 
 ============ Matrix (3, 3, 2)==========
 
-[[[9, 4]
-[1, 1]
-[6, 9]]
+[[[4, 1]
+[10, 6]
+[3, 3]]
 
-[[9, 3]
-[4, 3]
-[8, 2]]
+[[9, 9]
+[2, 7]
+[8, 4]]
 
-[[6, 6]
-[1, 4]
-[10, 7]]]
+[[6, 5]
+[1, 8]
+[5, 5]]]
 
 ----------------
 
@@ -210,6 +209,7 @@ mat2[0] - own-data :false
 [[3, 0, 0]
 [0, 3, 0]
 [0, 0, 3]]]
+
 ```
 
 -----------------------
