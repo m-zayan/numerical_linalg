@@ -6,8 +6,8 @@
  *	vec1d strides iterator, [sequential permutation]
  */
 
-#ifndef SRC_ITERATORS_SEQUENTIALNDITERATOR_HPP_
-#define SRC_ITERATORS_SEQUENTIALNDITERATOR_HPP_
+#ifndef SRC_ITERATORS_SEQUENTIALNDITERATOR_HPP
+#define SRC_ITERATORS_SEQUENTIALNDITERATOR_HPP
 
 #include "../common/vec1d.cpp"
 
@@ -48,4 +48,4 @@ public:
 	virtual ~SequentialNdIterator();
 };
 
-#endif /* SRC_ITERATORS_SequentialNdIterator_HPP_ */
+#endif /* SRC_ITERATORS_SequentialNdIterator_HPP */

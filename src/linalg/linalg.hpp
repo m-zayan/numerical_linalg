@@ -4,8 +4,8 @@
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_MULTIDIM_LINALG_HPP_
-#define SRC_MULTIDIM_LINALG_HPP_
+#ifndef SRC_MULTIDIM_LINALG_HPP
+#define SRC_MULTIDIM_LINALG_HPP
 
 #include "../multidim/matrix.hpp"
 
@@ -43,4 +43,4 @@ nd::matrix<T> transpose(shape_t axes);
 
 }
 
-#endif /* SRC_MULTIDIM_ND_LINALG_HPP_ */
+#endif /* SRC_MULTIDIM_LINALG_HPP */

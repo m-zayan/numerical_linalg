@@ -4,11 +4,9 @@
  *	Author: Z. Mohamed
  *
  *	 vector-1d,
+ *
  *	 Arithmetical operations are explicit
  *	 (i.e. conversions are not allowed - vec1d<float> + vec1d<int>)
- *
- *	 Strides, array for dimentions (storing nd-matrix using 1d array),
- *	 it's inspired by Numpy (https://numpy.org/)
  */
 
 #ifndef SRC_VEC1D_HPP

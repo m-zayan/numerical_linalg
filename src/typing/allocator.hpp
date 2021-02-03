@@ -4,8 +4,8 @@
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_TYPING_ALLOCATOR_HPP_
-#define SRC_TYPING_ALLOCATOR_HPP_
+#ifndef SRC_TYPING_ALLOCATOR_HPP
+#define SRC_TYPING_ALLOCATOR_HPP
 
 #include <vector>
 #include <memory>
@@ -20,4 +20,4 @@ std::shared_ptr<T> val_to_shared_ptr(T val);
 
 }
 
-#endif /* SRC_TYPING_ALLOCATOR_HPP_ */
+#endif /* SRC_TYPING_ALLOCATOR_HPP */
