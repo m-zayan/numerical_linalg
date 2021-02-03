@@ -454,27 +454,27 @@ T vec1d<T>::multiply(big_size_t begin, big_size_t end) {
 template<typename T>
 void vec1d<T>::print_vec1d(big_size_t begin, big_size_t end) {
 
-	if (allocator::is_dereferenceable<T>::value) {
+	std::cout << "[";
 
-		std::cout << "[";
-
-		for (big_size_t i = begin; i < end - 1; i++) {
-			std::cout << *this->values[i] << ", ";
-		}
-
-		std::cout << *this->values[end - 1] << "]";
+	for (big_size_t i = begin; i < end - 1; i++) {
+		std::cout << this->values[i] << ", ";
 	}
 
-	else {
+	std::cout << this->values[end - 1] << "]";
 
-		std::cout << "[";
+}
 
-		for (big_size_t i = begin; i < end - 1; i++) {
-			std::cout << this->values[i] << ", ";
-		}
+template<typename T>
+void vec1d<T>::rprint_vec1d(big_size_t begin, big_size_t end) {
 
-		std::cout << this->values[end - 1] << "]";
+	std::cout << "[";
+
+	for (big_size_t i = begin; i < end - 1; i++) {
+		std::cout << *this->values[i] << ", ";
 	}
+
+	std::cout << *this->values[end - 1] << "]";
+
 }
 
 template<typename T>

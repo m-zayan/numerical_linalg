@@ -19,8 +19,8 @@
 #include <functional>
 
 #include "./algorithm.cpp"
-#include "./random/generator.cpp"
-#include "./handlers/exception.hpp"
+#include "../random/generator.cpp"
+#include "../handlers/exception.hpp"
 
 template<typename T>
 class vec1d;
@@ -124,6 +124,7 @@ public:
 	T multiply(big_size_t begin, big_size_t end);
 
 	void print_vec1d(big_size_t begin, big_size_t end);
+	void rprint_vec1d(big_size_t begin, big_size_t end);
 
 	// overload output stream (<<  operator) for shape_t.
 	inline friend std::ostream& operator <<(std::ostream &os, shape_t &shape);
