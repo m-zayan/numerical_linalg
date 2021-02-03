@@ -19,12 +19,12 @@ SequentialNdIterator::SequentialNdIterator(shape_t shape) {
 	this->locked = false;
 }
 
-vec1d<max_size_t> SequentialNdIterator::icurrent() {
+shape_t SequentialNdIterator::icurrent() {
 
 	return this->current;
 }
 
-vec1d<max_size_t> SequentialNdIterator::next() {
+shape_t SequentialNdIterator::next() {
 
 	if (this->isLoked()) {
 

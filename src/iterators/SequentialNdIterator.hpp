@@ -15,11 +15,11 @@ class SequentialNdIterator {
 
 private:
 
-	// indices
 	shape_t shape;
 	max_size_t dim_bounds;
 
-	vec1d<max_size_t> current;
+	// indices
+	shape_t current;
 
 	max_size_t cur_dim;
 
@@ -37,8 +37,8 @@ public:
 
 	SequentialNdIterator(shape_t shapes);
 
-	vec1d<max_size_t> next();
-	vec1d<max_size_t> icurrent();
+	shape_t next();
+	shape_t icurrent();
 
 	bool isLoked();
 
