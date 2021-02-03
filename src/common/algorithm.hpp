@@ -9,8 +9,8 @@
 
 #include <queue>
 
-#include "./types.hpp"
-#include "./allocator.cpp"
+#include "../typing/types.hpp"
+#include "../typing/allocator.cpp"
 
 template<typename T>
 class algorithm {

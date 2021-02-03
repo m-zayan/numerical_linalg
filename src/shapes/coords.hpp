@@ -10,7 +10,7 @@
 #include <ostream>
 #include <sstream>
 
-#include "../vec1d.cpp"
+#include "../common/vec1d.cpp"
 
 // matrix attributes (ex. dimensions)
 class coords {
