@@ -39,7 +39,7 @@ template<typename T>
 nd::matrix<T> tensordot(nd::matrix<T> mat1, nd::matrix<T> mat2, shape_t axes);
 
 template<typename T>
-nd::matrix<T> transpose(shape_t axes);
+nd::matrix<T> transpose(nd::matrix<T> mat, shape_t axes);
 
 }
 

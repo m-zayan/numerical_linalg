@@ -22,6 +22,7 @@ void sum_alg(unsigned int test_size);
 void alloc_nd_matrix();
 void linalg_matmul();
 void linalg_dot();
+void linalg_transpose();
 
 }
 

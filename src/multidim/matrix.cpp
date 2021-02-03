@@ -15,13 +15,13 @@ big_size_t nd::matrix<T>::size() {
 }
 
 template<typename T>
-shape_t& nd::matrix<T>::shape() {
+shape_t nd::matrix<T>::shape() {
 
 	return this->attr.shape;
 }
 
 template<typename T>
-shape_t& nd::matrix<T>::strides() {
+shape_t nd::matrix<T>::strides() {
 
 	return this->attr.nd_strides;
 }
@@ -54,4 +54,10 @@ template<typename T>
 const_iterator<ref_t<T>> nd::matrix<T>::end() {
 
 	return this->data.end();
+}
+
+template<typename T>
+coords nd::matrix<T>::_m_attr() const {
+
+	return this->attr;
 }

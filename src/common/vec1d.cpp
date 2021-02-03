@@ -36,6 +36,7 @@ vec1d<T>::vec1d(std::initializer_list<T> std_init_list) :
 
 template<typename T>
 vec1d<T>::vec1d(const_iterator<T> begin, const_iterator<T> end) {
+
 	this->values.assign(begin, end);
 }
 
@@ -493,7 +494,7 @@ vec1d<T>::vec1d(const vec1d<T> &vec) noexcept {
 	this->values.assign(vec.values.begin(), vec.values.end());
 }
 
-std::ostream& operator <<(std::ostream &os, shape_t &shape) {
+std::ostream& operator <<(std::ostream &os, shape_t shape) {
 
 	os << '(';
 

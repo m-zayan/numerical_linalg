@@ -33,18 +33,18 @@ nd::matrix<T>::matrix(shape_t shape, T val) {
 }
 
 template<typename T>
-nd::matrix<T>::matrix(const vec1d<ref_t<T>> &&chunk_data, const coords &&attr) :
-		data(std::move(chunk_data)), attr(std::move(attr)) {
+nd::matrix<T>::matrix(const coords &&attr, const vec1d<ref_t<T>> &&chunk_data) :
+		attr(std::move(attr)), data(std::move(chunk_data)) {
 }
 
 template<typename T>
 nd::matrix<T>::matrix(const matrix &&mat) noexcept :
-		data(std::move(mat.data)), attr(std::move(mat.attr)) {
+		attr(mat._m_attr()), data(std::move(mat.data)) {
 }
 
 template<typename T>
 nd::matrix<T>::matrix(const matrix &mat) noexcept :
-		data(mat.data), attr(mat.attr) {
+		attr(mat.attr), data(mat.data) {
 }
 
 template<typename T>

@@ -268,7 +268,9 @@ nd::matrix<T> nd::matrix<T>::operator [](max_size_t d_index) {
 
 	} else {
 
-		shape_t new_shape(this->shape().begin() + 1, this->shape().end());
+		shape_t cur_shape = this->shape();
+
+		shape_t new_shape(cur_shape.begin() + 1, cur_shape.end());
 		coords new_attr(new_shape, false);
 
 		vec1d<ref_t<T>> chunk_data;
@@ -276,8 +278,8 @@ nd::matrix<T> nd::matrix<T>::operator [](max_size_t d_index) {
 
 		this->chunk_at(chunk_data, (d_index * step), ((d_index + 1) * step));
 
-		nd::matrix<T> chunked_matrix(std::move(chunk_data),
-				std::move(new_attr));
+		nd::matrix<T> chunked_matrix(std::move(new_attr),
+				std::move(chunk_data));
 
 		return chunked_matrix;
 	}

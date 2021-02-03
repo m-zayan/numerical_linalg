@@ -255,6 +255,28 @@ nd::matrix<T> nd::linalg::dot(nd::matrix<T> mat1, nd::matrix<T> mat2) {
 }
 
 //template<typename T>
-//nd::matrix<T> nd::linalg::transpose(shape_t axes) {
+//nd::matrix<T> nd::linalg::transpose(nd::matrix<T> mat, shape_t axes) {
+//
+//	if (axes.size() != mat.ndim()) {
+//
+//		throw nd::exception("....");
+//	}
+//
+//	shape_t swaped_shape(mat.ndim());
+//	shape_t swaped_strides(mat.ndim());
+//
+//	shape_t cur_shape = mat.shape();
+//	shape_t cur_strides = mat.strides();
+//
+//	for (max_size_t i = 0; i < axes.size(); i++) {
+//
+//		if (axes[i] >= mat.ndim()) {
+//
+//			throw nd::exception("....");
+//		}
+//
+//		swaped_shape[i] = cur_shape[axes[i]];
+//		swaped_strides[i] = cur_strides[axes[i]];
+//	}
 //
 //}
