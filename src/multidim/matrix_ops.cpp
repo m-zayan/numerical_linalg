@@ -292,3 +292,33 @@ void nd::matrix<T>::assign(shape_t indices, T val) {
 
 	*this->data[index] = val;
 }
+
+template<typename T>
+void nd::matrix<T>::_prem(shape_t axes) {
+
+	if (axes.size() != this->ndim()) {
+
+		throw nd::exception(
+				"Invalid number of axes, axes.size() != mat.ndim()");
+	}
+
+	shape_t swaped_shape(this->ndim());
+	shape_t swaped_strides(this->ndim());
+
+	shape_t cur_shape = this->shape();
+	shape_t cur_strides = this->strides();
+
+	for (max_size_t i = 0; i < axes.size(); i++) {
+
+		if (axes[i] >= this->ndim()) {
+
+			throw nd::exception("Invalid axes, axes[i] >= mat.ndim()");
+		}
+
+		swaped_shape[i] = cur_shape[axes[i]];
+		swaped_strides[i] = cur_strides[axes[i]];
+	}
+
+	this->attr.shape = swaped_shape;
+	this->attr.nd_strides = swaped_strides;
+}

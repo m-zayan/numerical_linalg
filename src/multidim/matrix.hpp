@@ -33,8 +33,6 @@ private:
 
 	matrix(const coords &&n_attr, const vec1d<ref_t<T>> &&chunk_data);
 
-	big_size_t index_at(shape_t indices);
-
 public:
 
 	vec1d<ref_t<T>> data;
@@ -87,7 +85,10 @@ public:
 	void assign(shape_t indices, T val);
 	void print_matrix();
 
+	big_size_t index_at(shape_t indices);
+
 	coords _m_attr() const;
+	void _prem(shape_t axes);
 
 	matrix<T> copy();
 

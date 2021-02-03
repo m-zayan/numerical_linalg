@@ -254,29 +254,28 @@ nd::matrix<T> nd::linalg::dot(nd::matrix<T> mat1, nd::matrix<T> mat2) {
 	return result;
 }
 
-//template<typename T>
-//nd::matrix<T> nd::linalg::transpose(nd::matrix<T> mat, shape_t axes) {
-//
-//	if (axes.size() != mat.ndim()) {
-//
-//		throw nd::exception("....");
-//	}
-//
-//	shape_t swaped_shape(mat.ndim());
-//	shape_t swaped_strides(mat.ndim());
-//
-//	shape_t cur_shape = mat.shape();
-//	shape_t cur_strides = mat.strides();
-//
-//	for (max_size_t i = 0; i < axes.size(); i++) {
-//
-//		if (axes[i] >= mat.ndim()) {
-//
-//			throw nd::exception("....");
-//		}
-//
-//		swaped_shape[i] = cur_shape[axes[i]];
-//		swaped_strides[i] = cur_strides[axes[i]];
-//	}
-//
-//}
+template<typename T>
+nd::matrix<T> nd::linalg::transpose(nd::matrix<T> mat, shape_t axes) {
+
+	nd::matrix<T> result(mat);
+
+	result._prem(axes);
+
+	SequentialNdIterator seqIter(result.shape());
+	big_size_t k = 0;
+
+	result.data[k++] = allocator::val_to_shared_ptr(*mat.data[0]);
+
+	while (!seqIter.isLoked()) {
+
+		max_size_t idx = result.index_at(seqIter.next());
+
+		if (seqIter.isLoked()) {
+			break;
+		}
+
+		result.data[k++] = allocator::val_to_shared_ptr(*mat.data[idx]);
+	}
+
+	return result;
+}
