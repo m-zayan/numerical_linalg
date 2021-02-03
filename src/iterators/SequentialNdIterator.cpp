@@ -29,7 +29,7 @@ vec1d<max_size_t> SequentialNdIterator::next() {
 	if (this->isLoked()) {
 
 		throw nd::exception("The iterator was locked, if you want to reuse it, "
-				"consider using SequentialNdIterator::rest(), method.");
+				"consider using SequentialNdIterator::unlock(), method.");
 	}
 
 	this->next_prem();
@@ -98,8 +98,14 @@ bool SequentialNdIterator::isLoked() {
 	return this->locked;
 }
 
+void SequentialNdIterator::unlock() {
+
+	this->locked = false;
+}
+
 void SequentialNdIterator::reset() {
 
+	this->current.fill(this->dim_bounds, 0);
 	this->locked = false;
 }
 

@@ -3,7 +3,7 @@
  *
  *	Author: Z. Mohamed
  *
- *	vec1d strides iterator, using sequential permutation
+ *	vec1d strides iterator, [sequential permutation]
  */
 
 #ifndef SRC_ITERATORS_SEQUENTIALNDITERATOR_HPP_
@@ -30,7 +30,6 @@ private:
 	bool locked;
 
 	void lock();
-	void reset();
 
 public:
 
@@ -42,6 +41,9 @@ public:
 	vec1d<max_size_t> icurrent();
 
 	bool isLoked();
+
+	void unlock();
+	void reset();
 
 	virtual ~SequentialNdIterator();
 };
