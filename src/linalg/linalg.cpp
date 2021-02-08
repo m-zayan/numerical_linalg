@@ -254,7 +254,12 @@ nd::matrix<T> nd::linalg::dot(nd::matrix<T> mat1, nd::matrix<T> mat2) {
 	return result;
 }
 
-//template<typename T>
-//nd::matrix<T> nd::linalg::transpose(shape_t axes) {
-//
-//}
+template<typename T>
+nd::matrix<T> nd::linalg::transpose(nd::matrix<T> mat, shape_t axes) {
+
+	nd::matrix<T> result(mat);
+
+	result._prem(axes);
+
+	return result.copy();
+}

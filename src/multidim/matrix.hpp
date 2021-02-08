@@ -18,37 +18,39 @@ namespace nd {
 template<typename T>
 using composite = vec1d<T>;
 
-template<typename T>
+template<typename T, bool shared_ref = true>
 class matrix {
 
 private:
 
-	const_iterator<ref_t<T>> begin();
-	const_iterator<ref_t<T>> end();
+	template<typename U = T>
+	using data_t = typename ref_t<shared_ref, U>::type;
 
-	void chunk_at(vec1d<ref_t<T>> &chunk_data, big_size_t begin,
+	coords attr;
+
+//	const_iterator<...> begin();
+//	const_iterator<...> end();
+
+	matrix<T, false> chunk_at(const coords &attr, big_size_t begin,
 			big_size_t end);
-
-	matrix(const vec1d<ref_t<T>> &&chunk_data, const coords &&n_attr);
-
-	big_size_t index_at(shape_t indices);
 
 public:
 
-	vec1d<ref_t<T>> data;
-	coords attr;
+	vec1d<data_t<T>> data;
 
 	matrix() = delete;
 
 	matrix(shape_t shape);
 	matrix(shape_t shape, T val);
+	matrix(const coords &&attr);
 
-	matrix<T> operator [](max_size_t d_index);
+	matrix<T, false> operator [](max_size_t d_index);
+	matrix<T, false>& operator =(const matrix<T> &mat);
 
 	inline big_size_t size();
 
-	inline shape_t& shape();
-	inline shape_t& strides();
+	inline shape_t shape();
+	inline shape_t strides();
 
 	inline max_size_t ndim();
 
@@ -85,6 +87,11 @@ public:
 
 	void assign(shape_t indices, T val);
 	void print_matrix();
+
+	big_size_t index_at(shape_t indices);
+
+	coords _m_attr() const;
+	void _prem(shape_t axes);
 
 	matrix<T> copy();
 

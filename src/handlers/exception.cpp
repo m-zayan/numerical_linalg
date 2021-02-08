@@ -1,5 +1,5 @@
 /*
- * linalg_exception.cpp
+ * exception.cpp
  *
  *	Author: Z. Mohamed
  */

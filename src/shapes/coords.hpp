@@ -10,7 +10,7 @@
 #include <ostream>
 #include <sstream>
 
-#include "../vec1d.cpp"
+#include "../iterators/SequentialNdIterator.hpp"
 
 // matrix attributes (ex. dimensions)
 class coords {

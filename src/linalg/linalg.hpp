@@ -4,8 +4,8 @@
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_MULTIDIM_LINALG_HPP_
-#define SRC_MULTIDIM_LINALG_HPP_
+#ifndef SRC_MULTIDIM_LINALG_HPP
+#define SRC_MULTIDIM_LINALG_HPP
 
 #include "../multidim/matrix.hpp"
 
@@ -39,8 +39,8 @@ template<typename T>
 nd::matrix<T> tensordot(nd::matrix<T> mat1, nd::matrix<T> mat2, shape_t axes);
 
 template<typename T>
-nd::matrix<T> transpose(shape_t axes);
+nd::matrix<T> transpose(nd::matrix<T> mat, shape_t axes);
 
 }
 
-#endif /* SRC_MULTIDIM_ND_LINALG_HPP_ */
+#endif /* SRC_MULTIDIM_LINALG_HPP */

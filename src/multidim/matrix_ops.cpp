@@ -6,9 +6,22 @@
 
 #include "./matrix.hpp"
 
+// assign
+template<typename T, bool shared_ref>
+nd::matrix<T, false>& nd::matrix<T, shared_ref>::operator =(
+		const matrix<T> &mat) {
+
+	this->attr = mat._m_attr();
+	this->data.assign(mat.begin(), mat.end());
+
+	this->attr.own_data = false;
+
+	return (*this);
+}
+
 // mask
-template<typename T>
-nd::matrix<bool> nd::matrix<T>::operator ==(const T &val) {
+template<typename T, bool shared_ref>
+nd::matrix<bool> nd::matrix<T, shared_ref>::operator ==(const T &val) {
 
 	nd::matrix<bool> result(this->shape());
 
@@ -21,8 +34,8 @@ nd::matrix<bool> nd::matrix<T>::operator ==(const T &val) {
 }
 
 // nd::matrix<T> == nd::matrix<T>
-template<typename T>
-bool nd::matrix<T>::operator ==(const nd::matrix<T> &mat) {
+template<typename T, bool shared_ref>
+bool nd::matrix<T, shared_ref>::operator ==(const nd::matrix<T> &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -41,8 +54,8 @@ bool nd::matrix<T>::operator ==(const nd::matrix<T> &mat) {
 }
 
 // nd::matrix<T> + nd::matrix<T>
-template<typename T>
-nd::matrix<T> nd::matrix<T>::operator +(const nd::matrix<T> &mat) {
+template<typename T, bool shared_ref>
+nd::matrix<T> nd::matrix<T, shared_ref>::operator +(const nd::matrix<T> &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -62,8 +75,9 @@ nd::matrix<T> nd::matrix<T>::operator +(const nd::matrix<T> &mat) {
 }
 
 // nd::matrix<T> += nd::matrix<T>
-template<typename T>
-nd::matrix<T>& nd::matrix<T>::operator +=(const nd::matrix<T> &mat) {
+template<typename T, bool shared_ref>
+nd::matrix<T>& nd::matrix<T, shared_ref>::operator +=(
+		const nd::matrix<T> &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -80,8 +94,8 @@ nd::matrix<T>& nd::matrix<T>::operator +=(const nd::matrix<T> &mat) {
 }
 
 // nd::matrix<T> + val
-template<typename T>
-nd::matrix<T> nd::matrix<T>::operator +(const T &val) {
+template<typename T, bool shared_ref>
+nd::matrix<T> nd::matrix<T, shared_ref>::operator +(const T &val) {
 
 	nd::matrix<T> result(this->shape());
 
@@ -93,8 +107,8 @@ nd::matrix<T> nd::matrix<T>::operator +(const T &val) {
 }
 
 // matrix<T> += val
-template<typename T>
-nd::matrix<T>& nd::matrix<T>::operator +=(const T &val) {
+template<typename T, bool shared_ref>
+nd::matrix<T>& nd::matrix<T, shared_ref>::operator +=(const T &val) {
 
 	for (big_size_t i = 0; i < this->size(); i++) {
 		*this->data[i] += val;
@@ -106,8 +120,8 @@ nd::matrix<T>& nd::matrix<T>::operator +=(const T &val) {
 // ===========================
 
 // nd::matrix<T> - nd::matrix<T>
-template<typename T>
-nd::matrix<T> nd::matrix<T>::operator -(const nd::matrix<T> &mat) {
+template<typename T, bool shared_ref>
+nd::matrix<T> nd::matrix<T, shared_ref>::operator -(const nd::matrix<T> &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -126,8 +140,9 @@ nd::matrix<T> nd::matrix<T>::operator -(const nd::matrix<T> &mat) {
 }
 
 // nd::matrix<T> -= nd::matrix<T>
-template<typename T>
-nd::matrix<T>& nd::matrix<T>::operator -=(const nd::matrix<T> &mat) {
+template<typename T, bool shared_ref>
+nd::matrix<T>& nd::matrix<T, shared_ref>::operator -=(
+		const nd::matrix<T> &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -144,8 +159,9 @@ nd::matrix<T>& nd::matrix<T>::operator -=(const nd::matrix<T> &mat) {
 }
 
 // nd::matrix<T> - val
-template<typename T>
-nd::matrix<T> nd::matrix<T>::operator -(const T &val) {
+template<typename T, bool shared_ref>
+
+nd::matrix<T> nd::matrix<T, shared_ref>::operator -(const T &val) {
 
 	nd::matrix<T> result(this->shape()); // 2-path, have to be modified
 
@@ -157,8 +173,8 @@ nd::matrix<T> nd::matrix<T>::operator -(const T &val) {
 }
 
 // matrix<T> -= val
-template<typename T>
-nd::matrix<T>& nd::matrix<T>::operator -=(const T &val) {
+template<typename T, bool shared_ref>
+nd::matrix<T>& nd::matrix<T, shared_ref>::operator -=(const T &val) {
 
 	for (big_size_t i = 0; i < this->size(); i++) {
 		*this->data[i] -= val;
@@ -170,8 +186,8 @@ nd::matrix<T>& nd::matrix<T>::operator -=(const T &val) {
 // ==================
 
 // nd::matrix<T> * nd::matrix<T>
-template<typename T>
-nd::matrix<T> nd::matrix<T>::operator *(const nd::matrix<T> &mat) {
+template<typename T, bool shared_ref>
+nd::matrix<T> nd::matrix<T, shared_ref>::operator *(const nd::matrix<T> &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -190,8 +206,9 @@ nd::matrix<T> nd::matrix<T>::operator *(const nd::matrix<T> &mat) {
 }
 
 // nd::matrix<T> *= nd::matrix<T>
-template<typename T>
-nd::matrix<T>& nd::matrix<T>::operator *=(const nd::matrix<T> &mat) {
+template<typename T, bool shared_ref>
+nd::matrix<T>& nd::matrix<T, shared_ref>::operator *=(
+		const nd::matrix<T> &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -208,8 +225,8 @@ nd::matrix<T>& nd::matrix<T>::operator *=(const nd::matrix<T> &mat) {
 }
 
 // nd::matrix<T> * val
-template<typename T>
-nd::matrix<T> nd::matrix<T>::operator *(const T &val) {
+template<typename T, bool shared_ref>
+nd::matrix<T> nd::matrix<T, shared_ref>::operator *(const T &val) {
 
 	nd::matrix<T> result(this->shape()); // 2-path, have to be modified
 
@@ -221,8 +238,8 @@ nd::matrix<T> nd::matrix<T>::operator *(const T &val) {
 }
 
 // matrix<T> *= val
-template<typename T>
-nd::matrix<T>& nd::matrix<T>::operator *=(const T &val) {
+template<typename T, bool shared_ref>
+nd::matrix<T>& nd::matrix<T, shared_ref>::operator *=(const T &val) {
 
 	for (big_size_t i = 0; i < this->size(); i++) {
 		*this->data[i] *= val;
@@ -234,8 +251,8 @@ nd::matrix<T>& nd::matrix<T>::operator *=(const T &val) {
 // ============
 
 // nd::matrix<T> / val
-template<typename T>
-nd::matrix<T> nd::matrix<T>::operator /(const T &val) {
+template<typename T, bool shared_ref>
+nd::matrix<T> nd::matrix<T, shared_ref>::operator /(const T &val) {
 
 	nd::matrix<T> result(this->shape());
 
@@ -247,8 +264,8 @@ nd::matrix<T> nd::matrix<T>::operator /(const T &val) {
 }
 
 // matrix<T> /= val
-template<typename T>
-nd::matrix<T>& nd::matrix<T>::operator /=(const T &val) {
+template<typename T, bool shared_ref>
+nd::matrix<T>& nd::matrix<T, shared_ref>::operator /=(const T &val) {
 
 	for (big_size_t i = 0; i < this->size(); i++) {
 		*this->data[i] /= val;
@@ -257,8 +274,9 @@ nd::matrix<T>& nd::matrix<T>::operator /=(const T &val) {
 	return (*this);
 }
 
-template<typename T>
-nd::matrix<T> nd::matrix<T>::operator [](max_size_t d_index) {
+template<typename T, bool shared_ref>
+nd::matrix<T, false> nd::matrix<T, shared_ref>::operator [](
+		max_size_t d_index) {
 
 	max_size_t step = this->strides()[0];
 
@@ -268,25 +286,61 @@ nd::matrix<T> nd::matrix<T>::operator [](max_size_t d_index) {
 
 	} else {
 
-		shape_t new_shape(this->shape().begin() + 1, this->shape().end());
+		shape_t cur_shape = this->shape();
+
+		shape_t new_shape(cur_shape.begin() + 1, cur_shape.end());
 		coords new_attr(new_shape, false);
 
-		vec1d<ref_t<T>> chunk_data;
-		chunk_data.resize(attr.size1d);
+		big_size_t begin = (d_index * step);
+		big_size_t end = (d_index + 1) * step;
 
-		this->chunk_at(chunk_data, (d_index * step), ((d_index + 1) * step));
+		nd::matrix<T, false> mat_chunk = this->chunk_at(new_attr, begin, end);
 
-		nd::matrix<T> chunked_matrix(std::move(chunk_data),
-				std::move(new_attr));
-
-		return chunked_matrix;
+		return mat_chunk;
 	}
 }
 
-template<typename T>
-void nd::matrix<T>::assign(shape_t indices, T val) {
+template<typename T, bool shared_ref>
+void nd::matrix<T, shared_ref>::assign(shape_t indices, T val) {
 
 	big_size_t index = this->index_at(indices);
 
 	*this->data[index] = val;
+}
+
+template<typename T, bool shared_ref>
+void nd::matrix<T, shared_ref>::_prem(shape_t axes) {
+
+	if (!this->own_data()) {
+
+		throw nd::exception(
+				"Can't permute axes, for a chunk of the matrix, own_data = false. "
+						"Consider using nd::maxtrix<T>::copy(), method");
+	}
+
+	if (axes.size() != this->ndim()) {
+
+		throw nd::exception(
+				"Invalid number of axes, axes.size() != mat.ndim()");
+	}
+
+	shape_t swaped_shape(this->ndim());
+	shape_t swaped_strides(this->ndim());
+
+	shape_t cur_shape = this->shape();
+	shape_t cur_strides = this->strides();
+
+	for (max_size_t i = 0; i < axes.size(); i++) {
+
+		if (axes[i] >= this->ndim()) {
+
+			throw nd::exception("Invalid axes, axes[i] >= mat.ndim()");
+		}
+
+		swaped_shape[i] = cur_shape[axes[i]];
+		swaped_strides[i] = cur_strides[axes[i]];
+	}
+
+	this->attr.shape = swaped_shape;
+	this->attr.nd_strides = swaped_strides;
 }

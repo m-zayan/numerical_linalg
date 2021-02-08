@@ -6,17 +6,21 @@
 
 #include "./matrix.hpp"
 
-template<typename T>
-void nd::matrix<T>::chunk_at(vec1d<ref_t<T>> &chunk_data, big_size_t begin,
-		big_size_t end) {
+template<typename T, bool shared_ref>
+nd::matrix<T, false> nd::matrix<T, shared_ref>::chunk_at(const coords &attr,
+		big_size_t begin, big_size_t end) {
+
+	nd::matrix<T, false> mat_chunk(std::move(attr));
 
 	for (big_size_t i = begin; i < end; i++) {
-		chunk_data[i - begin] = this->data[i];
+		mat_chunk.data[i - begin] = this->data[i];
 	}
+
+	return mat_chunk;
 }
 
-template<typename T>
-big_size_t nd::matrix<T>::index_at(shape_t indices) {
+template<typename T, bool shared_ref>
+big_size_t nd::matrix<T, shared_ref>::index_at(shape_t indices) {
 
 	if (indices.size() != this->ndim()) {
 		throw nd::exception("Dimensions Indices, Out of Range");
