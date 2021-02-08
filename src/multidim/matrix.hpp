@@ -23,20 +23,22 @@ class matrix {
 
 private:
 
-	template<typename U = T>
-	using data_t = typename ref_t<shared_ref, U>::type;
+	using data_t = typename ref_t<shared_ref, T>::type;
+
+	template<typename U = T, bool rt = shared_ref>
+	using rf = typename nd::matrix<U, rt>::data_t;
 
 	coords attr;
 
-//	const_iterator<...> begin();
-//	const_iterator<...> end();
+	const_iterator<rf<T, shared_ref>> begin();
+	const_iterator<rf<T, shared_ref>> end();
 
 	matrix<T, false> chunk_at(const coords &attr, big_size_t begin,
 			big_size_t end);
 
 public:
 
-	vec1d<data_t<T>> data;
+	vec1d<data_t> data;
 
 	matrix() = delete;
 

@@ -10,6 +10,9 @@
 #include "./matrix_stdout.cpp"
 
 template<typename T, bool shared_ref>
+using rf = typename nd::matrix<T, shared_ref>::data_t;
+
+template<typename T, bool shared_ref>
 big_size_t nd::matrix<T, shared_ref>::size() {
 	return this->attr.size1d;
 }
@@ -44,17 +47,17 @@ bool nd::matrix<T, shared_ref>::own_data() {
 	return this->attr.own_data;
 }
 
-//template<typename T, bool shared_ref>
-//const_iterator<...> nd::matrix<T, shared_ref>::begin() {
-//
-//	return this->data.begin();
-//}
-//
-//template<typename T, bool shared_ref>
-//const_iterator<...> nd::matrix<T, shared_ref>::end() {
-//
-//	return this->data.end();
-//}
+template<typename T, bool shared_ref>
+const_iterator<rf<T, shared_ref>> nd::matrix<T, shared_ref>::begin() {
+
+	return this->data.begin();
+}
+
+template<typename T, bool shared_ref>
+const_iterator<rf<T, shared_ref>> nd::matrix<T, shared_ref>::end() {
+
+	return this->data.end();
+}
 
 template<typename T, bool shared_ref>
 coords nd::matrix<T, shared_ref>::_m_attr() const {
