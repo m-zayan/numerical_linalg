@@ -25,12 +25,12 @@ vec1d<T>::vec1d(big_size_t size, T val) {
 }
 
 template<typename T>
-vec1d<T>::vec1d(std::vector<T> std_vec) :
+vec1d<T>::vec1d(const std::vector<T> &std_vec) :
 		values(std_vec) {
 }
 
 template<typename T>
-vec1d<T>::vec1d(std::initializer_list<T> std_init_list) :
+vec1d<T>::vec1d(const std::initializer_list<T> &std_init_list) :
 		values(std_init_list) {
 }
 
@@ -43,7 +43,7 @@ vec1d<T>::vec1d(const_iterator<T> begin, const_iterator<T> end) {
 // ====================================================================
 
 template<typename T>
-big_size_t vec1d<T>::size() {
+big_size_t vec1d<T>::size() const {
 	return this->values.size();
 }
 
@@ -141,13 +141,16 @@ vec1d<T> vec1d<T>::operator =(const vec1d<T> &vec) {
 template<typename T>
 bool vec1d<T>::operator ==(const vec1d<T> &vec) {
 
-	if (this->values.size() != vec.values.size()) {
+	vec1d<T> temp = std::move(vec);
+
+	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid boolean operation, "
 				"vectors must have the same shape");
 	}
 
-	for (big_size_t i = 0; i < vec.values.size(); i++) {
-		if (this->values[i] != vec.values[i]) {
+	for (big_size_t i = 0; i < temp.size(); i++) {
+
+		if (this->operator [](i) != temp[i]) {
 			return false;
 		}
 	}
@@ -159,13 +162,15 @@ bool vec1d<T>::operator ==(const vec1d<T> &vec) {
 template<typename T>
 bool vec1d<T>::operator !=(const vec1d<T> &vec) {
 
-	if (this->values.size() != vec.values.size()) {
+	vec1d<T> temp = std::move(vec);
+
+	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid boolean operation, "
 				"vectors must have the same shape");
 	}
 
-	for (big_size_t i = 0; i < vec.values.size(); i++) {
-		if (this->values[i] != vec.values[i]) {
+	for (big_size_t i = 0; i < temp.size(); i++) {
+		if (this->operator [](i) != temp[i]) {
 			return true;
 		}
 	}
@@ -177,10 +182,10 @@ bool vec1d<T>::operator !=(const vec1d<T> &vec) {
 template<typename T>
 vec1d<bool> vec1d<T>::operator ==(const T &val) {
 
-	vec1d<bool> mask_vec(this->values.size());
+	vec1d<bool> mask_vec(this->size());
 
-	for (big_size_t i = 0; i < this->values.size(); i++) {
-		mask_vec.values[i] = (this->values[i] == val);
+	for (big_size_t i = 0; i < this->size(); i++) {
+		mask_vec[i] = (this->operator [](i) == val);
 	}
 
 	return mask_vec;
@@ -192,15 +197,17 @@ vec1d<bool> vec1d<T>::operator ==(const T &val) {
 template<typename T>
 vec1d<T> vec1d<T>::operator +(const vec1d<T> &vec) {
 
-	if (this->values.size() != vec.values.size()) {
+	vec1d<T> temp = std::move(vec);
+
+	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
 	vec1d<T> res_vec(*this);
 
-	for (big_size_t i = 0; i < vec.values.size(); i++) {
-		res_vec.values[i] += vec.values[i];
+	for (big_size_t i = 0; i < temp.size(); i++) {
+		res_vec[i] += temp[i];
 	}
 
 	return res_vec;
@@ -211,13 +218,15 @@ vec1d<T> vec1d<T>::operator +(const vec1d<T> &vec) {
 template<typename T>
 vec1d<T>& vec1d<T>::operator +=(const vec1d<T> &vec) {
 
-	if (this->values.size() != vec.values.size()) {
+	vec1d<T> temp = std::move(vec);
+
+	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
-	for (big_size_t i = 0; i < vec.values.size(); i++) {
-		this->values[i] += vec.values[i];
+	for (big_size_t i = 0; i < temp.size(); i++) {
+		this->operator [](i) += temp[i];
 	}
 
 	return (*this);
@@ -229,8 +238,8 @@ vec1d<T> vec1d<T>::operator +(const T &val) {
 
 	vec1d<T> res_vec(*this);
 
-	for (big_size_t i = 0; i < res_vec.values.size(); i++) {
-		res_vec.values[i] += val;
+	for (big_size_t i = 0; i < res_vec.size(); i++) {
+		res_vec[i] += val;
 	}
 
 	return res_vec;
@@ -240,8 +249,8 @@ vec1d<T> vec1d<T>::operator +(const T &val) {
 template<typename T>
 vec1d<T>& vec1d<T>::operator +=(const T &val) {
 
-	for (big_size_t i = 0; i < this->values.size(); i++) {
-		this->values[i] += val;
+	for (big_size_t i = 0; i < this->size(); i++) {
+		this->operator[](i) += val;
 	}
 
 	return (*this);
@@ -254,15 +263,17 @@ vec1d<T>& vec1d<T>::operator +=(const T &val) {
 template<typename T>
 vec1d<T> vec1d<T>::operator -(const vec1d<T> &vec) {
 
-	if (this->values.size() != vec.values.size()) {
+	vec1d<T> temp = std::move(vec);
+
+	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
 	vec1d<T> res_vec(*this);
 
-	for (big_size_t i = 0; i < vec.values.size(); i++) {
-		res_vec.values[i] -= vec.values[i];
+	for (big_size_t i = 0; i < temp.size(); i++) {
+		res_vec[i] -= temp[i];
 	}
 
 	return res_vec;
@@ -273,13 +284,15 @@ vec1d<T> vec1d<T>::operator -(const vec1d<T> &vec) {
 template<typename T>
 vec1d<T>& vec1d<T>::operator -=(const vec1d<T> &vec) {
 
-	if (this->values.size() != vec.values.size()) {
+	vec1d<T> temp = std::move(vec);
+
+	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
-	for (big_size_t i = 0; i < vec.values.size(); i++) {
-		this->values[i] -= vec.values[i];
+	for (big_size_t i = 0; i < temp.size(); i++) {
+		this->operator [](i) -= temp[i];
 	}
 
 	return (*this);
@@ -291,8 +304,8 @@ vec1d<T> vec1d<T>::operator -(const T &val) {
 
 	vec1d<T> res_vec(*this);
 
-	for (big_size_t i = 0; i < res_vec.values.size(); i++) {
-		res_vec.values[i] -= val;
+	for (big_size_t i = 0; i < res_vec.size(); i++) {
+		res_vec[i] -= val;
 	}
 
 	return res_vec;
@@ -302,8 +315,8 @@ vec1d<T> vec1d<T>::operator -(const T &val) {
 template<typename T>
 vec1d<T>& vec1d<T>::operator -=(const T &val) {
 
-	for (big_size_t i = 0; i < this->values.size(); i++) {
-		this->values[i] -= val;
+	for (big_size_t i = 0; i < this->size(); i++) {
+		this->operator [](i) -= val;
 	}
 
 	return (*this);
@@ -316,15 +329,17 @@ vec1d<T>& vec1d<T>::operator -=(const T &val) {
 template<typename T>
 vec1d<T> vec1d<T>::operator *(const vec1d<T> &vec) {
 
-	if (this->values.size() != vec.values.size()) {
+	vec1d<T> temp = std::move(vec);
+
+	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
 	vec1d<T> res_vec(*this);
 
-	for (big_size_t i = 0; i < vec.values.size(); i++) {
-		res_vec.values[i] *= vec.values[i];
+	for (big_size_t i = 0; i < temp.size(); i++) {
+		res_vec[i] *= temp[i];
 	}
 
 	return res_vec;
@@ -335,13 +350,15 @@ vec1d<T> vec1d<T>::operator *(const vec1d<T> &vec) {
 template<typename T>
 vec1d<T>& vec1d<T>::operator *=(const vec1d<T> &vec) {
 
-	if (this->values.size() != vec.values.size()) {
+	vec1d<T> temp = std::move(vec);
+
+	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
-	for (big_size_t i = 0; i < vec.values.size(); i++) {
-		this->values[i] *= vec.values[i];
+	for (big_size_t i = 0; i < temp.size(); i++) {
+		this->operator [](i) *= temp[i];
 	}
 
 	return (*this);
@@ -353,8 +370,8 @@ vec1d<T> vec1d<T>::operator *(const T &val) {
 
 	vec1d<T> res_vec(*this);
 
-	for (big_size_t i = 0; i < res_vec.values.size(); i++) {
-		res_vec.values[i] *= val;
+	for (big_size_t i = 0; i < res_vec.size(); i++) {
+		res_vec[i] *= val;
 	}
 
 	return res_vec;
@@ -364,8 +381,8 @@ vec1d<T> vec1d<T>::operator *(const T &val) {
 template<typename T>
 vec1d<T>& vec1d<T>::operator *=(const T &val) {
 
-	for (big_size_t i = 0; i < this->values.size(); i++) {
-		this->values[i] *= val;
+	for (big_size_t i = 0; i < this->size(); i++) {
+		this->operator [](i) *= val;
 	}
 
 	return (*this);
@@ -379,8 +396,8 @@ vec1d<T> vec1d<T>::operator /(const T &val) {
 
 	vec1d<T> res_vec(*this);
 
-	for (big_size_t i = 0; i < res_vec.values.size(); i++) {
-		res_vec.values[i] /= val;
+	for (big_size_t i = 0; i < res_vec.size(); i++) {
+		res_vec[i] /= val;
 	}
 
 	return res_vec;
@@ -390,8 +407,8 @@ vec1d<T> vec1d<T>::operator /(const T &val) {
 template<typename T>
 vec1d<T>& vec1d<T>::operator /=(const T &val) {
 
-	for (big_size_t i = 0; i < this->values.size(); i++) {
-		this->values[i] /= val;
+	for (big_size_t i = 0; i < this->size(); i++) {
+		this->operator ()[i] /= val;
 	}
 
 	return (*this);
@@ -409,7 +426,7 @@ void vec1d<T>::write_in_range(big_size_t begin, big_size_t end,
 		std::function<void(T &vec_i)> custom_func) {
 
 	for (big_size_t i = begin; i < end; i++) {
-		custom_func(this->values[i]);
+		custom_func(this->operator [](i));
 	}
 }
 
@@ -422,7 +439,7 @@ void vec1d<T>::apply_in_range(big_size_t begin, big_size_t end,
 		std::function<T(T vec_i)> custom_func) {
 
 	for (big_size_t i = begin; i < end; i++) {
-		this->values[i] = custom_func(this->values[i]);
+		this->operator [](i) = custom_func(this->operator [](i));
 	}
 }
 
@@ -446,7 +463,7 @@ T vec1d<T>::multiply(big_size_t begin, big_size_t end) {
 	big_size_t result = 1;
 
 	for (big_size_t i = begin; i < end; i++) {
-		result *= this->values[i];
+		result *= this->operator [](i);
 	}
 
 	return result;
@@ -458,10 +475,10 @@ void vec1d<T>::print_vec1d(big_size_t begin, big_size_t end) {
 	std::cout << "[";
 
 	for (big_size_t i = begin; i < end - 1; i++) {
-		std::cout << this->values[i] << ", ";
+		std::cout << this->operator [](i) << ", ";
 	}
 
-	std::cout << this->values[end - 1] << "]";
+	std::cout << this->operator [](end - 1) << "]";
 
 }
 
@@ -471,10 +488,10 @@ void vec1d<T>::rprint_vec1d(big_size_t begin, big_size_t end) {
 	std::cout << "[";
 
 	for (big_size_t i = begin; i < end - 1; i++) {
-		std::cout << *this->values[i] << ", ";
+		std::cout << *this->operator [](i).get() << ", ";
 	}
 
-	std::cout << *this->values[end - 1] << "]";
+	std::cout << *this->operator [](end - 1).get() << "]";
 
 }
 

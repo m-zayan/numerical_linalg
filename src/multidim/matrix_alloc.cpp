@@ -6,8 +6,8 @@
 
 #include "./matrix.hpp"
 
-template<typename T>
-nd::matrix<T>::matrix(shape_t shape) {
+template<typename T, bool shared_ref>
+nd::matrix<T, shared_ref>::matrix(shape_t shape) {
 
 	this->attr = coords(shape);
 	this->data.resize(this->attr.size1d);
@@ -20,8 +20,8 @@ nd::matrix<T>::matrix(shape_t shape) {
  * stride - dictates the number of elements have to be skipped,
  * to get the next element in that dimension.
  */
-template<typename T>
-nd::matrix<T>::matrix(shape_t shape, T val) {
+template<typename T, bool shared_ref>
+nd::matrix<T, shared_ref>::matrix(shape_t shape, T val) {
 
 	this->attr = coords(shape);
 	this->data.resize(this->attr.size1d);
@@ -31,36 +31,51 @@ nd::matrix<T>::matrix(shape_t shape, T val) {
 		this->data[i] = allocator::val_to_shared_ptr<T>(val);
 	}
 }
+template<typename T, bool shared_ref>
+nd::matrix<T, shared_ref>::matrix(const coords &&attr) {
 
-template<typename T>
-nd::matrix<T>::matrix(const coords &&attr, const vec1d<ref_t<T>> &&chunk_data) :
-		attr(std::move(attr)), data(std::move(chunk_data)) {
+	this->attr = std::move(attr);
+	this->data.resize(this->attr.size1d);
 }
 
-template<typename T>
-nd::matrix<T>::matrix(const matrix &&mat) noexcept :
+template<typename T, bool shared_ref>
+nd::matrix<T, shared_ref>::matrix(const matrix &&mat) noexcept :
 		attr(mat._m_attr()), data(std::move(mat.data)) {
 }
 
-template<typename T>
-nd::matrix<T>::matrix(const matrix &mat) noexcept :
-		attr(mat.attr), data(mat.data) {
+template<typename T, bool shared_ref>
+nd::matrix<T, shared_ref>::matrix(const matrix &mat) noexcept :
+		attr(mat._m_attr()), data(mat.data) {
 }
 
-template<typename T>
-nd::matrix<T>::~matrix() {
+template<typename T, bool shared_ref>
+nd::matrix<T, shared_ref>::~matrix() {
+
 }
 
-template<typename T>
-nd::matrix<T> nd::matrix<T>::copy() {
+template<typename T, bool shared_ref>
+nd::matrix<T> nd::matrix<T, shared_ref>::copy() {
 
-	nd::matrix<T> mat(this->shape());
+	nd::matrix<T> result(this->shape());
 
-	for (big_size_t i = 0; i < mat.size(); i++) {
-		mat.data[i] = allocator::val_to_shared_ptr<T>(*this->data[i]);
+	SequentialNdIterator seqIter(this->shape());
+
+	big_size_t k = 0;
+
+	result.data[k++] = allocator::val_to_shared_ptr(*this->data[0]);
+
+	while (true) {
+
+		max_size_t idx = this->index_at(seqIter.next());
+
+		if (seqIter.isLoked()) {
+			break;
+		}
+
+		result.data[k++] = allocator::val_to_shared_ptr(*this->data[idx]);
 	}
 
-	return mat;
+	return result;
 }
 
 template<typename T>

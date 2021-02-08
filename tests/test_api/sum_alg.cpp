@@ -15,13 +15,16 @@ double power2(double val) {
 
 template<typename T>
 void print_vec1d(vec1d<T> vec) {
+
 	std::cout << "[";
+
 	for (big_size_t i = 0; i < vec.size() - 1; i++) {
 		std::cout << vec[i] << ", ";
 
 		if (i && i % 10 == 0)
 			std::cout << ln;
 	}
+
 	std::cout << vec[vec.size() - 1] << "]\n";
 }
 
@@ -49,8 +52,7 @@ void sieve(max_size_t test_size) {
 
 	is_prime.resize(test_size + 1);
 
-	// std::fill()
-	fill(is_prime.begin(), is_prime.end(), 1);
+	std::fill(is_prime.begin(), is_prime.end(), 1);
 
 	is_prime[0] = is_prime[1] = 0;
 

@@ -261,21 +261,5 @@ nd::matrix<T> nd::linalg::transpose(nd::matrix<T> mat, shape_t axes) {
 
 	result._prem(axes);
 
-	SequentialNdIterator seqIter(result.shape());
-	big_size_t k = 0;
-
-	result.data[k++] = allocator::val_to_shared_ptr(*mat.data[0]);
-
-	while (!seqIter.isLoked()) {
-
-		max_size_t idx = result.index_at(seqIter.next());
-
-		if (seqIter.isLoked()) {
-			break;
-		}
-
-		result.data[k++] = allocator::val_to_shared_ptr(*mat.data[idx]);
-	}
-
-	return result;
+	return result.copy();
 }

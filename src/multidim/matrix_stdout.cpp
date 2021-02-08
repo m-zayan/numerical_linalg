@@ -6,8 +6,8 @@
 
 #include "./matrix.hpp"
 
-template<typename T>
-void nd::matrix<T>::print_matrix() {
+template<typename T, bool shared_ref>
+void nd::matrix<T, shared_ref>::print_matrix() {
 
 	max_size_t step = this->step_size();
 

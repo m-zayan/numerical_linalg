@@ -14,14 +14,20 @@ SequentialNdIterator::SequentialNdIterator(shape_t shape) {
 	this->current.fill(this->dim_bounds, 0);
 
 	// last dimension
-	this->cur_dim = this->dim_bounds - 1;
+	this->axis = this->dim_bounds - 1;
+	this->mov_axis = this->dim_bounds - 1;
 
 	this->locked = false;
 }
 
-shape_t SequentialNdIterator::icurrent() {
+shape_t SequentialNdIterator::icurrent() const {
 
 	return this->current;
+}
+
+max_size_t SequentialNdIterator::iaxis() {
+
+	return this->axis;
 }
 
 shape_t SequentialNdIterator::next() {
@@ -40,8 +46,8 @@ shape_t SequentialNdIterator::next() {
 // update step & return a status flag
 flag8_t SequentialNdIterator::proceed(big_t i) {
 
-	// If the current, is upper bound, request locking the iterator
-	if (this->cur_dim + i < 0 || this->cur_dim + i >= this->dim_bounds) {
+	// If the current, is upper bound, lock the iterator
+	if (this->mov_axis + i < 0 || this->mov_axis + i >= this->dim_bounds) {
 
 		this->lock();
 
@@ -49,18 +55,18 @@ flag8_t SequentialNdIterator::proceed(big_t i) {
 	}
 
 	// Current updated. i.e. next() is ready
-	else if (this->current[this->cur_dim + i] + 1
-			< this->shape[this->cur_dim + i]) {
+	else if (this->current[this->mov_axis + i] + 1
+			< this->shape[this->mov_axis + i]) {
 
-		this->current[this->cur_dim + i] += 1;
+		this->current[this->mov_axis + i] += 1;
 
 		return 1;
 	}
 
-	// If couldn't proceed with the current dimension, request previous update
+	// If couldn't proceed with the current axis, request previous update
 	else {
 
-		this->current[this->cur_dim + i] = 0;
+		this->current[this->mov_axis + i] = 0;
 
 		return -1;
 	}
@@ -84,6 +90,8 @@ flag8_t SequentialNdIterator::update_state(flag8_t state) {
 
 		lbound -= 1;
 	}
+
+	this->axis = this->dim_bounds + lbound;
 
 	return state;
 }

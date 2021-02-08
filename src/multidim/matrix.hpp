@@ -18,31 +18,34 @@ namespace nd {
 template<typename T>
 using composite = vec1d<T>;
 
-template<typename T>
+template<typename T, bool shared_ref = true>
 class matrix {
 
 private:
 
+	template<typename U = T>
+	using data_t = typename ref_t<shared_ref, U>::type;
+
 	coords attr;
 
-	const_iterator<ref_t<T>> begin();
-	const_iterator<ref_t<T>> end();
+	const_iterator<data_t<T>> begin();
+	const_iterator<data_t<T>> end();
 
-	void chunk_at(vec1d<ref_t<T>> &chunk_data, big_size_t begin,
+	matrix<T, false> chunk_at(const coords &attr, big_size_t begin,
 			big_size_t end);
-
-	matrix(const coords &&n_attr, const vec1d<ref_t<T>> &&chunk_data);
 
 public:
 
-	vec1d<ref_t<T>> data;
+	vec1d<data_t<T>> data;
 
 	matrix() = delete;
 
 	matrix(shape_t shape);
 	matrix(shape_t shape, T val);
+	matrix(const coords &&attr);
 
-	matrix<T> operator [](max_size_t d_index);
+	matrix<T, false> operator [](max_size_t d_index);
+	matrix<T, false>& operator =(const matrix<T> &mat);
 
 	inline big_size_t size();
 

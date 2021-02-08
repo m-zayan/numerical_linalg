@@ -28,7 +28,9 @@ using shape_t = vec1d<max_size_t>;
 
 template<typename T>
 class vec1d {
-private:
+
+protected:
+
 	std::vector<T> values;
 
 public:
@@ -36,11 +38,11 @@ public:
 	vec1d();
 	vec1d(big_size_t size);
 	vec1d(big_size_t size, T val);
-	vec1d(std::vector<T> std_vec);
-	vec1d(std::initializer_list<T> std_init_list);
+	vec1d(const std::vector<T> &std_vec);
+	vec1d(const std::initializer_list<T> &std_init_list);
 	vec1d(const_iterator<T> begin, const_iterator<T> end);
 
-	inline big_size_t size();
+	inline big_size_t size() const;
 
 	void reserve(big_size_t size);
 	void resize(big_size_t size);

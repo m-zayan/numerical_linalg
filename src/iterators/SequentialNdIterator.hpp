@@ -20,8 +20,8 @@ private:
 
 	// indices
 	shape_t current;
-
-	max_size_t cur_dim;
+	max_size_t axis;
+	max_size_t mov_axis;
 
 	flag8_t proceed(big_t i);
 	flag8_t update_state(flag8_t state);
@@ -38,8 +38,9 @@ public:
 	SequentialNdIterator(shape_t shapes);
 
 	shape_t next();
-	shape_t icurrent();
+	shape_t icurrent() const;
 
+	max_size_t iaxis();
 	bool isLoked();
 
 	void unlock();
