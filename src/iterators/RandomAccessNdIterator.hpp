@@ -15,12 +15,12 @@ private:
 
 	coords attr;
 
-	inline shape_t strides() const;
-	inline shape_t shape() const;
-	inline max_size_t ndim() const;
-	inline big_size_t size() const;
-	inline char order() const;
-	inline bool own_data() const;
+	inline shape_t strides();
+	inline shape_t shape();
+	inline max_size_t ndim();
+	inline big_size_t size();
+	inline char order();
+	inline bool own_data();
 
 public:
 
