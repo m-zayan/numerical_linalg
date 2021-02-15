@@ -3,13 +3,13 @@
  *
  *	Author: Z. Mohamed
  *
- *	vec1d strides iterator, [sequential permutation]
+ *	N-dimensional iterator to index vec1d
  */
 
 #ifndef SRC_ITERATORS_SEQUENTIALNDITERATOR_HPP
 #define SRC_ITERATORS_SEQUENTIALNDITERATOR_HPP
 
-#include "../common/vec1d.cpp"
+#include "../shapes/coords.hpp"
 
 class SequentialNdIterator {
 

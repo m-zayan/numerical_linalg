@@ -5,7 +5,6 @@
  */
 
 #include "./matrix_alloc.cpp"
-#include "./matrix_iter.cpp"
 #include "./matrix_ops.cpp"
 #include "./matrix_stdout.cpp"
 
@@ -26,7 +25,7 @@ shape_t nd::matrix<T, shared_ref>::shape() {
 template<typename T, bool shared_ref>
 shape_t nd::matrix<T, shared_ref>::strides() {
 
-	return this->attr.nd_strides;
+	return this->attr.strides;
 }
 
 template<typename T, bool shared_ref>
@@ -60,7 +59,7 @@ const_iterator<rf<T, shared_ref>> nd::matrix<T, shared_ref>::end() {
 }
 
 template<typename T, bool shared_ref>
-coords nd::matrix<T, shared_ref>::_m_attr() const {
+coords nd::matrix<T, shared_ref>::_m_coords() const {
 
 	return this->attr;
 }

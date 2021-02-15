@@ -10,13 +10,15 @@
 #include <ostream>
 #include <sstream>
 
-#include "../iterators/SequentialNdIterator.hpp"
+#include "../common/vec1d.cpp"
 
 // matrix attributes (ex. dimensions)
 class coords {
 
 private:
-	shape_t get_nd_strides(shape_t shape);
+
+	shape_t get_strides(shape_t shape);
+	void check_strides(shape_t shape, shape_t strides);
 
 public:
 
@@ -25,15 +27,19 @@ public:
 
 	big_size_t size1d; // shape.multiply(0, n)
 
-	shape_t nd_strides;
+	shape_t strides;
 
 	char order; // C-style, F-style, default : 'C'
 	bool own_data; // inspired by, Numpy ndarray's flags
 
 	coords();
+
 	coords(shape_t shape);
+
 	coords(shape_t shape, char order);
 	coords(shape_t shape, bool own_data);
+
+	coords(shape_t shape, shape_t strides, bool own_data);
 
 	coords operator =(const coords &&attr);
 

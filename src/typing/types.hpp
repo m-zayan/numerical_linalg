@@ -24,19 +24,25 @@ using max_size_t = unsigned int;
 using big_size_t = unsigned long long;
 
 template<typename T>
+using unique_ptr = std::unique_ptr<T>;
+
+template<typename T>
+using shared_ptr = std::shared_ptr<T>;
+
+template<typename T>
 using const_iterator = typename std::vector<T>::iterator;
 
 template<bool own_data, typename T> struct ref_t;
 
 template<typename T> struct ref_t<true, T> {
 
-	using type = std::shared_ptr<T>;
+	using type = shared_ptr<T>;
 	using val_t = T;
 };
 
 template<typename T> struct ref_t<false, T> {
 
-	using type =weak_ptr<T>;
+	using type = weak_ptr<T>;
 	using val_t = T;
 };
 

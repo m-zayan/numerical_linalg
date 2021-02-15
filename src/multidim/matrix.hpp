@@ -11,7 +11,7 @@
 
 #include <algorithm>
 
-#include "../shapes/coords.hpp"
+#include "../iterators/RandomAccessNdIterator.hpp"
 
 namespace nd {
 
@@ -26,15 +26,17 @@ private:
 	using data_t = typename ref_t<shared_ref, T>::type;
 
 	template<typename U = T, bool rt = shared_ref>
-	using rf = typename nd::matrix<U, rt>::data_t;
+	using rf = typename matrix<U, rt>::data_t;
 
 	coords attr;
 
-	const_iterator<rf<T, shared_ref>> begin();
-	const_iterator<rf<T, shared_ref>> end();
+	const_iterator<rf<>> begin();
+	const_iterator<rf<>> end();
 
 	matrix<T, false> chunk_at(const coords &attr, big_size_t begin,
 			big_size_t end);
+
+//	void movedata(big_size_t begin, big_size_t end);
 
 public:
 
@@ -90,12 +92,11 @@ public:
 	void assign(shape_t indices, T val);
 	void print_matrix();
 
-	big_size_t index_at(shape_t indices);
-
-	coords _m_attr() const;
-	void _prem(shape_t axes);
+	coords _m_coords() const;
 
 	matrix<T> copy();
+
+	matrix<T, false> permute(shape_t axes);
 
 	matrix(const matrix &mat) noexcept;
 	matrix(const matrix &&mat) noexcept;

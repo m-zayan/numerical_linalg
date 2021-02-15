@@ -10,7 +10,6 @@
 #include <queue>
 
 #include "../typing/types.hpp"
-#include "../typing/allocator.cpp"
 
 template<typename T>
 class algorithm {

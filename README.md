@@ -413,50 +413,50 @@ shape :(3,3,3,3) -- own-data :1
   ```c++
 
 shape_t shape0 = { 3, 2 };
-	nd::matrix<int> mat0 = nd::random::uniform<int>(0, 5, shape0);
+nd::matrix<int> mat0 = nd::random::uniform<int>(0, 5, shape0);
 
-	std::cout << "shape :" << mat0.shape() << ", own_data: " << mat0.own_data()
-			<< ln;
-	std::cout << "------------\n";
+std::cout << "shape :" << mat0.shape() << ", own_data: " << mat0.own_data()
+		<< ln;
+std::cout << "------------\n";
 
-	mat0.print_matrix();
+mat0.print_matrix();
 
-	//  nd::linalg::transpose<T>(nd::matrix<T> mat, axes = {...})
-	nd::matrix<int> result0 = nd::linalg::transpose<int>(mat0, { 1, 0 });
+//  nd::linalg::transpose<T>(nd::matrix<T> mat, axes = {...})
+nd::matrix<int> result0 = nd::linalg::transpose<int>(mat0, { 1, 0 });
 
-	std::cout << "\n\n=========== transposed ==============\n";
+std::cout << "\n\n=========== transposed, axes = {1, 0} ==============\n";
 
-	std::cout << "shape :" << result0.shape() << ", " << result0.own_data()
-			<< ln;
-	std::cout << "\n------------\n";
+std::cout << "shape :" << result0.shape() << ", own_data: "
+		<< result0.own_data() << ln;
 
-	result0.print_matrix();
+std::cout << "\n------------\n";
 
-	std::cout << "\n\n==============================\n";
+result0.print_matrix();
 
-	shape_t shape = { 3, 2, 2, 2 };
-	nd::matrix<int> mat = nd::random::uniform<int>(0, 5, shape);
+std::cout << "\n\n==============================\n";
 
-	std::cout << "shape :" << mat.shape() << ", own_data :" << mat.own_data()
-			<< ln;
-	std::cout << "\n------------\n";
-	std::cout << "data : ";
-	mat.data.rprint_vec1d(0, mat.size());
+shape_t shape = { 3, 2, 2, 2 };
+nd::matrix<int> mat = nd::random::uniform<int>(0, 5, shape);
 
-	std::cout << "\n\n============ transposed =============\n";
+std::cout << "shape :" << mat.shape() << ", own_data :" << mat.own_data()
+		<< ln;
+std::cout << "\n------------\n";
+std::cout << "data : ";
+mat.data.rprint_vec1d(0, mat.size());
 
-	//  nd::linalg::transpose<T>(nd::matrix<T> mat, axes = {...})
-	nd::matrix<int> result = nd::linalg::transpose<int>(mat, { 3, 0, 1, 2 });
+std::cout
+		<< "\n\n============ transposed, axes = { 3, 0, 1, 2 } =============\n";
 
-	std::cout << "shape :" << result.shape() << ", own_data :"
-			<< result.own_data() << ln;
-	
-	std::cout << "\n------------\n";
-	std::cout << "data : ";
+nd::matrix<int> result = nd::linalg::transpose<int>(mat, { 3, 0, 1, 2 });
 
-	result.data.rprint_vec1d(0, result.size());
+std::cout << "shape :" << result.shape() << ", own_data :"
+		<< result.own_data() << ln;
+std::cout << "\n------------\n";
+std::cout << "data : ";
 
-	std::cout << "\n=================================\n";
+result.data.rprint_vec1d(0, result.size());
+
+std::cout << "\n=================================\n";
 	
 ```
   

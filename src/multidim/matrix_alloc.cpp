@@ -2,6 +2,12 @@
  * matrix_alloc.cpp
  *
  *	Author: Z. Mohamed
+ *
+ * Initialize - C-order, n-dimension matrix using vec1d - storage.
+ *
+ * Acess values, using strides array.
+ * stride - dictates the number of elements have to be skipped,
+ * to get the next element in that dimension.
  */
 
 #include "./matrix.hpp"
@@ -10,16 +16,9 @@ template<typename T, bool shared_ref>
 nd::matrix<T, shared_ref>::matrix(shape_t shape) {
 
 	this->attr = coords(shape);
-	this->data.resize(this->attr.size1d);
+	this->data.resize(this->size());
 }
 
-/*
- * Initialize - C-order, n-dimension matrix using 1d - storage.
- *
- * Acess values, using nd_strides array.
- * stride - dictates the number of elements have to be skipped,
- * to get the next element in that dimension.
- */
 template<typename T, bool shared_ref>
 nd::matrix<T, shared_ref>::matrix(shape_t shape, T val) {
 
@@ -40,12 +39,12 @@ nd::matrix<T, shared_ref>::matrix(const coords &&attr) {
 
 template<typename T, bool shared_ref>
 nd::matrix<T, shared_ref>::matrix(const matrix &&mat) noexcept :
-		attr(mat._m_attr()), data(std::move(mat.data)) {
+		attr(std::move(mat._m_coords())), data(std::move(mat.data)) {
 }
 
 template<typename T, bool shared_ref>
 nd::matrix<T, shared_ref>::matrix(const matrix &mat) noexcept :
-		attr(mat._m_attr()), data(mat.data) {
+		attr(mat._m_coords()), data(mat.data) {
 }
 
 template<typename T, bool shared_ref>
@@ -56,23 +55,15 @@ nd::matrix<T, shared_ref>::~matrix() {
 template<typename T, bool shared_ref>
 nd::matrix<T> nd::matrix<T, shared_ref>::copy() {
 
+	RandomAccessNdIterator rndIter(this->attr);
+
 	nd::matrix<T> result(this->shape());
 
-	SequentialNdIterator seqIter(this->shape());
+	for (big_size_t i = 0; i < this->size(); i++) {
 
-	big_size_t k = 0;
+		result.data[i] = allocator::val_to_shared_ptr(
+				*this->data[rndIter.index_at(i)].get());
 
-	result.data[k++] = allocator::val_to_shared_ptr(*this->data[0]);
-
-	while (true) {
-
-		max_size_t idx = this->index_at(seqIter.next());
-
-		if (seqIter.isLoked()) {
-			break;
-		}
-
-		result.data[k++] = allocator::val_to_shared_ptr(*this->data[idx]);
 	}
 
 	return result;
@@ -118,7 +109,7 @@ nd::matrix<T> nd::stack(nd::composite<nd::matrix<T>> matrix_list) {
 		for (big_size_t j = 0; j < matrix_list[i].size(); j++) {
 
 			result.data[slice + j] = allocator::val_to_shared_ptr<T>(
-					*matrix_list[i].data[j]);
+					*matrix_list[i].data[j].get());
 		}
 
 		slice += (i + 1) * matrix_list[i].size();

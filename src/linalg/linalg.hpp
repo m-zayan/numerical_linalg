@@ -24,22 +24,19 @@ template<typename T>
 nd::matrix<T> inner(nd::matrix<T> mat1, nd::matrix<T> mat2);
 
 template<typename T>
-nd::matrix<T> inverse(nd::matrix<T> mat);
-
-template<typename T>
-nd::composite<nd::matrix<T>> eigen(nd::matrix<T> mat);
-
-template<typename T>
-nd::composite<nd::matrix<T>> svd(nd::matrix<T> mat);
-
-template<typename T>
-nd::matrix<T> pseudo_inverse(nd::matrix<T> mat);
-
-template<typename T>
 nd::matrix<T> tensordot(nd::matrix<T> mat1, nd::matrix<T> mat2, shape_t axes);
 
 template<typename T>
 nd::matrix<T> transpose(nd::matrix<T> mat, shape_t axes);
+
+template<typename T>
+nd::matrix<T> inverse(nd::matrix<T> mat);
+
+template<typename T>
+nd::matrix<T> pseudo_inverse(nd::matrix<T> mat);
+
+//template<typename T>
+//nd::composite<nd::matrix<T>> eigen(nd::matrix<T> mat);
 
 }
 

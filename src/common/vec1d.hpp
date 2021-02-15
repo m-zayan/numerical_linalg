@@ -17,7 +17,9 @@
 #include <functional>
 
 #include "./algorithm.cpp"
+#include "../typing/allocator.cpp"
 #include "../random/generator.cpp"
+
 #include "../handlers/exception.hpp"
 
 template<typename T>
