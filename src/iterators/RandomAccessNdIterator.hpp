@@ -1,5 +1,5 @@
 /*
- * RandomAccessNdIterator.h
+ * RandomAccessNdIterator.hpp
  *
  *	Author: Z. Mohamed
  */
@@ -15,12 +15,12 @@ private:
 
 	coords attr;
 
-	inline shape_t strides();
-	inline shape_t shape();
-	inline max_size_t ndim();
-	inline big_size_t size();
-	inline char order();
-	inline bool own_data();
+	shape_t strides() const;
+	shape_t shape() const;
+	max_size_t ndim() const;
+	big_size_t size() const;
+	char order() const;
+	bool own_data() const;
 
 public:
 
