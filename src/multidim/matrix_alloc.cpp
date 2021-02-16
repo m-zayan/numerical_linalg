@@ -55,15 +55,11 @@ nd::matrix<T, shared_ref>::~matrix() {
 template<typename T, bool shared_ref>
 nd::matrix<T> nd::matrix<T, shared_ref>::copy() {
 
-	RandomAccessNdIterator rndIter(this->attr);
-
 	nd::matrix<T> result(this->shape());
 
 	for (big_size_t i = 0; i < this->size(); i++) {
 
-		result.data[i] = allocator::val_to_shared_ptr(
-				*this->data[rndIter.index_at(i)].get());
-
+		result.data[i] = allocator::val_to_shared_ptr(*this->data[i].get());
 	}
 
 	return result;

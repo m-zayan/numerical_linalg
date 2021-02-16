@@ -280,10 +280,12 @@ template<typename T, bool shared_ref>
 nd::matrix<T, false> nd::matrix<T, shared_ref>::chunk_at(const coords &attr,
 		big_size_t begin, big_size_t end) {
 
+	RandomAccessNdIterator rndIter(attr);
+
 	nd::matrix<T, false> mat_chunk(std::move(attr));
 
 	for (big_size_t i = begin; i < end; i++) {
-		mat_chunk.data[i - begin] = this->data[i];
+		mat_chunk.data[i - begin] = this->data[rndIter.index_at(i)];
 	}
 
 	return mat_chunk;
