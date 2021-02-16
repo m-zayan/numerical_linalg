@@ -44,7 +44,7 @@ public:
 	vec1d(const std::initializer_list<T> &std_init_list);
 	vec1d(const_iterator<T> begin, const_iterator<T> end);
 
-	inline big_size_t size() const;
+	big_size_t size() const;
 
 	void reserve(big_size_t size);
 	void resize(big_size_t size);
