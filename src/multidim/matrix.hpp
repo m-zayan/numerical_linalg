@@ -34,7 +34,7 @@ private:
 	const_iterator<rf<>> end();
 
 	matrix<T, false> chunk_at(const coords &attr, big_size_t begin,
-			big_size_t end);
+			big_size_t end, bool use_iter);
 
 //	void movedata(big_size_t begin, big_size_t end);
 

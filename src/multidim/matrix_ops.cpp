@@ -278,14 +278,24 @@ nd::matrix<T>& nd::matrix<T, shared_ref>::operator /=(const T &val) {
 
 template<typename T, bool shared_ref>
 nd::matrix<T, false> nd::matrix<T, shared_ref>::chunk_at(const coords &attr,
-		big_size_t begin, big_size_t end) {
-
-	RandomAccessNdIterator rndIter(attr);
+		big_size_t begin, big_size_t end, bool use_iter) {
 
 	nd::matrix<T, false> mat_chunk(std::move(attr));
 
-	for (big_size_t i = begin; i < end; i++) {
-		mat_chunk.data[i - begin] = this->data[rndIter.index_at(i)];
+	if (use_iter) {
+
+		RandomAccessNdIterator rndIter(attr);
+
+		for (big_size_t i = begin; i < end; i++) {
+			mat_chunk.data[i - begin] = this->data[rndIter.index_at(i)];
+		}
+	}
+
+	else {
+
+		for (big_size_t i = begin; i < end; i++) {
+			mat_chunk.data[i - begin] = this->data[i];
+		}
 	}
 
 	return mat_chunk;
@@ -311,7 +321,8 @@ nd::matrix<T, false> nd::matrix<T, shared_ref>::operator [](
 		big_size_t begin = (d_index * step);
 		big_size_t end = (d_index + 1) * step;
 
-		nd::matrix<T, false> mat_chunk = this->chunk_at(new_attr, begin, end);
+		nd::matrix<T, false> mat_chunk = this->chunk_at(new_attr, begin, end,
+				false);
 
 		return mat_chunk;
 	}
@@ -355,7 +366,8 @@ nd::matrix<T, false> nd::matrix<T, shared_ref>::permute(shape_t axes) {
 
 	coords attr(swaped_shape, swaped_strides, false);
 
-	nd::matrix<T, false> mat_chunk = this->chunk_at(attr, 0, this->size());
+	nd::matrix<T, false> mat_chunk = this->chunk_at(attr, 0, this->size(),
+			true);
 
 	return mat_chunk;
 }
