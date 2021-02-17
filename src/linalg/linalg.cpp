@@ -9,11 +9,38 @@
 template<typename T>
 nd::matrix<T> nd::linalg::eye(shape_t shape) {
 
-	nd::matrix<T> mat(shape, 0);
-	big_size_t k = 0;
+	if (shape.size() < 2) {
 
-	for (big_size_t i = 0; i < mat.size() - k; i += mat.step_size(), k++) {
-		mat.data[i + k] = allocator::val_to_shared_ptr<T>(1);
+		nd::exception(
+				"shape, have to be greater than or equal 2, shape.size() >= 2");
+	}
+
+	nd::matrix<T> mat(shape, 0);
+
+	max_size_t ndim = mat.ndim();
+
+	max_size_t step0 = shape[ndim - 1];
+	max_size_t step1 = shape[ndim - 2];
+
+	max_size_t step = std::min(step0, step1);
+
+	big_size_t chunk_step = step0 * step1;
+
+	big_size_t size = mat.size();
+
+	big_size_t k;
+
+	for (big_size_t i = 0; i < size; i += chunk_step) {
+
+		k = 0;
+
+		for (max_size_t j = 0; j < step; j++) {
+
+			mat.data[i + j + k] = allocator::val_to_shared_ptr<T>(1);
+
+			k += step0;
+		}
+
 	}
 
 	return mat;
@@ -201,7 +228,7 @@ nd::matrix<T> nd::linalg::dot(nd::matrix<T> mat1, nd::matrix<T> mat2) {
 
 	new_shape[new_ndim - 1] = shape_2[ndim_2 - 1];
 
-	// mat2
+// mat2
 	max_size_t step_02 = mat2.strides()[ndim_2 - 2];
 	max_size_t step_12 = mat2.strides()[ndim_2 - 1];
 
@@ -217,12 +244,12 @@ nd::matrix<T> nd::linalg::dot(nd::matrix<T> mat1, nd::matrix<T> mat2) {
 		chunk_size_2 = (dim02 * dim12);
 	}
 
-	// mat1
+// mat1
 	max_size_t step_size_1 = mat1.step_size();
 
 	big_size_t steps_1 = mat1.size() / step_size_1;
 
-	// ...
+// ...
 	vec1d<T> elems(dim12);
 	big_size_t index = 0;
 

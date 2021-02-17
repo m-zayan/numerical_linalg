@@ -49,7 +49,6 @@ nd::matrix<T, shared_ref>::matrix(const matrix &mat) noexcept :
 
 template<typename T, bool shared_ref>
 nd::matrix<T, shared_ref>::~matrix() {
-
 }
 
 template<typename T, bool shared_ref>

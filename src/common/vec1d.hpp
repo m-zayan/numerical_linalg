@@ -133,7 +133,7 @@ public:
 
 	virtual ~vec1d();
 
-	// nd_matrix<T>::matrix_storage : shallow copy
+	// nd_matrix<T>::data : shallow copy
 	vec1d(const vec1d<T> &vec) noexcept;
 	vec1d(const vec1d<T> &&vec) noexcept;
 

@@ -22,6 +22,8 @@ int main() {
 //	test_api::linalg_dot();
 
 //  [5]
-	test_api::linalg_transpose();
+//	test_api::linalg_transpose();
 
+// [6]
+	test_api::linalg_lu();
 }

@@ -11,7 +11,7 @@ template<typename T, bool shared_ref>
 nd::matrix<T, false>& nd::matrix<T, shared_ref>::operator =(
 		const matrix<T> &mat) {
 
-	this->attr = mat._m_attr();
+	this->attr = mat._m_coords();
 
 	// should be replaced by this->movedata()
 	this->data.assign(mat.begin(), mat.end());
