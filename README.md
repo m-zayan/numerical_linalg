@@ -62,160 +62,8 @@ Generated Test Case - TXT - File :test_api/gen_test_cases.txt
 
 ```
 
-### N-Dimensional Matrix Allocation (C contiguous)
-----
-
-```c++
-
-shape_t shape = { 3, 3 };
-
-nd::matrix<int> mat = nd::random::uniform<int>(1, 10, shape); // low = 1, high = 10
-
-std::cout << "shape :" << mat.shape() << ln;
-std::cout << "Chunk storage size :" << mat.size() << ln;
-
-std::cout << "=======================\n";
-mat.print_matrix();
-
-std::cout << "========== matrix[0] ============\n";
-mat[0].print_matrix();
-
-std::cout << "========== matrix[1] ============\n";
-mat[1].print_matrix();
-
-std::cout << "========== matrix[2] ============\n";
-mat[2].print_matrix();
-
-std::cout << "========== Updated: op: diag(matrix) = 0 ============\n";
-
-for (max_size_t i = 0; i < 3; i++) {
-	mat.assign( { i, i }, 0);
-}
-
-mat.print_matrix();
-
-std::cout
-		<< "============ op: (matrix * matrix) - (matrix + matrix) =========\n";
-((mat * mat) - (mat + mat)).print_matrix();
-
-std::cout << "============ Matrix (3, 3, 2)==========\n";
-
-shape_t shape2 = { 3, 3, 2 };
-
-nd::matrix<int> mat2 = nd::random::uniform(1, 10, shape2); // low = 1, high = 10
-mat2.print_matrix();
-
-std::cout << "----------------\n";
-
-std::cout << std::boolalpha;
-std::cout << "mat2 - own-data :" << mat2.own_data() << ln;
-std::cout << "mat2[0] - own-data :" << mat2[0].own_data() << ln;
-
-std::cout << "========== [1]: Identity - {3, 3} =======\n";
-
-shape_t shape_01 = { 3, 3 };
-nd::matrix<int> mat_01 = nd::linalg::eye<int>(shape_01);
-
-mat_01.print_matrix();
-
-std::cout << "========== [2]: Diag(matrix) = 3 - {3, 3} =======\n";
-
-shape_t shape_02 = { 3, 3 };
-nd::matrix<int> mat_02 = nd::linalg::eye<int>(shape_02);
-
-mat_02 *= 3;
-mat_02.print_matrix();
-
-std::cout << "========== Stack [1], [2] =======\n";
-
-nd::matrix<int> result = nd::stack<int>( { mat_01, mat_02 });
-
-result.print_matrix();
-
-```
-  
-  
-  ```c++
-
-shape :(3,3)
-Chunk storage size :9
-=======================
-
-[[2, 5, 7]
-[2, 9, 3]
-[10, 10, 2]]
-
-========== matrix[0] ============
-
-[2, 5, 7]
-
-========== matrix[1] ============
-
-[2, 9, 3]
-
-========== matrix[2] ============
-
-[10, 10, 2]
-
-========== Updated: op: diag(matrix) = 0 ============
-
-[[0, 5, 7]
-[2, 0, 3]
-[10, 10, 0]]
-
-============ op: (matrix * matrix) - (matrix + matrix) =========
-
-[[0, 15, 35]
-[0, 0, 3]
-[80, 80, 0]]
-
-============ Matrix (3, 3, 2)==========
-
-[[[4, 1]
-[10, 6]
-[3, 3]]
-
-[[9, 9]
-[2, 7]
-[8, 4]]
-
-[[6, 5]
-[1, 8]
-[5, 5]]]
-
-----------------
-
-mat2 - own-data :true
-mat2[0] - own-data :false
-
-========== [1]: Identity - {3, 3} =======
-
-[[1, 0, 0]
-[0, 1, 0]
-[0, 0, 1]]
-
-========== [2]: Diag(matrix) = 3 - {3, 3} =======
-
-[[3, 0, 0]
-[0, 3, 0]
-[0, 0, 3]]
-
-========== Stack [1], [2] =======
-
-[[[1, 0, 0]
-[0, 1, 0]
-[0, 0, 1]]
-
-[[3, 0, 0]
-[0, 3, 0]
-[0, 0, 3]]]
-
-```
-
------------------------
-
-
 ### N-Dimensional Sequential Iterator
+
 ```c++
 
 shape_t shape = { 4, 3, 2, 2 };
@@ -235,11 +83,107 @@ while (!seqIter.isLoked()) {
 }
 
 ```
+
+### N-Dimensional Matrix Allocation (C contiguous)
+----
+
+```c++
+
+shape_t shape = { 3, 3, 3 };
+
+nd::matrix<int> mat = nd::random::uniform<int>(1, 3, shape); // low = 1, high = 3
+
+std::cout << "shape :" << mat.shape() << ln;
+std::cout << "Chunk storage size :" << mat.size() << ln;
+
+std::cout << "=======================\n";
+nd::out::print_matrix(mat);
+
+std::cout << "\n========== matrix[0] ============\n";
+nd::out::print_matrix(mat[0]);
+
+std::cout << "========== matrix[0][1] ============\n";
+nd::out::print_matrix(mat[0][1]);
+
+std::cout << "\n========== matrix[1] ============\n";
+nd::out::print_matrix(mat[1]);
+
+std::cout << "========== matrix[1][2] ============\n";
+nd::out::print_matrix(mat[1][2]);
+
+std::cout << "\n========== matrix[2] ============\n";
+nd::out::print_matrix(mat[2]);
+
+std::cout << "========== matrix[2][3] ============\n";
+nd::out::print_matrix(mat[2][2]);
+
+std::cout << "\n========== Updated: op: diag(matrix) = 0 ============\n";
+
+for (max_size_t i = 0; i < 3; i++) {
+	for (max_size_t j = 0; j < 3; j++) {
+		mat.assign( { i, j, j }, 0);
+	}
+}
+
+nd::out::print_matrix(mat);
+
+std::cout << "\n============ op: div =========\n";
+
+mat /= 1;
+nd::out::print_matrix(mat / 2);
+
+std::cout << "\n============ op: mul =========\n";
+
+mat *= 2;
+nd::out::print_matrix(mat * mat * 2);
+
+std::cout << "\n============ op: sub =========\n";
+
+mat -= 2;
+nd::out::print_matrix(mat);
+
+std::cout << "\n============ op: add =========\n";
+
+mat += 2;
+nd::out::print_matrix(mat);
+
+std::cout << "\n============ op: euqal =========\n";
+
+std::cout << (mat == mat) << ", " << (mat == (mat + 1)) << '\n';
+
+std::cout << "\n============ op: mask =========\n";
+
+nd::out::print_matrix(mat == 2);
+
+std::cout << "\n========== [1]: Identity - {3, 3} =======\n";
+
+shape_t shape0 = { 3, 3 };
+nd::matrix<int> mat0 = nd::linalg::eye<int>(shape0);
+
+nd::out::print_matrix(mat0);
+
+std::cout << "\n========== [2]: Diag(matrix) = 3 - {3, 3} =======\n";
+
+shape_t shape1 = { 3, 3 };
+nd::matrix<int> mat1 = nd::linalg::eye<int>(shape1);
+
+mat1 *= 3;
+
+nd::out::print_matrix(mat1);
+
+std::cout << "\n========== Stack [1], [2] =======\n";
+
+nd::matrix<int> result = nd::stack<int>( { mat0, mat1 });
+
+nd::out::print_matrix(result);
+
+```
+
 -----------------------
 
 ### N-Dimensional Matrix Multiplication (C contiguous)
 ----
-  ```c++
+```c++
 
 nd::matrix<int> mat1 = nd::random::uniform<int>(1, 10, { 3, 3, 2 });
 
@@ -247,60 +191,22 @@ nd::matrix<int> mat2 = nd::random::uniform<int>(1, 10, { 2, 4 });
 
 std::cout << "=============== (3, 3, 2) ================\n";
 
-mat1.print_matrix();
+nd::out::print_matrix(mat1);
 
 std::cout << "=============== (2, 4) ================\n";
 
-mat2.print_matrix();
+nd::out::print_matrix(mat2);
 
 std::cout << "============= matmul: (3, 3, 2) - (2, 4) ================\n";
+
 nd::matrix<int> result = nd::linalg::matmul<int>(mat1, mat2);
 
 std::cout << "shape :" << result.shape() << " -- own-data :"
-		<< result.own_data() << ln;
+	<< result.own_data() << ln;
+
 std::cout << "---------------------\n";
 
-result.print_matrix();
-
-  ```
-  
-
- ```c++
-=============== (3, 3, 2) ================
-
-[[[6, 3]
-[7, 2]
-[10, 4]]
-
-[[10, 3]
-[7, 2]
-[8, 10]]
-
-[[5, 10]
-[2, 1]
-[4, 4]]]
-
-=============== (2, 4) ================
-
-[[9, 6, 9, 3]
-[9, 1, 9, 2]]
-
-============= matmul: (3, 3, 2) - (2, 4) ================
-
-shape :(3,3,4) -- own-data :1
----------------------
-
-[[[81, 39, 81, 24]
-[81, 44, 81, 25]
-[126, 64, 126, 38]]
-
-[[117, 63, 117, 36]
-[81, 44, 81, 25]
-[162, 58, 162, 44]]
-
-[[135, 40, 135, 35]
-[27, 13, 27, 8]
-[72, 28, 72, 20]]]
+nd::out::print_matrix(result);
 
 ```
  
@@ -316,97 +222,25 @@ nd::matrix<int> mat2 = nd::random::uniform<int>(0, 3, { 3, 2, 3 });
 
 std::cout << "=============== (3, 3, 2) ================\n";
 
-mat1.print_matrix();
+nd::out::print_matrix(mat1);
 
 std::cout << "=============== (3, 2, 3) ================\n";
 
-mat2.print_matrix();
+nd::out::print_matrix(mat2);
 
 std::cout << "============= dot: (3, 3, 2) - (3, 2, 3) ================\n";
+
 nd::matrix<int> result = nd::linalg::dot<int>(mat1, mat2);
 
 std::cout << "shape :" << result.shape() << " -- own-data :"
-		<< result.own_data() << ln;
+	<< result.own_data() << ln;
 
 std::cout << "---------------------\n";
 
-result.print_matrix();
+nd::out::print_matrix(result);
 
-  ```
+```
 
-
-
- ```c++
- 
-=============== (3, 3, 2) ================
-
-[[[3, 1]
-[3, 3]
-[1, 2]]
-
-[[0, 1]
-[1, 3]
-[1, 1]]
-
-[[0, 2]
-[0, 2]
-[2, 2]]]
-
-=============== (3, 2, 3) ================
-
-[[[0, 0, 3]
-[1, 3, 1]]
-
-[[1, 1, 2]
-[0, 0, 0]]
-
-[[0, 1, 3]
-[3, 0, 1]]]
-
-============= dot: (3, 3, 2) - (3, 2, 3) ================
-
-shape :(3,3,3,3) -- own-data :1
----------------------
-
-[[[[1, 3, 10]
-[3, 3, 6]
-[3, 3, 10]]
-
-[[3, 9, 12]
-[3, 3, 6]
-[9, 3, 12]]
-
-[[2, 6, 5]
-[1, 1, 2]
-[6, 1, 5]]]
-
-
-[[[1, 3, 1]
-[0, 0, 0]
-[3, 0, 1]]
-
-[[3, 9, 6]
-[1, 1, 2]
-[9, 1, 6]]
-
-[[1, 3, 4]
-[1, 1, 2]
-[3, 1, 4]]]
-
-
-[[[2, 6, 2]
-[0, 0, 0]
-[6, 0, 2]]
-
-[[2, 6, 2]
-[0, 0, 0]
-[6, 0, 2]]
-
-[[2, 6, 8]
-[2, 2, 4]
-[6, 2, 8]]]]
-
- ```
 
  ### N-Dimensional Matrix Transpose (C contiguous)
 ----
@@ -419,7 +253,7 @@ std::cout << "shape :" << mat0.shape() << ", own_data: " << mat0.own_data()
 		<< ln;
 std::cout << "------------\n";
 
-mat0.print_matrix();
+nd::out::print_matrix(mat0);
 
 //  nd::linalg::transpose<T>(nd::matrix<T> mat, axes = {...})
 nd::matrix<int> result0 = nd::linalg::transpose<int>(mat0, { 1, 0 });
@@ -431,18 +265,21 @@ std::cout << "shape :" << result0.shape() << ", own_data: "
 
 std::cout << "\n------------\n";
 
-result0.print_matrix();
+nd::out::print_matrix(result0);
 
 std::cout << "\n\n==============================\n";
 
 shape_t shape = { 3, 2, 2, 2 };
+
 nd::matrix<int> mat = nd::random::uniform<int>(0, 5, shape);
 
 std::cout << "shape :" << mat.shape() << ", own_data :" << mat.own_data()
 		<< ln;
+
 std::cout << "\n------------\n";
 std::cout << "data : ";
-mat.data.rprint_vec1d(0, mat.size());
+
+nd::out::_h::print_vec1d(mat._m_begin(), 0, mat.size());
 
 std::cout
 		<< "\n\n============ transposed, axes = { 3, 0, 1, 2 } =============\n";
@@ -451,10 +288,11 @@ nd::matrix<int> result = nd::linalg::transpose<int>(mat, { 3, 0, 1, 2 });
 
 std::cout << "shape :" << result.shape() << ", own_data :"
 		<< result.own_data() << ln;
+
 std::cout << "\n------------\n";
 std::cout << "data : ";
 
-result.data.rprint_vec1d(0, result.size());
+nd::out::_h::print_vec1d(result._m_begin(), 0, result.size());
 
 std::cout << "\n=================================\n";
 	
@@ -465,32 +303,31 @@ std::cout << "\n=================================\n";
 
 shape :(3,2), own_data: 1
 ------------
-[[5, 2]
-[1, 4]
-[5, 2]]
+[[5, 3]
+[3, 3]
+[3, 5]]
 
 
-=========== transposed ==============
-shape :(2,3), 1
+=========== transposed, axes = {1, 0} ==============
+shape :(2,3), own_data: 1
 
 ------------
-[[5, 1, 5]
-[2, 4, 2]]
+[[5, 3, 3]
+[3, 3, 5]]
 
 
 ==============================
 shape :(3,2,2,2), own_data :1
 
 ------------
-data : [1, 1, 2, 0, 0, 2, 2, 3, 3, 0, 3, 5, 3, 3, 2, 0, 0, 4, 2, 5, 5, 5, 0, 5]
+data : [0, 0, 4, 0, 4, 4, 3, 1, 3, 4, 4, 4, 2, 1, 2, 4, 2, 1, 2, 5, 0, 1, 2, 3]
 
-============ transposed =============
+============ transposed, axes = { 3, 0, 1, 2 } =============
 shape :(2,3,2,2), own_data :1
 
 ------------
-data : [1, 2, 0, 2, 3, 3, 3, 2, 0, 2, 5, 0, 1, 0, 2, 3, 0, 5, 3, 0, 4, 5, 5, 5]
+data : [0, 4, 4, 3, 3, 4, 2, 2, 2, 2, 0, 2, 0, 0, 4, 1, 4, 4, 1, 4, 1, 5, 1, 3]
 =================================
-
  ```
 
 

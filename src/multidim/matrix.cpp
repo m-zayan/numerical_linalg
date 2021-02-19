@@ -10,73 +10,73 @@
 
 // base
 
-template<typename T, bool shared_ref>
-big_size_t nd::_matrix<T, shared_ref>::size() {
+template<typename T, bool ref_holder>
+big_size_t nd::_matrix<T, ref_holder>::size() {
 	return this->attr.size1d;
 }
 
-template<typename T, bool shared_ref>
-shape_t nd::_matrix<T, shared_ref>::shape() {
+template<typename T, bool ref_holder>
+shape_t nd::_matrix<T, ref_holder>::shape() {
 
 	return this->attr.shape;
 }
 
-template<typename T, bool shared_ref>
-shape_t nd::_matrix<T, shared_ref>::strides() {
+template<typename T, bool ref_holder>
+shape_t nd::_matrix<T, ref_holder>::strides() {
 
 	return this->attr.strides;
 }
 
-template<typename T, bool shared_ref>
-max_size_t nd::_matrix<T, shared_ref>::ndim() {
+template<typename T, bool ref_holder>
+max_size_t nd::_matrix<T, ref_holder>::ndim() {
 
 	return this->attr.ndim;
 }
 
-template<typename T, bool shared_ref>
-max_size_t nd::_matrix<T, shared_ref>::step_size() {
+template<typename T, bool ref_holder>
+max_size_t nd::_matrix<T, ref_holder>::step_size() {
 
 	return this->shape()[this->ndim() - 1];
 }
 
-template<typename T, bool shared_ref>
-bool nd::_matrix<T, shared_ref>::own_data() {
+template<typename T, bool ref_holder>
+bool nd::_matrix<T, ref_holder>::own_data() {
 
 	return this->attr.own_data;
 }
 
-template<typename T, bool shared_ref>
-coords nd::_matrix<T, shared_ref>::_m_coords() const {
+template<typename T, bool ref_holder>
+coords nd::_matrix<T, ref_holder>::_m_coords() const {
 
 	return this->attr;
 }
 
-template<typename T, bool shared_ref>
-vec1d<T> nd::_matrix<T, shared_ref>::_m_data() const {
+template<typename T, bool ref_holder>
+vec1d<T> nd::_matrix<T, ref_holder>::_m_data() const {
 
 	return *this->data.get();
 }
 
-template<typename T, bool shared_ref>
-big_size_t nd::_matrix<T, shared_ref>::_m_c_begin() const {
+template<typename T, bool ref_holder>
+big_size_t nd::_matrix<T, ref_holder>::_m_c_begin() const {
 
 	return this->c_begin;
 }
 
-template<typename T, bool shared_ref>
-big_size_t nd::_matrix<T, shared_ref>::_m_c_end() const {
+template<typename T, bool ref_holder>
+big_size_t nd::_matrix<T, ref_holder>::_m_c_end() const {
 
 	return this->c_end;
 }
 
-template<typename T, bool shared_ref>
-T* nd::_matrix<T, shared_ref>::_m_begin() {
+template<typename T, bool ref_holder>
+T* nd::_matrix<T, ref_holder>::_m_begin() {
 
 	return &(*this->data.get())[0] + this->c_begin;
 }
 
-template<typename T, bool shared_ref>
-T* nd::_matrix<T, shared_ref>::_m_end() {
+template<typename T, bool ref_holder>
+T* nd::_matrix<T, ref_holder>::_m_end() {
 
 	return &(*this->data.get())[0] + this->c_end;
 }
