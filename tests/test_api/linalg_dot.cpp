@@ -14,11 +14,11 @@ void test_api::linalg_dot() {
 
 	std::cout << "=============== (3, 3, 2) ================\n";
 
-	mat1.print_matrix();
+	nd::out::print_matrix(mat1);
 
 	std::cout << "=============== (3, 2, 3) ================\n";
 
-	mat2.print_matrix();
+	nd::out::print_matrix(mat2);
 
 	std::cout << "============= dot: (3, 3, 2) - (3, 2, 3) ================\n";
 	nd::matrix<int> result = nd::linalg::dot<int>(mat1, mat2);
@@ -28,6 +28,6 @@ void test_api::linalg_dot() {
 
 	std::cout << "---------------------\n";
 
-	result.print_matrix();
+	nd::out::print_matrix(result);
 }
 

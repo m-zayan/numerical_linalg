@@ -11,20 +11,20 @@
 
 namespace nd::linalg {
 
-template<typename T>
-nd::matrix<T> upper_triangular(nd::matrix<T> mat);
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> upper_triangular(nd::matrix<T, rf_h> mat);
 
-template<typename T>
-nd::matrix<T> lower_triangular(nd::matrix<T> mat);
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> lower_triangular(nd::matrix<T, rf_h> mat);
 
-template<typename T>
-nd::matrix<T> triangular(nd::matrix<T> mat);
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> triangular(nd::matrix<T, rf_h> mat);
 
-template<typename T>
-nd::matrix<T> echelon(nd::matrix<T> mat);
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> echelon(nd::matrix<T, rf_h> mat);
 
-template<typename T>
-nd::matrix<T> hessenberg(nd::matrix<T> mat);
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> hessenberg(nd::matrix<T, rf_h> mat);
 
 }
 

@@ -483,19 +483,6 @@ void vec1d<T>::print_vec1d(big_size_t begin, big_size_t end) {
 }
 
 template<typename T>
-void vec1d<T>::rprint_vec1d(big_size_t begin, big_size_t end) {
-
-	std::cout << "[";
-
-	for (big_size_t i = begin; i < end - 1; i++) {
-		std::cout << *this->operator [](i).get() << ", ";
-	}
-
-	std::cout << *this->operator [](end - 1).get() << "]";
-
-}
-
-template<typename T>
 vec1d<T>::~vec1d() {
 
 }

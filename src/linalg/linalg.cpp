@@ -30,13 +30,15 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 
 	big_size_t k;
 
+	T *d = mat._m_begin();
+
 	for (big_size_t i = 0; i < size; i += chunk_step) {
 
 		k = 0;
 
 		for (max_size_t j = 0; j < step; j++) {
 
-			mat.data[i + j + k] = allocator::val_to_shared_ptr<T>(1);
+			d[i + j + k] = 1;
 
 			k += step0;
 		}
@@ -46,8 +48,9 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 	return mat;
 }
 
-template<typename T>
-nd::matrix<T> nd::linalg::matmul(nd::matrix<T> mat1, nd::matrix<T> mat2) {
+template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
+nd::matrix<RT> nd::linalg::matmul(nd::matrix<T1, rf_h0> mat1,
+		nd::matrix<T2, rf_h1> mat2) {
 
 	max_size_t ndim_1 = mat1.ndim();
 	max_size_t ndim_2 = mat2.ndim();
@@ -148,7 +151,11 @@ nd::matrix<T> nd::linalg::matmul(nd::matrix<T> mat1, nd::matrix<T> mat2) {
 
 	}
 
-	nd::matrix<T> result(new_shape);
+	nd::matrix<RT> result(new_shape);
+
+	T1 *d0 = mat1._m_begin();
+	T2 *d1 = mat2._m_begin();
+	RT *d2 = result._m_begin();
 
 	big_size_t index = 0;
 
@@ -161,19 +168,18 @@ nd::matrix<T> nd::linalg::matmul(nd::matrix<T> mat1, nd::matrix<T> mat2) {
 
 			for (big_size_t d02 = 0; d02 < dim02; d02++) {
 
-				vec1d<T> element(dim12);
+				vec1d<RT> element(dim12);
 
 				for (big_size_t d12 = 0; d12 < dim12; d12++) {
 
 					big_size_t l1 = s1 + (d12 + d11 * dim01);
 					big_size_t l2 = s2 + (d02 + d12 * dim02);
 
-					element[d12] = (*mat1.data[l1]) * (*mat2.data[l2]);
+					element[d12] = d0[l1] * d1[l2];
 
 				}
 
-				T sum = element.sum(0, dim12);
-				result.data[index++] = allocator::val_to_shared_ptr<T>(sum);
+				d2[index++] = element.sum(0, dim12);
 			}
 		}
 
@@ -182,8 +188,9 @@ nd::matrix<T> nd::linalg::matmul(nd::matrix<T> mat1, nd::matrix<T> mat2) {
 	return result;
 }
 
-template<typename T>
-nd::matrix<T> nd::linalg::dot(nd::matrix<T> mat1, nd::matrix<T> mat2) {
+template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
+nd::matrix<RT> nd::linalg::dot(nd::matrix<T1, rf_h0> mat1,
+		nd::matrix<T2, rf_h1> mat2) {
 
 	max_size_t ndim_1 = mat1.ndim();
 	max_size_t ndim_2 = mat2.ndim();
@@ -228,14 +235,14 @@ nd::matrix<T> nd::linalg::dot(nd::matrix<T> mat1, nd::matrix<T> mat2) {
 
 	new_shape[new_ndim - 1] = shape_2[ndim_2 - 1];
 
-// mat2
+	// mat2
 	max_size_t step_02 = mat2.strides()[ndim_2 - 2];
 	max_size_t step_12 = mat2.strides()[ndim_2 - 1];
 
 	big_size_t steps_2 = 1;
 	big_size_t chunk_size_2 = 1;
 
-	big_size_t ij = 0;
+	big_size_t ik = 0;
 	big_size_t slice_2 = 0;
 
 	if (ndim_2 > 2) {
@@ -244,36 +251,39 @@ nd::matrix<T> nd::linalg::dot(nd::matrix<T> mat1, nd::matrix<T> mat2) {
 		chunk_size_2 = (dim02 * dim12);
 	}
 
-// mat1
+	nd::matrix<RT> result(new_shape);
+
+	// ...
 	max_size_t step_size_1 = mat1.step_size();
 
 	big_size_t steps_1 = mat1.size() / step_size_1;
 
-// ...
-	vec1d<T> elems(dim12);
+	vec1d<RT> elems(dim12);
+
 	big_size_t index = 0;
 
-	nd::matrix<T> result(new_shape);
+	T1 *d0 = mat1._m_begin();
+	T2 *d1 = mat2._m_begin();
+	RT *d2 = result._m_begin();
 
-	for (big_size_t d0 = 0; d0 < steps_1; d0++) {
+	for (big_size_t i = 0; i < steps_1; i++) {
 
-		big_size_t start = d0 * step_size_1;
+		big_size_t start = i * step_size_1;
 
 		for (big_size_t k = 0; k < steps_2; k++) {
 
 			slice_2 = k * chunk_size_2;
 
-			for (max_size_t d02 = 0; d02 < dim02; d02++) {
+			for (max_size_t j = 0; j < dim02; j++) {
 
-				for (max_size_t d12 = 0; d12 < dim12; d12++) {
+				for (max_size_t k = 0; k < dim12; k++) {
 
-					ij = slice_2 + d02 * step_12 + d12 * step_02;
+					ik = slice_2 + j * step_12 + k * step_02;
 
-					elems[d12] = (*mat1.data[start + d12]) * (*mat2.data[ij]);
+					elems[k] = d0[start + k] * d1[ik];
 				}
 
-				T sum = elems.sum(0, dim12);
-				result.data[index++] = allocator::val_to_shared_ptr<T>(sum);
+				d2[index++] = elems.sum(0, dim12);
 			}
 		}
 	}
@@ -281,8 +291,8 @@ nd::matrix<T> nd::linalg::dot(nd::matrix<T> mat1, nd::matrix<T> mat2) {
 	return result;
 }
 
-template<typename T>
-nd::matrix<T> nd::linalg::transpose(nd::matrix<T> mat, shape_t axes) {
+template<typename T, bool rf_h>
+nd::matrix<T> nd::linalg::transpose(nd::matrix<T, rf_h> mat, shape_t axes) {
 
 	return mat.permute(axes).copy();
 }

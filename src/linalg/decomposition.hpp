@@ -11,17 +11,17 @@
 
 namespace nd::linalg {
 
-template<typename T>
-nd::composite<nd::matrix<T>> lu(nd::matrix<T> mat);
+template<typename RT, typename T, bool rf_h>
+nd::composite<nd::matrix<RT>> lu(nd::matrix<T, rf_h> mat);
 
-template<typename T>
-nd::composite<nd::matrix<T>> plu(nd::matrix<T> mat);
+template<typename RT, typename T, bool rf_h>
+nd::composite<nd::matrix<RT>> plu(nd::matrix<T, rf_h> mat);
 
-template<typename T>
-nd::composite<nd::matrix<T>> qr(nd::matrix<T> mat);
+template<typename RT, typename T, bool rf_h>
+nd::composite<nd::matrix<RT>> qr(nd::matrix<T, rf_h> mat);
 
-template<typename T>
-nd::composite<nd::matrix<T>> svd(nd::matrix<T> mat);
+template<typename RT, typename T, bool rf_h>
+nd::composite<nd::matrix<RT>> svd(nd::matrix<T, rf_h> mat);
 
 }
 

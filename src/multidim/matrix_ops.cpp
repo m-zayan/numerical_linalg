@@ -6,38 +6,95 @@
 
 #include "./matrix.hpp"
 
+namespace _vops {
+
+template<typename T1, typename T2>
+std::function<std::function<void(T1&)>(T2 val)> mul = [](T2 val) {
+
+	std::function<void(T1&)> write_func = [val](T1 &vec_i) {
+
+		vec_i *= val;
+	};
+
+	return write_func;
+};
+
+template<typename T1, typename T2>
+std::function<std::function<void(T1&)>(T2 val)> div = [](T2 val) {
+
+	std::function<void(T1&)> write_func = [val](T1 &vec_i) {
+
+		vec_i /= val;
+	};
+
+	return write_func;
+};
+
+template<typename T1, typename T2>
+std::function<std::function<void(T1&)>(T2 val)> add = [](T2 val) {
+
+	std::function<void(T1&)> write_func = [val](T1 &vec_i) {
+
+		vec_i += val;
+	};
+
+	return write_func;
+};
+
+template<typename T1, typename T2>
+std::function<std::function<void(T1&)>(T2 val)> sub = [](T2 val) {
+
+	std::function<void(T1&)> write_func = [val](T1 &vec_i) {
+
+		vec_i -= val;
+	};
+
+	return write_func;
+};
+
+}
+
+template<typename T, bool ref_holder>
+void nd::_matrix<T, ref_holder>::write_in_range_wrapper(big_size_t c_begin,
+		big_size_t c_end, std::function<void(T&)> func) {
+
+	(*this->data.get()).write_in_range(c_begin, c_end, func);
+}
+
 // assign
-template<typename T, bool shared_ref>
-nd::matrix<T, false>& nd::matrix<T, shared_ref>::operator =(
+template<typename T, bool ref_holder>
+nd::matrix<T, false>& nd::_matrix<T, ref_holder>::operator =(
 		const matrix<T> &mat) {
 
 	this->attr = mat._m_coords();
 
-	// should be replaced by this->movedata()
-	this->data.assign(mat.begin(), mat.end());
+	this->data = data;
 
 	this->attr.own_data = false;
 
-	return (*this);
+	return this->_m_dynamic_cast();
 }
 
 // mask
-template<typename T, bool shared_ref>
-nd::matrix<bool> nd::matrix<T, shared_ref>::operator ==(const T &val) {
+template<typename T, bool ref_holder>
+nd::matrix<min_size_t> nd::_matrix<T, ref_holder>::operator ==(const T &val) {
 
-	nd::matrix<bool> result(this->shape());
+	nd::matrix<min_size_t> result(this->shape());
+
+	T *d0 = this->_m_begin();
+	min_size_t *d1 = result._m_begin();
 
 	for (big_size_t i = 0; i < this->size(); i++) {
-		result.data[i] = allocator::val_to_shared_ptr<bool>(
-				*this->data[i] == val);
+
+		d1[i] = static_cast<min_size_t>(d0[i] == val);
 	}
 
 	return result;
 }
 
 // nd::matrix<T> == nd::matrix<T>
-template<typename T, bool shared_ref>
-bool nd::matrix<T, shared_ref>::operator ==(const nd::matrix<T> &mat) {
+template<typename T, bool ref_holder>
+bool nd::_matrix<T, ref_holder>::operator ==(const mat_t &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -46,8 +103,11 @@ bool nd::matrix<T, shared_ref>::operator ==(const nd::matrix<T> &mat) {
 				"matrices must have the same shape");
 	}
 
+	T *d0 = this->_m_begin();
+	T *d1 = temp._m_begin();
+
 	for (big_size_t i = 0; i < this->size(); i++) {
-		if ((*this->data[i]) != (*temp.data[i])) {
+		if (d0[i] != d1[i]) {
 			return false;
 		}
 	}
@@ -56,74 +116,8 @@ bool nd::matrix<T, shared_ref>::operator ==(const nd::matrix<T> &mat) {
 }
 
 // nd::matrix<T> + nd::matrix<T>
-template<typename T, bool shared_ref>
-nd::matrix<T> nd::matrix<T, shared_ref>::operator +(const nd::matrix<T> &mat) {
-
-	nd::matrix<T> temp = std::move(mat);
-
-	if (this->shape() != temp.shape()) {
-		throw nd::exception("Invalid element-wise operation, "
-				"matrices must have the same shape");
-	}
-
-	nd::matrix<T> result(this->shape());
-
-	for (big_size_t i = 0; i < this->size(); i++) {
-		result.data[i] = allocator::val_to_shared_ptr<T>(
-				(*this->data[i]) + (*temp.data[i]));
-	}
-
-	return result;
-}
-
-// nd::matrix<T> += nd::matrix<T>
-template<typename T, bool shared_ref>
-nd::matrix<T>& nd::matrix<T, shared_ref>::operator +=(
-		const nd::matrix<T> &mat) {
-
-	nd::matrix<T> temp = std::move(mat);
-
-	if (this->shape() != temp.shape()) {
-		throw nd::exception("Invalid element-wise operation, "
-				"matrices must have the same shape");
-	}
-
-	for (big_size_t i = 0; i < this->size(); i++) {
-		*this->data[i] += (*temp.data[i]);
-	}
-
-	return (*this);
-}
-
-// nd::matrix<T> + val
-template<typename T, bool shared_ref>
-nd::matrix<T> nd::matrix<T, shared_ref>::operator +(const T &val) {
-
-	nd::matrix<T> result(this->shape());
-
-	for (big_size_t i = 0; i < this->size(); i++) {
-		result.data[i] = allocator::val_to_shared_ptr<T>(*this->data[i] + val);
-	}
-
-	return result;
-}
-
-// matrix<T> += val
-template<typename T, bool shared_ref>
-nd::matrix<T>& nd::matrix<T, shared_ref>::operator +=(const T &val) {
-
-	for (big_size_t i = 0; i < this->size(); i++) {
-		*this->data[i] += val;
-	}
-
-	return (*this);
-}
-
-// ===========================
-
-// nd::matrix<T> - nd::matrix<T>
-template<typename T, bool shared_ref>
-nd::matrix<T> nd::matrix<T, shared_ref>::operator -(const nd::matrix<T> &mat) {
+template<typename T, bool ref_holder>
+nd::matrix<T> nd::_matrix<T, ref_holder>::operator +(const mat_t &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -133,18 +127,22 @@ nd::matrix<T> nd::matrix<T, shared_ref>::operator -(const nd::matrix<T> &mat) {
 	}
 	nd::matrix<T> result(this->shape());
 
+	T *d0 = this->_m_begin();
+	T *d1 = temp._m_begin();
+	T *d2 = result._m_begin();
+
 	for (big_size_t i = 0; i < this->size(); i++) {
-		result.data[i] = allocator::val_to_shared_ptr<T>(
-				(*this->data[i]) - (*temp.data[i]));
+
+		d2[i] = d0[i] + d1[i];
 	}
 
 	return result;
 }
 
 // nd::matrix<T> -= nd::matrix<T>
-template<typename T, bool shared_ref>
-nd::matrix<T>& nd::matrix<T, shared_ref>::operator -=(
-		const nd::matrix<T> &mat) {
+template<typename T, bool ref_holder>
+nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator +=(
+		const mat_t &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -153,43 +151,48 @@ nd::matrix<T>& nd::matrix<T, shared_ref>::operator -=(
 				"matrices must have the same shape");
 	}
 
+	T *d0 = this->_m_begin();
+	T *d1 = temp._m_begin();
+
 	for (big_size_t i = 0; i < this->size(); i++) {
-		*this->data[i] -= (*temp.data[i]);
+
+		d0[i] += d1[i];
 	}
 
-	return (*this);
+	return *this->_m_dynamic_cast();
 }
 
 // nd::matrix<T> - val
-template<typename T, bool shared_ref>
+template<typename T, bool ref_holder>
 
-nd::matrix<T> nd::matrix<T, shared_ref>::operator -(const T &val) {
+nd::matrix<T> nd::_matrix<T, ref_holder>::operator +(const T &val) {
 
 	nd::matrix<T> result(this->shape());
 
-	for (big_size_t i = 0; i < this->size(); i++) {
-		result.data[i] = allocator::val_to_shared_ptr<T>(*this->data[i] - val);
-	}
+	*result.data = (*this->data.get());
+
+	result.write_in_range_wrapper(result.c_begin, result.c_end,
+			_vops::add<T, T>(val));
 
 	return result;
 }
 
 // matrix<T> -= val
-template<typename T, bool shared_ref>
-nd::matrix<T>& nd::matrix<T, shared_ref>::operator -=(const T &val) {
+template<typename T, bool ref_holder>
+nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator +=(
+		const T &val) {
 
-	for (big_size_t i = 0; i < this->size(); i++) {
-		*this->data[i] -= val;
-	}
+	this->write_in_range_wrapper(this->c_begin, this->c_end,
+			_vops::add<T, T>(val));
 
-	return (*this);
+	return *this->_m_dynamic_cast();
 }
 
-// ==================
+// ===========================
 
-// nd::matrix<T> * nd::matrix<T>
-template<typename T, bool shared_ref>
-nd::matrix<T> nd::matrix<T, shared_ref>::operator *(const nd::matrix<T> &mat) {
+// nd::matrix<T> - nd::matrix<T>
+template<typename T, bool ref_holder>
+nd::matrix<T> nd::_matrix<T, ref_holder>::operator -(const mat_t &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -197,20 +200,99 @@ nd::matrix<T> nd::matrix<T, shared_ref>::operator *(const nd::matrix<T> &mat) {
 		throw nd::exception("Invalid element-wise operation, "
 				"matrices must have the same shape");
 	}
-	nd::matrix<T> result(this->shape()); // 2-path, have to be modified
+	nd::matrix<T> result(this->shape());
+
+	T *d0 = this->_m_begin();
+	T *d1 = temp._m_begin();
+	T *d2 = result._m_begin();
 
 	for (big_size_t i = 0; i < this->size(); i++) {
-		result.data[i] = allocator::val_to_shared_ptr<T>(
-				(*this->data[i]) * (*temp.data[i]));
+
+		d2[i] = d0[i] - d1[i];
+	}
+
+	return result;
+}
+
+// nd::matrix<T> -= nd::matrix<T>
+template<typename T, bool ref_holder>
+nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator -=(
+		const mat_t &mat) {
+
+	nd::matrix<T> temp = std::move(mat);
+
+	if (this->shape() != temp.shape()) {
+		throw nd::exception("Invalid element-wise operation, "
+				"matrices must have the same shape");
+	}
+
+	T *d0 = this->_m_begin();
+	T *d1 = temp._m_begin();
+
+	for (big_size_t i = 0; i < this->size(); i++) {
+
+		d0[i] -= d1[i];
+	}
+
+	return *this->_m_dynamic_cast();
+}
+
+// nd::matrix<T> - val
+template<typename T, bool ref_holder>
+
+nd::matrix<T> nd::_matrix<T, ref_holder>::operator -(const T &val) {
+
+	nd::matrix<T> result(this->shape());
+
+	*result.data = (*this->data.get());
+
+	result.write_in_range_wrapper(result.c_begin, result.c_end,
+			_vops::sub<T, T>(val));
+
+	return result;
+}
+
+// matrix<T> -= val
+template<typename T, bool ref_holder>
+nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator -=(
+		const T &val) {
+
+	this->write_in_range_wrapper(this->c_begin, this->c_end,
+			_vops::sub<T, T>(val));
+
+	return *this->_m_dynamic_cast();
+}
+
+// ==================
+
+// nd::matrix<T> * nd::matrix<T>
+template<typename T, bool ref_holder>
+nd::matrix<T> nd::_matrix<T, ref_holder>::operator *(const mat_t &mat) {
+
+	nd::matrix<T> temp = std::move(mat);
+
+	if (this->shape() != temp.shape()) {
+		throw nd::exception("Invalid element-wise operation, "
+				"matrices must have the same shape");
+	}
+	nd::matrix<T> result(this->shape());
+
+	T *d0 = this->_m_begin();
+	T *d1 = temp._m_begin();
+	T *d2 = result._m_begin();
+
+	for (big_size_t i = 0; i < this->size(); i++) {
+
+		d2[i] = d0[i] * d1[i];
 	}
 
 	return result;
 }
 
 // nd::matrix<T> *= nd::matrix<T>
-template<typename T, bool shared_ref>
-nd::matrix<T>& nd::matrix<T, shared_ref>::operator *=(
-		const nd::matrix<T> &mat) {
+template<typename T, bool ref_holder>
+nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator *=(
+		const mat_t &mat) {
 
 	nd::matrix<T> temp = std::move(mat);
 
@@ -219,90 +301,69 @@ nd::matrix<T>& nd::matrix<T, shared_ref>::operator *=(
 				"matrices must have the same shape");
 	}
 
+	T *d0 = this->_m_begin();
+	T *d1 = temp._m_begin();
+
 	for (big_size_t i = 0; i < this->size(); i++) {
-		*this->data[i] *= (*temp.data[i]);
+
+		d0[i] *= d1[i];
 	}
 
-	return (*this);
+	return *this->_m_dynamic_cast();
 }
 
 // nd::matrix<T> * val
-template<typename T, bool shared_ref>
-nd::matrix<T> nd::matrix<T, shared_ref>::operator *(const T &val) {
+template<typename T, bool ref_holder>
+nd::matrix<T> nd::_matrix<T, ref_holder>::operator *(const T &val) {
 
-	nd::matrix<T> result(this->shape()); // 2-path, have to be modified
+	nd::matrix<T> result(this->shape());
 
-	for (big_size_t i = 0; i < this->size(); i++) {
-		result.data[i] = allocator::val_to_shared_ptr<T>(*this->data[i] * val);
-	}
+	*result.data = (*this->data.get());
+
+	result.write_in_range_wrapper(result.c_begin, result.c_end,
+			_vops::mul<T, T>(val));
 
 	return result;
 }
 
 // matrix<T> *= val
-template<typename T, bool shared_ref>
-nd::matrix<T>& nd::matrix<T, shared_ref>::operator *=(const T &val) {
+template<typename T, bool ref_holder>
+nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator *=(
+		const T &val) {
 
-	for (big_size_t i = 0; i < this->size(); i++) {
-		*this->data[i] *= val;
-	}
+	this->write_in_range_wrapper(this->c_begin, this->c_end,
+			_vops::mul<T, T>(val));
 
-	return (*this);
+	return *this->_m_dynamic_cast();
 }
 
-// ============
-
 // nd::matrix<T> / val
-template<typename T, bool shared_ref>
-nd::matrix<T> nd::matrix<T, shared_ref>::operator /(const T &val) {
+template<typename T, bool ref_holder>
+nd::matrix<T> nd::_matrix<T, ref_holder>::operator /(const T &val) {
 
 	nd::matrix<T> result(this->shape());
 
-	for (big_size_t i = 0; i < this->size(); i++) {
-		result.data[i] = allocator::val_to_shared_ptr<T>(*this->data[i] / val);
-	}
+	*result.data = (*this->data.get());
+
+	result.write_in_range_wrapper(result.c_begin, result.c_end,
+			_vops::div<T, T>(val));
 
 	return result;
 }
 
 // matrix<T> /= val
-template<typename T, bool shared_ref>
-nd::matrix<T>& nd::matrix<T, shared_ref>::operator /=(const T &val) {
+template<typename T, bool ref_holder>
+nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator /=(
+		const T &val) {
 
-	for (big_size_t i = 0; i < this->size(); i++) {
-		*this->data[i] /= val;
-	}
+	this->write_in_range_wrapper(this->c_begin, this->c_end,
+			_vops::div<T, T>(val));
 
-	return (*this);
+	return *this->_m_dynamic_cast();
 }
 
-template<typename T, bool shared_ref>
-nd::matrix<T, false> nd::matrix<T, shared_ref>::chunk_at(const coords &attr,
-		big_size_t begin, big_size_t end, bool use_iter) {
-
-	nd::matrix<T, false> mat_chunk(std::move(attr));
-
-	if (use_iter) {
-
-		RandomAccessNdIterator rndIter(attr);
-
-		for (big_size_t i = begin; i < end; i++) {
-			mat_chunk.data[i - begin] = this->data[rndIter.index_at(i)];
-		}
-	}
-
-	else {
-
-		for (big_size_t i = begin; i < end; i++) {
-			mat_chunk.data[i - begin] = this->data[i];
-		}
-	}
-
-	return mat_chunk;
-}
-
-template<typename T, bool shared_ref>
-nd::matrix<T, false> nd::matrix<T, shared_ref>::operator [](
+template<typename T, bool ref_holder>
+nd::matrix<T, false> nd::_matrix<T, ref_holder>::operator [](
 		max_size_t d_index) {
 
 	max_size_t step = this->strides()[0];
@@ -318,28 +379,27 @@ nd::matrix<T, false> nd::matrix<T, shared_ref>::operator [](
 		shape_t new_shape(cur_shape.begin() + 1, cur_shape.end());
 		coords new_attr(new_shape, false);
 
-		big_size_t begin = (d_index * step);
-		big_size_t end = (d_index + 1) * step;
+		big_size_t c_begin = this->c_begin + (d_index * step);
+		big_size_t c_end = this->c_begin + (d_index + 1) * step;
 
-		nd::matrix<T, false> mat_chunk = this->chunk_at(new_attr, begin, end,
-				false);
+		nd::matrix<T, false> mat_chunk(new_attr, this->data, c_begin, c_end);
 
 		return mat_chunk;
 	}
 }
 
-template<typename T, bool shared_ref>
-void nd::matrix<T, shared_ref>::assign(shape_t indices, T val) {
+template<typename T, bool ref_holder>
+void nd::_matrix<T, ref_holder>::assign(shape_t indices, T val) {
 
 	RandomAccessNdIterator rndIter(this->attr);
 
 	big_size_t index = rndIter.index_at(indices);
 
-	*this->data[index] = val;
+	(*this->data)[index] = val;
 }
 
-template<typename T, bool shared_ref>
-nd::matrix<T, false> nd::matrix<T, shared_ref>::permute(shape_t axes) {
+template<typename T, bool ref_holder>
+nd::matrix<T, false> nd::_matrix<T, ref_holder>::permute(shape_t axes) {
 
 	if (axes.size() != this->ndim()) {
 
@@ -364,10 +424,40 @@ nd::matrix<T, false> nd::matrix<T, shared_ref>::permute(shape_t axes) {
 		swaped_strides[i] = cur_strides[axes[i]];
 	}
 
-	coords attr(swaped_shape, swaped_strides, false);
+	coords new_attr(swaped_shape, swaped_strides, false);
 
-	nd::matrix<T, false> mat_chunk = this->chunk_at(attr, 0, this->size(),
-			true);
+	nd::matrix<T, false> mat_chunk(new_attr, this->data, 0, this->size());
 
 	return mat_chunk;
 }
+
+// false
+template<typename T, bool ref_holder>
+nd::matrix<T> nd::_matrix<T, ref_holder>::reordered_chunk(bool use_iter) {
+
+	nd::matrix<T> mat_chunk(this->shape());
+
+	T *d0 = this->_m_begin();
+	T *d1 = mat_chunk._m_begin();
+
+	if (use_iter) {
+
+		RandomAccessNdIterator rndIter(this->attr);
+
+		for (big_size_t i = 0; i < this->size(); i++) {
+
+			d1[i] = d0[rndIter.index_at(i)];
+		}
+	}
+
+	else {
+
+		for (big_size_t i = 0; i < this->size(); i++) {
+
+			d1[i] = d0[i];
+		}
+	}
+
+	return mat_chunk;
+}
+

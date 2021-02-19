@@ -12,58 +12,111 @@
 
 #include "./matrix.hpp"
 
-template<typename T, bool shared_ref>
-nd::matrix<T, shared_ref>::matrix(shape_t shape) {
+template<typename T, bool ref_holder>
+nd::matrix<T, ref_holder>* nd::_matrix<T, ref_holder>::_m_dynamic_cast() {
 
-	this->attr = coords(shape);
-	this->data.resize(this->size());
+	return dynamic_cast<nd::matrix<T, ref_holder>*>(this);
 }
 
-template<typename T, bool shared_ref>
-nd::matrix<T, shared_ref>::matrix(shape_t shape, T val) {
+template<typename T, bool ref_holder>
+nd::_matrix<T, ref_holder>::~_matrix() {
+
+}
+
+// true
+template<typename T>
+nd::matrix<T, true>::matrix(shape_t shape) {
 
 	this->attr = coords(shape);
-	this->data.resize(this->attr.size1d);
+	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size()));
 
-	for (big_size_t i = 0; i < this->attr.size1d; i++) {
-
-		this->data[i] = allocator::val_to_shared_ptr<T>(val);
-	}
+	this->c_begin = 0;
+	this->c_end = this->size();
 }
-template<typename T, bool shared_ref>
-nd::matrix<T, shared_ref>::matrix(const coords &&attr) {
+
+template<typename T>
+nd::matrix<T, true>::matrix(shape_t shape, T val) {
+
+	this->attr = coords(shape);
+	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size(), val));
+
+	this->c_begin = 0;
+	this->c_end = this->size();
+}
+
+template<typename T>
+nd::matrix<T, true>::matrix(const coords &attr) {
 
 	this->attr = std::move(attr);
-	this->data.resize(this->attr.size1d);
+	this->attr.own_data = true;
+
+	this->c_begin = 0;
+	this->c_end = this->size();
+
+	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size()));
+
 }
 
-template<typename T, bool shared_ref>
-nd::matrix<T, shared_ref>::matrix(const matrix &&mat) noexcept :
-		attr(std::move(mat._m_coords())), data(std::move(mat.data)) {
+template<typename T>
+nd::matrix<T> nd::matrix<T, true>::copy() {
+
+	return this->reordered_chunk(false);
 }
 
-template<typename T, bool shared_ref>
-nd::matrix<T, shared_ref>::matrix(const matrix &mat) noexcept :
-		attr(mat._m_coords()), data(mat.data) {
+template<typename T>
+nd::matrix<T, true>::~matrix() {
+
 }
 
-template<typename T, bool shared_ref>
-nd::matrix<T, shared_ref>::~matrix() {
-}
+// false
+template<typename T>
+nd::matrix<T, false>::matrix(const coords &attr, shared_ptr<vec1d<T>> data,
+		big_size_t c_begin, big_size_t c_end) {
 
-template<typename T, bool shared_ref>
-nd::matrix<T> nd::matrix<T, shared_ref>::copy() {
+	if (attr.own_data) {
 
-	nd::matrix<T> result(this->shape());
-
-	for (big_size_t i = 0; i < this->size(); i++) {
-
-		result.data[i] = allocator::val_to_shared_ptr(*this->data[i].get());
+		// debuging
+		throw nd::exception("...");
 	}
 
-	return result;
+	this->attr = std::move(attr);
+
+	this->data = data;
+
+	this->c_begin = c_begin;
+	this->c_end = c_end;
 }
 
+template<typename T>
+nd::matrix<T, false>::matrix(const coords &attr, weak_ptr<vec1d<T>> data,
+		big_size_t c_begin, big_size_t c_end) {
+
+	if (attr.own_data) {
+
+		// debuging
+		throw nd::exception("...");
+	}
+
+	this->attr = std::move(attr);
+
+	this->data = data;
+
+	this->c_begin = c_begin;
+	this->c_end = c_end;
+}
+
+template<typename T>
+nd::matrix<T> nd::matrix<T, false>::copy() {
+
+	return this->reordered_chunk(true);
+}
+
+template<typename T>
+nd::matrix<T, false>::~matrix() {
+
+}
+
+// functions
 template<typename T>
 nd::matrix<T> nd::stack(nd::composite<nd::matrix<T>> matrix_list) {
 
@@ -97,14 +150,17 @@ nd::matrix<T> nd::stack(nd::composite<nd::matrix<T>> matrix_list) {
 
 	nd::matrix<T> result(new_shape);
 
+	T *dr = result._m_begin();
+
 	big_size_t slice = 0;
 
 	for (max_size_t i = 0; i < matrix_list.size(); i++) {
 
+		T *d = matrix_list[i]._m_begin();
+
 		for (big_size_t j = 0; j < matrix_list[i].size(); j++) {
 
-			result.data[slice + j] = allocator::val_to_shared_ptr<T>(
-					*matrix_list[i].data[j].get());
+			dr[slice + j] = d[j];
 		}
 
 		slice += (i + 1) * matrix_list[i].size();
@@ -113,18 +169,20 @@ nd::matrix<T> nd::stack(nd::composite<nd::matrix<T>> matrix_list) {
 	return result;
 }
 
-// ============ random ===========
-
+// #random
 template<typename T>
 nd::matrix<T> nd::random::uniform(T low, T high, shape_t shape) {
 
 	nd::matrix<T> mat(shape);
 
+	T *d = mat._m_begin();
+
 	for (big_size_t i = 0; i < mat.size(); i++) {
 
-		T val = generator<T>::random_uniform(low, high);
-		mat.data[i] = allocator::val_to_shared_ptr<T>(val);
+		d[i] = generator<T>::random_uniform(low, high);
 	}
 
 	return mat;
 }
+
+// end functions
