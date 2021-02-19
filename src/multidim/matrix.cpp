@@ -8,6 +8,11 @@
 #include "./matrix_ops.cpp"
 #include "./matrix_stdout.cpp"
 
+namespace _pptr {
+
+template<typename T, bool ref_holder>
+using data_t = typename _t::dt<T, ref_holder>::type;
+}
 // base
 
 template<typename T, bool ref_holder>
@@ -52,12 +57,6 @@ coords nd::_matrix<T, ref_holder>::_m_coords() const {
 }
 
 template<typename T, bool ref_holder>
-vec1d<T> nd::_matrix<T, ref_holder>::_m_data() const {
-
-	return *this->data.get();
-}
-
-template<typename T, bool ref_holder>
 big_size_t nd::_matrix<T, ref_holder>::_m_c_begin() const {
 
 	return this->c_begin;
@@ -67,6 +66,18 @@ template<typename T, bool ref_holder>
 big_size_t nd::_matrix<T, ref_holder>::_m_c_end() const {
 
 	return this->c_end;
+}
+
+template<typename T, bool ref_holder>
+_pptr::data_t<T, ref_holder> nd::_matrix<T, ref_holder>::_m_ptr() const {
+
+	return this->data;
+}
+
+template<typename T, bool ref_holder>
+vec1d<T> nd::_matrix<T, ref_holder>::_m_data() const {
+
+	return *this->data.get();
 }
 
 template<typename T, bool ref_holder>

@@ -6,65 +6,44 @@
 
 #include "./matrix.hpp"
 
-namespace _vops {
+template<typename T, bool ref_holder>
+template<typename U, typename RT>
+void nd::_matrix<T, ref_holder>::_m_data_wrapper(U *d0, RT *d1, big_size_t s1,
+		big_size_t c_begin, big_size_t c_end,
+		std::function<void(U&, RT&)> func) {
 
-template<typename T1, typename T2>
-std::function<std::function<void(T1&)>(T2 val)> mul = [](T2 val) {
+	if (c_begin > c_end || c_end - c_begin >= s1) {
 
-	std::function<void(T1&)> write_func = [val](T1 &vec_i) {
+		// debugging
+		nd::exception("nd::_matrix<T, ...>::data_wrapper(...), "
+				"size dosen't match");
+	}
 
-		vec_i *= val;
-	};
+	for (big_size_t i = c_begin; i < c_end; i++) {
 
-	return write_func;
-};
-
-template<typename T1, typename T2>
-std::function<std::function<void(T1&)>(T2 val)> div = [](T2 val) {
-
-	std::function<void(T1&)> write_func = [val](T1 &vec_i) {
-
-		vec_i /= val;
-	};
-
-	return write_func;
-};
-
-template<typename T1, typename T2>
-std::function<std::function<void(T1&)>(T2 val)> add = [](T2 val) {
-
-	std::function<void(T1&)> write_func = [val](T1 &vec_i) {
-
-		vec_i += val;
-	};
-
-	return write_func;
-};
-
-template<typename T1, typename T2>
-std::function<std::function<void(T1&)>(T2 val)> sub = [](T2 val) {
-
-	std::function<void(T1&)> write_func = [val](T1 &vec_i) {
-
-		vec_i -= val;
-	};
-
-	return write_func;
-};
-
+		func(d0[i], d1[i]);
+	}
 }
 
 template<typename T, bool ref_holder>
-void nd::_matrix<T, ref_holder>::write_in_range_wrapper(big_size_t c_begin,
+void nd::_matrix<T, ref_holder>::_m_write_in_range(big_size_t c_begin,
 		big_size_t c_end, std::function<void(T&)> func) {
+
+	if (c_begin > c_end || c_end - c_begin >= this->size()) {
+
+		// debugging
+		nd::exception("nd::_matrix<T, ...>::data_wrapper(...), "
+				"size dosen't match");
+	}
 
 	(*this->data.get()).write_in_range(c_begin, c_end, func);
 }
 
 // assign
 template<typename T, bool ref_holder>
+template<bool ref_h>
 nd::matrix<T, false>& nd::_matrix<T, ref_holder>::operator =(
-		const matrix<T> &mat) {
+		const matrix<T, ref_h> &mat) {
 
 	this->attr = mat._m_coords();
 
@@ -72,7 +51,7 @@ nd::matrix<T, false>& nd::_matrix<T, ref_holder>::operator =(
 
 	this->attr.own_data = false;
 
-	return this->_m_dynamic_cast();
+	return *this->_m_dynamic_cast<T>();
 }
 
 // mask
@@ -94,9 +73,10 @@ nd::matrix<min_size_t> nd::_matrix<T, ref_holder>::operator ==(const T &val) {
 
 // nd::matrix<T> == nd::matrix<T>
 template<typename T, bool ref_holder>
-bool nd::_matrix<T, ref_holder>::operator ==(const mat_t &mat) {
+template<bool ref_h>
+bool nd::_matrix<T, ref_holder>::operator ==(const matrix<T, ref_h> &mat) {
 
-	nd::matrix<T> temp = std::move(mat);
+	nd::matrix<T, false> temp = mat;
 
 	if (this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -117,9 +97,11 @@ bool nd::_matrix<T, ref_holder>::operator ==(const mat_t &mat) {
 
 // nd::matrix<T> + nd::matrix<T>
 template<typename T, bool ref_holder>
-nd::matrix<T> nd::_matrix<T, ref_holder>::operator +(const mat_t &mat) {
+template<bool ref_h>
+nd::matrix<T> nd::_matrix<T, ref_holder>::operator +(
+		const matrix<T, ref_h> &mat) {
 
-	nd::matrix<T> temp = std::move(mat);
+	nd::matrix<T, false> temp = mat;
 
 	if (this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -129,6 +111,7 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator +(const mat_t &mat) {
 
 	T *d0 = this->_m_begin();
 	T *d1 = temp._m_begin();
+
 	T *d2 = result._m_begin();
 
 	for (big_size_t i = 0; i < this->size(); i++) {
@@ -141,10 +124,11 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator +(const mat_t &mat) {
 
 // nd::matrix<T> -= nd::matrix<T>
 template<typename T, bool ref_holder>
+template<bool ref_h>
 nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator +=(
-		const mat_t &mat) {
+		const matrix<T, ref_h> &mat) {
 
-	nd::matrix<T> temp = std::move(mat);
+	nd::matrix<T, false> temp = mat;
 
 	if (this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -159,20 +143,22 @@ nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator +=(
 		d0[i] += d1[i];
 	}
 
-	return *this->_m_dynamic_cast();
+	return *this->_m_dynamic_cast<T>();
 }
 
 // nd::matrix<T> - val
 template<typename T, bool ref_holder>
-
 nd::matrix<T> nd::_matrix<T, ref_holder>::operator +(const T &val) {
 
 	nd::matrix<T> result(this->shape());
 
-	*result.data = (*this->data.get());
+	T *d0 = this->_m_begin();
+	T *d1 = result._m_begin();
 
-	result.write_in_range_wrapper(result.c_begin, result.c_end,
-			_vops::add<T, T>(val));
+	for (big_size_t i = 0; i < this->size(); i++) {
+
+		d1[i] = d0[i] + val;
+	}
 
 	return result;
 }
@@ -182,19 +168,21 @@ template<typename T, bool ref_holder>
 nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator +=(
 		const T &val) {
 
-	this->write_in_range_wrapper(this->c_begin, this->c_end,
-			_vops::add<T, T>(val));
+	this->_m_write_in_range(this->c_begin, this->c_end,
+			_ops::v1v::add<T, T>(val));
 
-	return *this->_m_dynamic_cast();
+	return *this->_m_dynamic_cast<T>();
 }
 
 // ===========================
 
 // nd::matrix<T> - nd::matrix<T>
 template<typename T, bool ref_holder>
-nd::matrix<T> nd::_matrix<T, ref_holder>::operator -(const mat_t &mat) {
+template<bool ref_h>
+nd::matrix<T> nd::_matrix<T, ref_holder>::operator -(
+		const matrix<T, ref_h> &mat) {
 
-	nd::matrix<T> temp = std::move(mat);
+	nd::matrix<T, false> temp = mat;
 
 	if (this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -216,10 +204,11 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator -(const mat_t &mat) {
 
 // nd::matrix<T> -= nd::matrix<T>
 template<typename T, bool ref_holder>
+template<bool ref_h>
 nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator -=(
-		const mat_t &mat) {
+		const matrix<T, ref_h> &mat) {
 
-	nd::matrix<T> temp = std::move(mat);
+	nd::matrix<T, false> temp = mat;
 
 	if (this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -234,20 +223,22 @@ nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator -=(
 		d0[i] -= d1[i];
 	}
 
-	return *this->_m_dynamic_cast();
+	return *this->_m_dynamic_cast<T>();
 }
 
 // nd::matrix<T> - val
 template<typename T, bool ref_holder>
-
 nd::matrix<T> nd::_matrix<T, ref_holder>::operator -(const T &val) {
 
 	nd::matrix<T> result(this->shape());
 
-	*result.data = (*this->data.get());
+	T *d0 = this->_m_begin();
+	T *d1 = result._m_begin();
 
-	result.write_in_range_wrapper(result.c_begin, result.c_end,
-			_vops::sub<T, T>(val));
+	for (big_size_t i = 0; i < this->size(); i++) {
+
+		d1[i] = d0[i] - val;
+	}
 
 	return result;
 }
@@ -257,19 +248,21 @@ template<typename T, bool ref_holder>
 nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator -=(
 		const T &val) {
 
-	this->write_in_range_wrapper(this->c_begin, this->c_end,
-			_vops::sub<T, T>(val));
+	this->_m_write_in_range(this->c_begin, this->c_end,
+			_ops::v1v::sub<T, T>(val));
 
-	return *this->_m_dynamic_cast();
+	return *this->_m_dynamic_cast<T>();
 }
 
 // ==================
 
 // nd::matrix<T> * nd::matrix<T>
 template<typename T, bool ref_holder>
-nd::matrix<T> nd::_matrix<T, ref_holder>::operator *(const mat_t &mat) {
+template<bool ref_h>
+nd::matrix<T> nd::_matrix<T, ref_holder>::operator *(
+		const matrix<T, ref_h> &mat) {
 
-	nd::matrix<T> temp = std::move(mat);
+	nd::matrix<T, false> temp = mat;
 
 	if (this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -291,10 +284,11 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator *(const mat_t &mat) {
 
 // nd::matrix<T> *= nd::matrix<T>
 template<typename T, bool ref_holder>
+template<bool ref_h>
 nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator *=(
-		const mat_t &mat) {
+		const matrix<T, ref_h> &mat) {
 
-	nd::matrix<T> temp = std::move(mat);
+	nd::matrix<T, false> temp = mat;
 
 	if (this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -309,7 +303,7 @@ nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator *=(
 		d0[i] *= d1[i];
 	}
 
-	return *this->_m_dynamic_cast();
+	return *this->_m_dynamic_cast<T>();
 }
 
 // nd::matrix<T> * val
@@ -318,10 +312,13 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator *(const T &val) {
 
 	nd::matrix<T> result(this->shape());
 
-	*result.data = (*this->data.get());
+	T *d0 = this->_m_begin();
+	T *d1 = result._m_begin();
 
-	result.write_in_range_wrapper(result.c_begin, result.c_end,
-			_vops::mul<T, T>(val));
+	for (big_size_t i = 0; i < this->size(); i++) {
+
+		d1[i] = d0[i] * val;
+	}
 
 	return result;
 }
@@ -331,10 +328,10 @@ template<typename T, bool ref_holder>
 nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator *=(
 		const T &val) {
 
-	this->write_in_range_wrapper(this->c_begin, this->c_end,
-			_vops::mul<T, T>(val));
+	this->_m_write_in_range(this->c_begin, this->c_end,
+			_ops::v1v::mul<T, T>(val));
 
-	return *this->_m_dynamic_cast();
+	return *this->_m_dynamic_cast<T>();
 }
 
 // nd::matrix<T> / val
@@ -343,10 +340,13 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator /(const T &val) {
 
 	nd::matrix<T> result(this->shape());
 
-	*result.data = (*this->data.get());
+	T *d0 = this->_m_begin();
+	T *d1 = result._m_begin();
 
-	result.write_in_range_wrapper(result.c_begin, result.c_end,
-			_vops::div<T, T>(val));
+	for (big_size_t i = 0; i < this->size(); i++) {
+
+		d1[i] = d0[i] / val;
+	}
 
 	return result;
 }
@@ -356,10 +356,10 @@ template<typename T, bool ref_holder>
 nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator /=(
 		const T &val) {
 
-	this->write_in_range_wrapper(this->c_begin, this->c_end,
-			_vops::div<T, T>(val));
+	this->_m_write_in_range(this->c_begin, this->c_end,
+			_ops::v1v::div<T, T>(val));
 
-	return *this->_m_dynamic_cast();
+	return *this->_m_dynamic_cast<T>();
 }
 
 template<typename T, bool ref_holder>

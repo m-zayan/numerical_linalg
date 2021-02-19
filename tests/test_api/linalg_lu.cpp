@@ -29,5 +29,6 @@ void test_api::linalg_lu() {
 	nd::matrix<int> mat3 = nd::linalg::eye<int>( { 3, 3 });
 
 	nd::out::print_matrix(mat3);
+
 }
 

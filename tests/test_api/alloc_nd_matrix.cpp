@@ -58,13 +58,12 @@ void test_api::alloc_nd_matrix() {
 
 	std::cout << "\n============ op: sub =========\n";
 
-	mat -= 2;
-	nd::out::print_matrix(mat);
+	mat /= 2;
+	nd::out::print_matrix(mat - 2);
 
 	std::cout << "\n============ op: add =========\n";
 
-	mat += 2;
-	nd::out::print_matrix(mat);
+	nd::out::print_matrix(mat + 2);
 
 	std::cout << "\n============ op: euqal =========\n";
 

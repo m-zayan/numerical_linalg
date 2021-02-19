@@ -5,6 +5,7 @@
  */
 
 #include "./algorithm.hpp"
+#include "./_v_func.hpp"
 
 template<typename T>
 algorithm<T>::algorithm() = default;

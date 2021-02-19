@@ -13,9 +13,10 @@
 #include "./matrix.hpp"
 
 template<typename T, bool ref_holder>
-nd::matrix<T, ref_holder>* nd::_matrix<T, ref_holder>::_m_dynamic_cast() {
+template<typename RT, bool ref_h>
+nd::matrix<RT, ref_h>* nd::_matrix<T, ref_holder>::_m_dynamic_cast() {
 
-	return dynamic_cast<nd::matrix<T, ref_holder>*>(this);
+	return dynamic_cast<nd::matrix<RT, ref_holder>*>(this);
 }
 
 template<typename T, bool ref_holder>
@@ -58,6 +59,16 @@ nd::matrix<T, true>::matrix(const coords &attr) {
 }
 
 template<typename T>
+nd::matrix<T, true>::matrix(const nd::matrix<T, false> &mat) {
+
+	this->attr = coords(mat.shape());
+	this->data = allocator::val_to_shared_ptr(mat._m_data());
+
+	this->c_begin = 0;
+	this->c_end = this->size();
+}
+
+template<typename T>
 nd::matrix<T> nd::matrix<T, true>::copy() {
 
 	return this->reordered_chunk(false);
@@ -73,10 +84,11 @@ template<typename T>
 nd::matrix<T, false>::matrix(const coords &attr, shared_ptr<vec1d<T>> data,
 		big_size_t c_begin, big_size_t c_end) {
 
-	if (attr.own_data) {
+	if (attr.own_data || c_begin > c_end) {
 
 		// debuging
-		throw nd::exception("...");
+		throw nd::exception("Invalid construction, "
+				"for a non-reference holder nd::matrix<T, ...>");
 	}
 
 	this->attr = std::move(attr);
@@ -91,10 +103,11 @@ template<typename T>
 nd::matrix<T, false>::matrix(const coords &attr, weak_ptr<vec1d<T>> data,
 		big_size_t c_begin, big_size_t c_end) {
 
-	if (attr.own_data) {
+	if (attr.own_data || c_begin > c_end) {
 
 		// debuging
-		throw nd::exception("...");
+		throw nd::exception("Invalid construction, "
+				"for a non-reference holder nd::matrix<T, ...>");
 	}
 
 	this->attr = std::move(attr);
@@ -103,6 +116,15 @@ nd::matrix<T, false>::matrix(const coords &attr, weak_ptr<vec1d<T>> data,
 
 	this->c_begin = c_begin;
 	this->c_end = c_end;
+}
+template<typename T>
+nd::matrix<T, false>::matrix(const nd::matrix<T, true> &mat) {
+
+	this->attr = mat._m_coords();
+	this->data = mat._m_ptr();
+
+	this->c_begin = mat._m_c_begin();
+	this->c_end = mat._m_c_end();
 }
 
 template<typename T>
