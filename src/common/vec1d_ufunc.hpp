@@ -4,8 +4,8 @@
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_COMMON__V_FUNC_HPP
-#define SRC_COMMON__V_FUNC_HPP
+#ifndef SRC_COMMON_VEC1D_UFUNC_HPP
+#define SRC_COMMON_VEC1D_UFUNC_HPP
 
 #include <functional>
 
@@ -62,4 +62,4 @@ std::function<std::function<void(T1&)>(T2 val)> sub = [](T2 val) {
 
 }
 
-#endif /* SRC_COMMON__V_FUNC_HPP_ */
+#endif /* SRC_COMMON_VEC1D_UFUNC_HPP */

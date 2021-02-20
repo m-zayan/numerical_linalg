@@ -13,7 +13,7 @@ int main() {
 //	test_api::sum_alg(test_size);
 
 //	[2]
-//	test_api::alloc_nd_matrix();
+	test_api::alloc_nd_matrix();
 
 //	[3]
 //	test_api::linalg_matmul();
@@ -25,5 +25,5 @@ int main() {
 //	test_api::linalg_transpose();
 
 // [6]
-	test_api::linalg_lu();
+//	test_api::linalg_lu();
 }

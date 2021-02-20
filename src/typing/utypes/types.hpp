@@ -4,8 +4,8 @@
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_TYPING_UTYPES_TYPES_HPP_
-#define SRC_TYPING_UTYPES_TYPES_HPP_
+#ifndef SRC_TYPING_UTYPES_TYPES_HPP
+#define SRC_TYPING_UTYPES_TYPES_HPP
 
 #include "../gtypes/types.hpp" // --> could be removed, i.e. (./common/vec1d.cpp)
 #include "../utypes/mask.hpp"
@@ -47,4 +47,4 @@ using data_t = typename vec1d_ptr<T, ref_holder>::type;
 
 }
 
-#endif /* SRC_TYPING_UTYPES_TYPES_HPP_ */
+#endif /* SRC_TYPING_UTYPES_TYPES_HPP */
