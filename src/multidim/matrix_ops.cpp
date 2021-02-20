@@ -15,8 +15,8 @@ void nd::_matrix<T, ref_holder>::_m_data_wrapper(U *d0, RT *d1, big_size_t s1,
 	if (c_begin > c_end || c_end - c_begin >= s1) {
 
 		// debugging
-		nd::exception("nd::_matrix<T, ...>::data_wrapper(...), "
-				"size dosen't match");
+		nd::exception("nd::_matrix<T, ...>::_m_data_wrapper(...), "
+				"size doesn't match");
 	}
 
 	for (big_size_t i = c_begin; i < c_end; i++) {
@@ -32,8 +32,8 @@ void nd::_matrix<T, ref_holder>::_m_write_in_range(big_size_t c_begin,
 	if (c_begin > c_end || c_end - c_begin >= this->size()) {
 
 		// debugging
-		nd::exception("nd::_matrix<T, ...>::data_wrapper(...), "
-				"size dosen't match");
+		nd::exception("nd::_matrix<T, ...>::_m_write_in_range(...), "
+				"size doesn't match");
 	}
 
 	(*this->data.get()).write_in_range(c_begin, c_end, func);
@@ -78,7 +78,7 @@ bool nd::_matrix<T, ref_holder>::operator ==(const matrix<T, ref_h> &mat) {
 
 	nd::matrix<T, false> temp = mat;
 
-	if (this->shape() != temp.shape()) {
+	if (this->ndim() != temp.ndim() || this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"matrices must have the same shape");
 	}
@@ -103,10 +103,11 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator +(
 
 	nd::matrix<T, false> temp = mat;
 
-	if (this->shape() != temp.shape()) {
+	if (this->ndim() != temp.ndim() || this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"matrices must have the same shape");
 	}
+
 	nd::matrix<T> result(this->shape());
 
 	T *d0 = this->_m_begin();
@@ -130,7 +131,7 @@ nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator +=(
 
 	nd::matrix<T, false> temp = mat;
 
-	if (this->shape() != temp.shape()) {
+	if (this->ndim() != temp.ndim() || this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"matrices must have the same shape");
 	}
@@ -184,10 +185,11 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator -(
 
 	nd::matrix<T, false> temp = mat;
 
-	if (this->shape() != temp.shape()) {
+	if (this->ndim() != temp.ndim() || this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"matrices must have the same shape");
 	}
+
 	nd::matrix<T> result(this->shape());
 
 	T *d0 = this->_m_begin();
@@ -210,7 +212,7 @@ nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator -=(
 
 	nd::matrix<T, false> temp = mat;
 
-	if (this->shape() != temp.shape()) {
+	if (this->ndim() != temp.ndim() || this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"matrices must have the same shape");
 	}
@@ -264,10 +266,11 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator *(
 
 	nd::matrix<T, false> temp = mat;
 
-	if (this->shape() != temp.shape()) {
+	if (this->ndim() != temp.ndim() || this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"matrices must have the same shape");
 	}
+
 	nd::matrix<T> result(this->shape());
 
 	T *d0 = this->_m_begin();
@@ -290,7 +293,7 @@ nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator *=(
 
 	nd::matrix<T, false> temp = mat;
 
-	if (this->shape() != temp.shape()) {
+	if (this->ndim() != temp.ndim() || this->shape() != temp.shape()) {
 		throw nd::exception("Invalid element-wise operation, "
 				"matrices must have the same shape");
 	}
