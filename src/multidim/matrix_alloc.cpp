@@ -138,7 +138,7 @@ nd::matrix<T, false>::~matrix() {
 
 }
 
-// functions
+// ufunc
 template<typename T>
 nd::matrix<T> nd::stack(nd::composite<nd::matrix<T>> matrix_list) {
 

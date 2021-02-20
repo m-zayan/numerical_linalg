@@ -9,48 +9,7 @@
 #ifndef SRC_MULTIDIM_MATRIX_HPP
 #define SRC_MULTIDIM_MATRIX_HPP
 
-#include <algorithm>
-
 #include "../iterators/RandomAccessNdIterator.hpp"
-
-// types
-namespace _t {
-
-template<typename T, bool ref_holder> struct dt;
-
-template<typename T> struct dt<T, true> {
-
-	using type = shared_ptr<vec1d<T>>;
-};
-
-template<typename T> struct dt<T, false> {
-
-	using type = weak_ptr<vec1d<T>>;
-
-};
-
-}
-// mask type
-class mask_t {
-public:
-	bool val = false;
-
-	friend std::ostream& operator <<(std::ostream &os, mask_t mask) {
-
-		os << mask.val;
-		return os;
-	}
-
-	mask_t& operator=(mask_t mask) {
-		this->val = mask.val;
-		return (*this);
-	}
-
-	mask_t& operator=(bool val) {
-		this->val = val;
-		return (*this);
-	}
-};
 
 // nd
 namespace nd {
@@ -61,7 +20,7 @@ class matrix;
 template<typename T>
 using composite = vec1d<T>;
 
-// functions
+// ufunc
 
 template<typename T>
 matrix<T> stack(composite<matrix<T>> matrix_list);
@@ -73,14 +32,14 @@ matrix<T> uniform(T low, T high, shape_t shape);
 
 }
 
-// end functions
+// end ufunc
 
 template<typename T, bool ref_holder>
 class _matrix {
 
 protected:
 
-	using data_t = typename _t::dt<T, ref_holder>::type;
+	using data_t = _type::data_t<T, ref_holder>;
 	using mat_t = matrix<T, ref_holder>;
 
 	coords attr;
@@ -136,8 +95,6 @@ public:
 	mat_t& operator *=(const matrix<T, ref_h> &mat);
 
 	// _matrix <---> value
-
-	//	 mask - (flag8_t -> should be modified -> mask object)
 	matrix<mask_t> operator ==(const T &val);
 
 	matrix<T> operator +(const T &val);

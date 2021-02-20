@@ -7,7 +7,7 @@
 #ifndef SRC_ITERATORS_RANDOMACCESSNDITERATOR_HPP
 #define SRC_ITERATORS_RANDOMACCESSNDITERATOR_HPP
 
-#include "./SequentialNdIterator.hpp"
+#include "../shapes/coords.hpp"
 
 class RandomAccessNdIterator {
 
@@ -19,6 +19,7 @@ private:
 	shape_t shape() const;
 	max_size_t ndim() const;
 	big_size_t size() const;
+
 	char order() const;
 	bool own_data() const;
 

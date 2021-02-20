@@ -8,11 +8,6 @@
 #include "./matrix_ops.cpp"
 #include "./matrix_stdout.cpp"
 
-namespace _pptr {
-
-template<typename T, bool ref_holder>
-using data_t = typename _t::dt<T, ref_holder>::type;
-}
 // base
 
 template<typename T, bool ref_holder>
@@ -69,7 +64,7 @@ big_size_t nd::_matrix<T, ref_holder>::_m_c_end() const {
 }
 
 template<typename T, bool ref_holder>
-_pptr::data_t<T, ref_holder> nd::_matrix<T, ref_holder>::_m_ptr() const {
+_type::data_t<T, ref_holder> nd::_matrix<T, ref_holder>::_m_ptr() const {
 
 	return this->data;
 }

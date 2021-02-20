@@ -1,21 +1,25 @@
 src/linalg/decomposition.o: ../src/linalg/decomposition.cpp \
  ../src/linalg/./decomposition.hpp ../src/linalg/./../multidim/matrix.hpp \
  ../src/linalg/./../multidim/../iterators/RandomAccessNdIterator.hpp \
- ../src/linalg/./../multidim/../iterators/./SequentialNdIterator.hpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/coords.hpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/vec1d.cpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/./vec1d.hpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/././algorithm.cpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/./././algorithm.hpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/./././../typing/types.hpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/./././../typing/./stl_wrapper/weak_ptr.hpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/./././_v_func.hpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/./../typing/allocator.cpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/./../typing/./allocator.hpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/./../typing/././types.hpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/./../random/generator.cpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/./../random/./generator.hpp \
- ../src/linalg/./../multidim/../iterators/./../shapes/../common/./../handlers/exception.hpp
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/types.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../gtypes/types.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../gtypes/./stl_wrapper/weak_ptr.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../utypes/mask.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/vec1d.cpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./vec1d.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../typing/gtypes/types.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../handlers/exception.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../typing/allocator.cpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../typing/./allocator.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../typing/././gtypes/types.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../random/generator.cpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../random/./generator.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/././vec1d_ufunc.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/././algorithm.cpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./././algorithm.hpp \
+ ../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./././../typing/gtypes/types.hpp \
+ ../src/linalg/./../multidim/../iterators/../shapes/coords.hpp \
+ ../src/linalg/./../multidim/../iterators/../shapes/../typing/utypes/types.hpp
 
 ../src/linalg/./decomposition.hpp:
 
@@ -23,32 +27,40 @@ src/linalg/decomposition.o: ../src/linalg/decomposition.cpp \
 
 ../src/linalg/./../multidim/../iterators/RandomAccessNdIterator.hpp:
 
-../src/linalg/./../multidim/../iterators/./SequentialNdIterator.hpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/types.hpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/coords.hpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../gtypes/types.hpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/vec1d.cpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../gtypes/./stl_wrapper/weak_ptr.hpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/./vec1d.hpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../utypes/mask.hpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/././algorithm.cpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/vec1d.cpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/./././algorithm.hpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./vec1d.hpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/./././../typing/types.hpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../typing/gtypes/types.hpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/./././../typing/./stl_wrapper/weak_ptr.hpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../handlers/exception.hpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/./././_v_func.hpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../typing/allocator.cpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/./../typing/allocator.cpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../typing/./allocator.hpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/./../typing/./allocator.hpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../typing/././gtypes/types.hpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/./../typing/././types.hpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../random/generator.cpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/./../random/generator.cpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./../random/./generator.hpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/./../random/./generator.hpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/././vec1d_ufunc.hpp:
 
-../src/linalg/./../multidim/../iterators/./../shapes/../common/./../handlers/exception.hpp:
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/././algorithm.cpp:
+
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./././algorithm.hpp:
+
+../src/linalg/./../multidim/../iterators/../typing/utypes/../../common/./././../typing/gtypes/types.hpp:
+
+../src/linalg/./../multidim/../iterators/../shapes/coords.hpp:
+
+../src/linalg/./../multidim/../iterators/../shapes/../typing/utypes/types.hpp:

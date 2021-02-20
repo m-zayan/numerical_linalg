@@ -4,11 +4,11 @@
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_TYPES_HPP
-#define SRC_TYPES_HPP
+#ifndef SRC_TYPING_GTYPES_TYPES_HPP
+#define SRC_TYPING_GTYPES_TYPES_HPP
 
 #include <vector>
-#include <memory>
+#include <queue>
 
 #include "./stl_wrapper/weak_ptr.hpp"
 
@@ -47,6 +47,7 @@ template<typename T> struct ref_t<false, T> {
 	using val_t = T;
 };
 
+// ops
 template<typename T>
 using val_t = decltype(*std::declval<T>());
 
@@ -79,4 +80,4 @@ template<typename T>
 struct is_weak_ptr<weak_ptr<T>> : std::true_type {
 };
 
-#endif /* SRC_TYPES_HPP */
+#endif /* SRC_TYPING_GTYPES_TYPES_HPP */

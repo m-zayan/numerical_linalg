@@ -7,7 +7,7 @@
 #ifndef SRC_TYPING_ALLOCATOR_HPP
 #define SRC_TYPING_ALLOCATOR_HPP
 
-#include "./types.hpp"
+#include "./gtypes/types.hpp"
 
 namespace allocator {
 

@@ -16,16 +16,26 @@
 #include <initializer_list>
 #include <functional>
 
-#include "./algorithm.cpp"
+#include "../typing/gtypes/types.hpp"
+#include "../handlers/exception.hpp"
+
 #include "../typing/allocator.cpp"
 #include "../random/generator.cpp"
 
-#include "../handlers/exception.hpp"
+#include "./vec1d_ufunc.hpp"
+
+#include "./algorithm.cpp"
 
 template<typename T>
 class vec1d;
 
-// shape_type
+namespace nd {
+
+template<typename T>
+using composite = vec1d<T>;
+
+}
+
 using shape_t = vec1d<max_size_t>;
 
 template<typename T>
