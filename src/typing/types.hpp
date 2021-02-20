@@ -13,6 +13,7 @@
 #include "./stl_wrapper/weak_ptr.hpp"
 
 // types
+using bool_t = bool;
 using flag8_t = int8_t;
 
 using min_t = short int;

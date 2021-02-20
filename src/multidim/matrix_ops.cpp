@@ -56,16 +56,16 @@ nd::matrix<T, false>& nd::_matrix<T, ref_holder>::operator =(
 
 // mask
 template<typename T, bool ref_holder>
-nd::matrix<min_size_t> nd::_matrix<T, ref_holder>::operator ==(const T &val) {
+nd::matrix<mask_t> nd::_matrix<T, ref_holder>::operator ==(const T &val) {
 
-	nd::matrix<min_size_t> result(this->shape());
+	nd::matrix<mask_t> result(this->shape());
 
 	T *d0 = this->_m_begin();
-	min_size_t *d1 = result._m_begin();
+	mask_t *d1 = result._m_begin();
 
 	for (big_size_t i = 0; i < this->size(); i++) {
 
-		d1[i] = static_cast<min_size_t>(d0[i] == val);
+		d1[i] = (d0[i] == val);
 	}
 
 	return result;

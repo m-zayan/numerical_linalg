@@ -147,7 +147,7 @@ std::cout << "\n============ op: add =========\n";
 mat += 2;
 nd::out::print_matrix(mat);
 
-std::cout << "\n============ op: euqal =========\n";
+std::cout << "\n============ op: equal =========\n";
 
 std::cout << (mat == mat) << ", " << (mat == (mat + 1)) << '\n';
 

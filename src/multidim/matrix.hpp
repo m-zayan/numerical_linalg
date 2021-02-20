@@ -13,7 +13,7 @@
 
 #include "../iterators/RandomAccessNdIterator.hpp"
 
-// type
+// types
 namespace _t {
 
 template<typename T, bool ref_holder> struct dt;
@@ -30,6 +30,27 @@ template<typename T> struct dt<T, false> {
 };
 
 }
+// mask type
+class mask_t {
+public:
+	bool val = false;
+
+	friend std::ostream& operator <<(std::ostream &os, mask_t mask) {
+
+		os << mask.val;
+		return os;
+	}
+
+	mask_t& operator=(mask_t mask) {
+		this->val = mask.val;
+		return (*this);
+	}
+
+	mask_t& operator=(bool val) {
+		this->val = val;
+		return (*this);
+	}
+};
 
 // nd
 namespace nd {
@@ -63,6 +84,7 @@ protected:
 	using mat_t = matrix<T, ref_holder>;
 
 	coords attr;
+	data_t data;
 
 	big_size_t c_begin;
 	big_size_t c_end;
@@ -74,13 +96,6 @@ protected:
 
 public:
 
-	data_t data;
-
-	matrix<T, false> operator [](max_size_t d_index);
-
-	template<bool ref_h>
-	matrix<T, false>& operator =(const matrix<T, ref_h> &mat);
-
 	inline big_size_t size();
 
 	inline shape_t shape();
@@ -91,6 +106,12 @@ public:
 	inline max_size_t step_size();
 
 	inline bool own_data();
+
+	// ===================
+	matrix<T, false> operator [](max_size_t d_index);
+
+	template<bool ref_h>
+	matrix<T, false>& operator =(const matrix<T, ref_h> &mat);
 
 	// _matrix <---> _matrix
 	template<bool ref_h>
@@ -116,8 +137,8 @@ public:
 
 	// _matrix <---> value
 
-	//	 mask - (min_size_t -> should be modified -> mask object)
-	matrix<min_size_t> operator ==(const T &val);
+	//	 mask - (flag8_t -> should be modified -> mask object)
+	matrix<mask_t> operator ==(const T &val);
 
 	matrix<T> operator +(const T &val);
 	mat_t& operator +=(const T &val);

@@ -65,7 +65,7 @@ void test_api::alloc_nd_matrix() {
 
 	nd::out::print_matrix(mat + 2);
 
-	std::cout << "\n============ op: euqal =========\n";
+	std::cout << "\n============ op: equal =========\n";
 
 	std::cout << (mat == mat) << ", " << (mat == (mat + 1)) << '\n';
 
