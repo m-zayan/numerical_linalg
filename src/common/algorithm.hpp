@@ -7,10 +7,9 @@
 #ifndef SRC_ALGORITHM_HPP
 #define SRC_ALGORITHM_HPP
 
-#include <queue>
+#include <algorithm>
 
-#include "./types.hpp"
-#include "./allocator.cpp"
+#include "../typing/gtypes/types.hpp"
 
 template<typename T>
 class algorithm {

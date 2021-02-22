@@ -1,5 +1,5 @@
 /*
- * linalg_exception.hpp
+ * exception.hpp
  *
  *	Author: Z. Mohamed
  */
@@ -24,4 +24,4 @@ public:
 	virtual ~exception();
 };
 }
-#endif /* HANDLERS_EXCEPTION_H_ */
+#endif /* SRC_HANDLERS_EXCEPTION_HPP */

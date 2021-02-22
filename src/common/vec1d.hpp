@@ -4,11 +4,9 @@
  *	Author: Z. Mohamed
  *
  *	 vector-1d,
+ *
  *	 Arithmetical operations are explicit
  *	 (i.e. conversions are not allowed - vec1d<float> + vec1d<int>)
- *
- *	 Strides, array for dimentions (storing nd-matrix using 1d array),
- *	 it's inspired by Numpy (https://numpy.org/)
  */
 
 #ifndef SRC_VEC1D_HPP
@@ -18,19 +16,33 @@
 #include <initializer_list>
 #include <functional>
 
+#include "../typing/gtypes/types.hpp"
+#include "../handlers/exception.hpp"
+
+#include "./vec1d_ufunc.hpp"
+
+#include "../typing/allocator.cpp"
+#include "../random/generator.cpp"
+
 #include "./algorithm.cpp"
-#include "./random/generator.cpp"
-#include "./handlers/exception.hpp"
 
 template<typename T>
 class vec1d;
 
-// shape_type
+namespace nd {
+
+template<typename T>
+using composite = vec1d<T>;
+
+}
+
 using shape_t = vec1d<max_size_t>;
 
 template<typename T>
 class vec1d {
-private:
+
+protected:
+
 	std::vector<T> values;
 
 public:
@@ -38,11 +50,11 @@ public:
 	vec1d();
 	vec1d(big_size_t size);
 	vec1d(big_size_t size, T val);
-	vec1d(std::vector<T> std_vec);
-	vec1d(std::initializer_list<T> std_init_list);
+	vec1d(const std::vector<T> &std_vec);
+	vec1d(const std::initializer_list<T> &std_init_list);
 	vec1d(const_iterator<T> begin, const_iterator<T> end);
 
-	inline big_size_t size();
+	big_size_t size() const;
 
 	void reserve(big_size_t size);
 	void resize(big_size_t size);
@@ -126,11 +138,11 @@ public:
 	void print_vec1d(big_size_t begin, big_size_t end);
 
 	// overload output stream (<<  operator) for shape_t.
-	inline friend std::ostream& operator <<(std::ostream &os, shape_t &shape);
+	inline friend std::ostream& operator <<(std::ostream &os, shape_t shape);
 
 	virtual ~vec1d();
 
-	// nd_matrix<T>::matrix_storage : shallow copy
+	// nd_matrix<T>::data : shallow copy
 	vec1d(const vec1d<T> &vec) noexcept;
 	vec1d(const vec1d<T> &&vec) noexcept;
 

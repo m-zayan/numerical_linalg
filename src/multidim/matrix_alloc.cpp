@@ -2,67 +2,158 @@
  * matrix_alloc.cpp
  *
  *	Author: Z. Mohamed
+ *
+ * Initialize - C-order, n-dimension matrix using vec1d - storage.
+ *
+ * Acess values, using strides array.
+ * stride - dictates the number of elements have to be skipped,
+ * to get the next element in that dimension.
  */
 
 #include "./matrix.hpp"
 
+template<typename T, bool ref_holder>
+template<typename RT, bool ref_h>
+nd::matrix<RT, ref_h>* nd::_matrix<T, ref_holder>::_m_dynamic_cast() {
+
+	return dynamic_cast<nd::matrix<RT, ref_holder>*>(this);
+}
+
+template<typename T, bool ref_holder>
+nd::_matrix<T, ref_holder>::~_matrix() {
+
+}
+
+template<typename T, bool ref_holder>
+nd::matrix<T> nd::_matrix<T, ref_holder>::copy() {
+
+	nd::matrix<T> result(this->shape());
+
+	T *d = this->_m_begin();
+	T *res = result._m_begin();
+
+	_m_ops::copy<T, T>(res, d, this->attr, this->req_iter);
+
+	return result;
+}
+
+// true
 template<typename T>
-nd::matrix<T>::matrix(shape_t shape) {
+nd::matrix<T, true>::matrix(shape_t shape) {
 
 	this->attr = coords(shape);
-	this->data.resize(this->attr.size1d);
+	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size()));
+
+	this->c_begin = 0;
+	this->c_end = this->size();
+
+	this->req_iter = false;
 }
 
-/*
- * Initialize - C-order, n-dimension matrix using 1d - storage.
- *
- * Acess values, using nd_strides array.
- * stride - dictates the number of elements have to be skipped,
- * to get the next element in that dimension.
- */
 template<typename T>
-nd::matrix<T>::matrix(shape_t shape, T val) {
+nd::matrix<T, true>::matrix(shape_t shape, T val) {
 
 	this->attr = coords(shape);
-	this->data.resize(this->attr.size1d);
+	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size(), val));
 
-	for (big_size_t i = 0; i < this->attr.size1d; i++) {
+	this->c_begin = 0;
+	this->c_end = this->size();
 
-		this->data[i] = allocator::val_to_shared_ptr<T>(val);
+	this->req_iter = false;
+}
+
+template<typename T>
+nd::matrix<T, true>::matrix(const coords &attr) {
+
+	this->attr = std::move(attr);
+	this->attr.own_data = true;
+
+	this->c_begin = 0;
+	this->c_end = this->size();
+
+	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size()));
+
+	this->req_iter = false;
+}
+
+template<typename T>
+nd::matrix<T, true>::matrix(const nd::matrix<T, false> &mat) {
+
+	this->attr = coords(mat.shape());
+	this->data = allocator::val_to_shared_ptr(mat._m_data());
+
+	this->c_begin = 0;
+	this->c_end = this->size();
+
+	this->req_iter = false;
+}
+
+template<typename T>
+nd::matrix<T, true>::~matrix() {
+
+}
+
+// false
+template<typename T>
+nd::matrix<T, false>::matrix(const coords &attr, shared_ptr<vec1d<T>> data,
+		big_size_t c_begin, big_size_t c_end, bool req_iter) {
+
+	if (attr.own_data || c_begin > c_end) {
+
+		// debuging
+		throw nd::exception("Invalid construction, "
+				"for a non-reference holder nd::matrix<T, ...>");
 	}
+
+	this->attr = std::move(attr);
+
+	this->data = data;
+
+	this->c_begin = c_begin;
+	this->c_end = c_end;
+
+	this->req_iter = req_iter;
 }
 
 template<typename T>
-nd::matrix<T>::matrix(const vec1d<ref_t<T>> &&chunk_data, const coords &&attr) :
-		data(std::move(chunk_data)), attr(std::move(attr)) {
-}
+nd::matrix<T, false>::matrix(const coords &attr, weak_ptr<vec1d<T>> data,
+		big_size_t c_begin, big_size_t c_end, bool req_iter) {
 
-template<typename T>
-nd::matrix<T>::matrix(const matrix &&mat) noexcept :
-		data(std::move(mat.data)), attr(std::move(mat.attr)) {
-}
+	if (attr.own_data || c_begin > c_end) {
 
-template<typename T>
-nd::matrix<T>::matrix(const matrix &mat) noexcept :
-		data(mat.data), attr(mat.attr) {
-}
-
-template<typename T>
-nd::matrix<T>::~matrix() {
-}
-
-template<typename T>
-nd::matrix<T> nd::matrix<T>::copy() {
-
-	nd::matrix<T> mat(this->shape());
-
-	for (big_size_t i = 0; i < mat.size(); i++) {
-		mat.data[i] = allocator::val_to_shared_ptr<T>(*this->data[i]);
+		// debuging
+		throw nd::exception("Invalid construction, "
+				"for a non-reference holder nd::matrix<T, ...>");
 	}
 
-	return mat;
+	this->attr = std::move(attr);
+
+	this->data = data;
+
+	this->c_begin = c_begin;
+	this->c_end = c_end;
+
+	this->req_iter = req_iter;
 }
 
+template<typename T>
+nd::matrix<T, false>::matrix(const nd::matrix<T, true> &mat) {
+
+	this->attr = mat._m_coords();
+	this->data = mat._m_ptr();
+
+	this->c_begin = mat._m_c_begin();
+	this->c_end = mat._m_c_end();
+
+	this->req_iter = mat._m_req_iter();
+}
+
+template<typename T>
+nd::matrix<T, false>::~matrix() {
+
+}
+
+// ufunc
 template<typename T>
 nd::matrix<T> nd::stack(nd::composite<nd::matrix<T>> matrix_list) {
 
@@ -96,14 +187,17 @@ nd::matrix<T> nd::stack(nd::composite<nd::matrix<T>> matrix_list) {
 
 	nd::matrix<T> result(new_shape);
 
+	T *dr = result._m_begin();
+
 	big_size_t slice = 0;
 
 	for (max_size_t i = 0; i < matrix_list.size(); i++) {
 
+		T *d = matrix_list[i]._m_begin();
+
 		for (big_size_t j = 0; j < matrix_list[i].size(); j++) {
 
-			result.data[slice + j] = allocator::val_to_shared_ptr<T>(
-					*matrix_list[i].data[j]);
+			dr[slice + j] = d[j];
 		}
 
 		slice += (i + 1) * matrix_list[i].size();
@@ -112,18 +206,20 @@ nd::matrix<T> nd::stack(nd::composite<nd::matrix<T>> matrix_list) {
 	return result;
 }
 
-// ============ random ===========
-
+// #random
 template<typename T>
 nd::matrix<T> nd::random::uniform(T low, T high, shape_t shape) {
 
 	nd::matrix<T> mat(shape);
 
+	T *d = mat._m_begin();
+
 	for (big_size_t i = 0; i < mat.size(); i++) {
 
-		T val = generator<T>::random_uniform(low, high);
-		mat.data[i] = allocator::val_to_shared_ptr<T>(val);
+		d[i] = generator<T>::random_uniform(low, high);
 	}
 
 	return mat;
 }
+
+// end ufunc

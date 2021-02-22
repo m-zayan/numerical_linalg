@@ -7,49 +7,60 @@
 #include "./coords.hpp"
 
 coords::coords() :
-		shape( { }), ndim(0), size1d(0), nd_strides( { }), order('C'), own_data(
-				1) {
+		shape( { }), ndim(0), size1d(0), strides( { }), order('C'), own_data(1) {
 
 }
 
 coords::coords(shape_t shape) :
 		shape(shape), ndim(shape.size()), size1d(
-				shape.multiply(0, shape.size())), nd_strides(
-				this->get_nd_strides(shape)), order('C'), own_data(1) {
+				shape.multiply(0, shape.size())), strides(
+				this->get_strides(shape)), order('C'), own_data(1) {
 
 }
 
 coords::coords(shape_t shape, char order) :
 		shape(shape), ndim(shape.size()), size1d(
-				shape.multiply(0, shape.size())), nd_strides(
-				this->get_nd_strides(shape)), order(order), own_data(1) {
+				shape.multiply(0, shape.size())), strides(
+				this->get_strides(shape)), order(order), own_data(1) {
 }
 
 coords::coords(shape_t shape, bool own_data) :
 		shape(shape), ndim(shape.size()), size1d(
-				shape.multiply(0, shape.size())), nd_strides(
-				this->get_nd_strides(shape)), order('C'), own_data(own_data) {
+				shape.multiply(0, shape.size())), strides(
+				this->get_strides(shape)), order('C'), own_data(own_data) {
+}
+
+coords::coords(shape_t shape, shape_t strides, bool own_data) {
+
+	this->check_strides(shape, strides);
+
+	this->shape = shape;
+	this->strides = strides;
+	this->ndim = shape.size();
+	this->size1d = shape.multiply(0, shape.size());
+	this->order = 'C';
+	this->own_data = own_data;
 }
 
 coords::~coords() {
 }
 
 coords::coords(const coords &attr) :
-		shape(attr.shape), ndim(attr.ndim), size1d(attr.size1d), nd_strides(
-				attr.nd_strides), order(attr.order), own_data(attr.own_data) {
+		shape(attr.shape), ndim(attr.ndim), size1d(attr.size1d), strides(
+				attr.strides), order(attr.order), own_data(attr.own_data) {
 
 }
 
 coords::coords(const coords &&attr) :
-		shape(std::move(attr.shape)), ndim(attr.ndim), size1d(attr.size1d), nd_strides(
-				std::move(attr.nd_strides)), order(attr.order), own_data(
+		shape(std::move(attr.shape)), ndim(attr.ndim), size1d(attr.size1d), strides(
+				std::move(attr.strides)), order(attr.order), own_data(
 				attr.own_data) {
 }
 
 coords coords::operator =(const coords &&attr) {
 
 	this->shape = std::move(attr.shape);
-	this->nd_strides = std::move(attr.nd_strides);
+	this->strides = std::move(attr.strides);
 	this->ndim = attr.ndim;
 	this->size1d = attr.size1d;
 	this->order = attr.order;
@@ -58,7 +69,7 @@ coords coords::operator =(const coords &&attr) {
 	return (*this);
 }
 
-shape_t coords::get_nd_strides(shape_t shape) {
+shape_t coords::get_strides(shape_t shape) {
 
 	shape_t strides;
 
@@ -85,6 +96,19 @@ shape_t coords::get_nd_strides(shape_t shape) {
 	}
 
 	return strides;
+}
+
+void coords::check_strides(shape_t shape, shape_t strides) {
+
+	for (max_size_t i = 0; i < shape.size() - 1; i++) {
+
+		if (strides[i] % shape[i] != 0
+				|| (strides[i] / shape[i]) != strides[i + 1]) {
+
+			nd::exception("Invalid coords(shape, strides), shape, "
+					"doesn't match with the given strides");
+		}
+	}
 }
 
 bool operator ==(const coords &attr1, const coords &attr2) {
