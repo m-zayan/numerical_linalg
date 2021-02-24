@@ -108,6 +108,7 @@ public:
 	mat_t& operator /=(const T &val);
 
 	void assign(shape_t indices, T val);
+	T& at(shape_t indices);
 
 	matrix<T> copy();
 
@@ -132,11 +133,6 @@ public:
 
 	virtual ~_matrix();
 
-	template<typename U>
-	friend matrix<U> random::uniform(U low, U high, shape_t shape);
-
-	template<typename U>
-	friend matrix<U> stack(composite<matrix<U>> matrix_list);
 };
 
 template<typename T, bool ref_holder>
@@ -155,7 +151,7 @@ public:
 	matrix(shape_t shape, T val);
 	matrix(const coords &attr);
 
-	matrix(const matrix &mat) = default;
+	matrix(const matrix<T> &mat);
 	matrix(const matrix<T, false> &mat);
 
 	~matrix();
@@ -176,7 +172,7 @@ public:
 	matrix(const coords &attr, weak_ptr<vec1d<T>> data, big_size_t c_begin,
 			big_size_t c_end, bool req_iter);
 
-	matrix(const matrix &mat) = default;
+	matrix(const matrix &mat);
 	matrix(const matrix<T, true> &mat);
 
 	~matrix();

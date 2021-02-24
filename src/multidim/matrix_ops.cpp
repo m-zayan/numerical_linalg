@@ -341,7 +341,7 @@ void nd::_matrix<T, ref_holder>::assign(shape_t indices, T val) {
 
 	big_size_t index = rndIter.index_at(indices);
 
-	(*this->data)[index] = val;
+	(*this->data.get())[index] = val;
 }
 
 template<typename T, bool ref_holder>
