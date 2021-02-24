@@ -120,7 +120,6 @@ void copy(RT *res, T *d, coords attr, bool req_iter) {
 
 		for (big_size_t i = 0; i < size; i++) {
 
-			std::cout << rndIter.index_at(i) << ", ";
 			res[i] = d[rndIter.index_at(i)];
 		}
 	}

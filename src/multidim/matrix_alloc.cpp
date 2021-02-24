@@ -77,15 +77,41 @@ nd::matrix<T, true>::matrix(const coords &attr) {
 }
 
 template<typename T>
-nd::matrix<T, true>::matrix(const nd::matrix<T, false> &mat) {
+nd::matrix<T, true>::matrix(const nd::matrix<T> &mat) {
 
-	this->attr = coords(mat.shape());
-	this->data = allocator::val_to_shared_ptr(mat._m_data());
+	nd::matrix<T, false> temp = mat;
+
+	this->attr = temp._m_coords();
+	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size()));
 
 	this->c_begin = 0;
 	this->c_end = this->size();
 
 	this->req_iter = false;
+
+	T *d = temp._m_begin();
+	T *res = this->_m_begin();
+
+	_m_ops::copy<T, T>(res, d, mat._m_coords(), mat._m_req_iter());
+}
+
+template<typename T>
+nd::matrix<T, true>::matrix(const nd::matrix<T, false> &mat) {
+
+	nd::matrix<T, false> temp = mat;
+
+	this->attr = coords(temp.shape());
+	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size()));
+
+	this->c_begin = 0;
+	this->c_end = this->size();
+
+	this->req_iter = false;
+
+	T *d = temp._m_begin();
+	T *res = this->_m_begin();
+
+	_m_ops::copy<T, T>(res, d, mat._m_coords(), mat._m_req_iter());
 }
 
 template<typename T>
@@ -149,77 +175,19 @@ nd::matrix<T, false>::matrix(const nd::matrix<T, true> &mat) {
 }
 
 template<typename T>
+nd::matrix<T, false>::matrix(const nd::matrix<T, false> &mat) {
+
+	this->attr = mat._m_coords();
+	this->data = mat._m_ptr();
+
+	this->c_begin = mat._m_c_begin();
+	this->c_end = mat._m_c_end();
+
+	this->req_iter = mat._m_req_iter();
+}
+
+template<typename T>
 nd::matrix<T, false>::~matrix() {
 
 }
 
-// ufunc
-template<typename T>
-nd::matrix<T> nd::stack(nd::composite<nd::matrix<T>> matrix_list) {
-
-	if (matrix_list.size() == 0) {
-
-		throw nd::exception(
-				"nd::composite<nd::matrix<T>>:: matrix_list is empty");
-	}
-
-	for (max_size_t i = 0; i < matrix_list.size() - 1; i++) {
-
-		if (matrix_list[i].shape() != matrix_list[i + 1].shape()
-				|| matrix_list[i].ndim() != matrix_list[i + 1].ndim()) {
-
-			throw nd::exception(
-					"nd::matrix<T>::stack, matrices must have the same shape");
-		}
-	}
-
-	max_size_t ndim = matrix_list[0].ndim();
-	shape_t shape = matrix_list[0].shape();
-
-	shape_t new_shape(ndim + 1);
-
-	new_shape[0] = matrix_list.size();
-
-	for (max_size_t i = 0; i < ndim; i++) {
-
-		new_shape[i + 1] = shape[i];
-	}
-
-	nd::matrix<T> result(new_shape);
-
-	T *dr = result._m_begin();
-
-	big_size_t slice = 0;
-
-	for (max_size_t i = 0; i < matrix_list.size(); i++) {
-
-		T *d = matrix_list[i]._m_begin();
-
-		for (big_size_t j = 0; j < matrix_list[i].size(); j++) {
-
-			dr[slice + j] = d[j];
-		}
-
-		slice += (i + 1) * matrix_list[i].size();
-	}
-
-	return result;
-}
-
-// #random
-template<typename T>
-nd::matrix<T> nd::random::uniform(T low, T high, shape_t shape) {
-
-	nd::matrix<T> mat(shape);
-
-	T *d = mat._m_begin();
-
-	for (big_size_t i = 0; i < mat.size(); i++) {
-
-		d[i] = generator<T>::random_uniform(low, high);
-	}
-
-	return mat;
-}
-
-// end ufunc
