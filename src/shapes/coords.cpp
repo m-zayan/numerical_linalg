@@ -127,7 +127,7 @@ coords coords::permuted(const shape_t &axes, bool own_data) const {
 
 	shape_t tmp_shape = this->shape;
 	shape_t tmp_strides = this->strides;
-	shape_t tmp_axes = std::move(axes);
+	shape_t tmp_axes = axes;
 
 	if (tmp_axes.size() != this->ndim) {
 
@@ -172,8 +172,8 @@ coords coords::reverse_permute(bool own_data) const {
 
 bool operator ==(const coords &attr1, const coords &attr2) {
 
-	coords temp1 = std::move(attr1);
-	coords temp2 = std::move(attr2);
+	coords temp1 = attr1;
+	coords temp2 = attr2;
 
 	if (temp1.ndim == temp2.ndim) {
 		for (max_size_t i = 0; i < temp1.ndim; i++) {

@@ -49,8 +49,11 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 }
 
 template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
-nd::matrix<RT> nd::linalg::matmul(nd::matrix<T1, rf_h0> mat1,
-		nd::matrix<T2, rf_h1> mat2) {
+nd::matrix<RT> nd::linalg::matmul(nd::matrix<T1, rf_h0> m1,
+		nd::matrix<T2, rf_h1> m2) {
+
+	nd::matrix<T1, true> mat1 = m1;
+	nd::matrix<T2, true> mat2 = m2;
 
 	max_size_t ndim_1 = mat1.ndim();
 	max_size_t ndim_2 = mat2.ndim();
@@ -88,7 +91,7 @@ nd::matrix<RT> nd::linalg::matmul(nd::matrix<T1, rf_h0> mat1,
 			}
 		}
 
-		new_shape = std::move(mat1.shape());
+		new_shape = mat1.shape();
 		new_shape[ndim_1 - 1] = dim02;
 
 		n_chunk = mat1.shape().multiply(0, ndim_1 - 2);
@@ -109,7 +112,7 @@ nd::matrix<RT> nd::linalg::matmul(nd::matrix<T1, rf_h0> mat1,
 			}
 		}
 
-		new_shape = std::move(mat1.shape());
+		new_shape = mat1.shape();
 		new_shape[ndim_1 - 1] = dim02;
 
 		n_chunk = mat1.shape().multiply(0, ndim_1 - 2);
@@ -135,7 +138,7 @@ nd::matrix<RT> nd::linalg::matmul(nd::matrix<T1, rf_h0> mat1,
 			}
 		}
 
-		new_shape = std::move(mat2.shape());
+		new_shape = mat2.shape();
 		new_shape[ndim_1 - 1] = dim02;
 
 		n_chunk = mat2.shape().multiply(0, ndim_2 - 2);
@@ -189,8 +192,11 @@ nd::matrix<RT> nd::linalg::matmul(nd::matrix<T1, rf_h0> mat1,
 }
 
 template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
-nd::matrix<RT> nd::linalg::dot(nd::matrix<T1, rf_h0> mat1,
-		nd::matrix<T2, rf_h1> mat2) {
+nd::matrix<RT> nd::linalg::dot(nd::matrix<T1, rf_h0> m1,
+		nd::matrix<T2, rf_h1> m2) {
+
+	nd::matrix<T1, true> mat1 = m1;
+	nd::matrix<T2, true> mat2 = m2;
 
 	max_size_t ndim_1 = mat1.ndim();
 	max_size_t ndim_2 = mat2.ndim();
@@ -217,8 +223,8 @@ nd::matrix<RT> nd::linalg::dot(nd::matrix<T1, rf_h0> mat1,
 		throw nd::exception("Input: mismatch dimension 0");
 	}
 
-	shape_t shape_1 = std::move(mat1.shape());
-	shape_t shape_2 = std::move(mat2.shape());
+	shape_t shape_1 = mat1.shape();
+	shape_t shape_2 = mat2.shape();
 
 	max_size_t new_ndim = ndim_1 + ndim_2 - 2;
 	shape_t new_shape(new_ndim);
