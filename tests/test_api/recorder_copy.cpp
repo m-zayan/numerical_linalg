@@ -50,8 +50,8 @@ void test_api::reorder_copy() {
 //
 //	std::cout << "\n ======================= \n";
 
-	nd::matrix<int> res2 = nd::linalg::matmul<int>(mat0,
-			mat1.permute( { 1, 0 }));
+	nd::matrix<double> res2 = nd::linalg::matmul<double>(mat0, mat1.permute( {
+			1, 0 })) + 0.5;
 
 	nd::out::print_matrix(res2);
 

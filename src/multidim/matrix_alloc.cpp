@@ -32,7 +32,7 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::copy() {
 	T *d = this->_m_begin();
 	T *res = result._m_begin();
 
-	_m_ops::copy<T, T>(res, d, this->attr, this->req_iter);
+	_m_ops::copy<T, T>(res, d, this->_m_coords(), this->req_iter);
 
 	return result;
 }
@@ -65,7 +65,7 @@ nd::matrix<T, true>::matrix(shape_t shape, T val) {
 template<typename T>
 nd::matrix<T, true>::matrix(const coords &attr) {
 
-	this->attr = std::move(attr);
+	this->attr = attr;
 	this->attr.own_data = true;
 
 	this->c_begin = 0;
@@ -131,7 +131,7 @@ nd::matrix<T, false>::matrix(const coords &attr, shared_ptr<vec1d<T>> data,
 				"for a non-reference holder nd::matrix<T, ...>");
 	}
 
-	this->attr = std::move(attr);
+	this->attr = attr;
 
 	this->data = data;
 
@@ -152,7 +152,7 @@ nd::matrix<T, false>::matrix(const coords &attr, weak_ptr<vec1d<T>> data,
 				"for a non-reference holder nd::matrix<T, ...>");
 	}
 
-	this->attr = std::move(attr);
+	this->attr = attr;
 
 	this->data = data;
 

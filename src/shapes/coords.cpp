@@ -7,27 +7,29 @@
 #include "./coords.hpp"
 
 coords::coords() :
-		shape( { }), ndim(0), size1d(0), strides( { }), order('C'), own_data(1) {
+		shape( { }), ndim(0), size1d(0), strides( { }), axes( { }), order('C'), own_data(
+				1) {
 
 }
 
 coords::coords(shape_t shape) :
 		shape(shape), ndim(shape.size()), size1d(
 				shape.multiply(0, shape.size())), strides(
-				this->get_strides(shape)), order('C'), own_data(1) {
+				this->get_strides(shape)), axes( { }), order('C'), own_data(1) {
 
+	this->axes.range(0, shape.size(), 1);
 }
 
 coords::coords(shape_t shape, char order) :
-		shape(shape), ndim(shape.size()), size1d(
-				shape.multiply(0, shape.size())), strides(
-				this->get_strides(shape)), order(order), own_data(1) {
+		coords::coords(shape) {
+
+	this->order = order;
 }
 
 coords::coords(shape_t shape, bool own_data) :
-		shape(shape), ndim(shape.size()), size1d(
-				shape.multiply(0, shape.size())), strides(
-				this->get_strides(shape)), order('C'), own_data(own_data) {
+		coords::coords(shape) {
+
+	this->own_data = own_data;
 }
 
 coords::coords(shape_t shape, shape_t strides, bool own_data) {
@@ -40,6 +42,14 @@ coords::coords(shape_t shape, shape_t strides, bool own_data) {
 	this->size1d = shape.multiply(0, shape.size());
 	this->order = 'C';
 	this->own_data = own_data;
+
+	this->axes.range(0, shape.size(), 1);
+}
+
+coords::coords(shape_t shape, shape_t axes, shape_t strides, bool own_data) :
+		coords::coords(shape, strides, own_data) {
+
+	this->axes = axes;
 }
 
 coords::~coords() {
@@ -47,20 +57,23 @@ coords::~coords() {
 
 coords::coords(const coords &attr) :
 		shape(attr.shape), ndim(attr.ndim), size1d(attr.size1d), strides(
-				attr.strides), order(attr.order), own_data(attr.own_data) {
+				attr.strides), axes(attr.axes), order(attr.order), own_data(
+				attr.own_data) {
 
 }
 
 coords::coords(const coords &&attr) :
 		shape(std::move(attr.shape)), ndim(attr.ndim), size1d(attr.size1d), strides(
-				std::move(attr.strides)), order(attr.order), own_data(
-				attr.own_data) {
+				std::move(attr.strides)), axes(std::move(attr.axes)), order(
+				attr.order), own_data(attr.own_data) {
 }
 
-coords coords::operator =(const coords &&attr) {
+coords& coords::operator =(const coords &attr) {
 
-	this->shape = std::move(attr.shape);
-	this->strides = std::move(attr.strides);
+	this->shape = attr.shape;
+	this->strides = attr.strides;
+	this->axes = attr.axes;
+
 	this->ndim = attr.ndim;
 	this->size1d = attr.size1d;
 	this->order = attr.order;
@@ -77,7 +90,6 @@ shape_t coords::get_strides(shape_t shape) {
 
 		strides.reserve(shape.size());
 
-		// multiply - big size_t, have to be modified
 		for (max_size_t i = 1; i < shape.size() - 1; i++) {
 
 			max_size_t begin = i;
@@ -109,6 +121,53 @@ void coords::check_strides(shape_t shape, shape_t strides) {
 					"doesn't match with the given strides");
 		}
 	}
+}
+
+coords coords::permuted(const shape_t &axes, bool own_data) const {
+
+	shape_t tmp_shape = this->shape;
+	shape_t tmp_strides = this->strides;
+	shape_t tmp_axes = std::move(axes);
+
+	if (tmp_axes.size() != this->ndim) {
+
+		throw nd::exception(
+				"Invalid number of axes, axes.size() != this->ndim()");
+	}
+
+	shape_t swaped_shape(this->ndim);
+	shape_t swaped_strides(this->ndim);
+
+	for (max_size_t i = 0; i < axes.size(); i++) {
+
+		if (tmp_axes[i] >= this->ndim) {
+
+			throw nd::exception("Invalid axes, axes[i] >= this->ndim()");
+		}
+
+		swaped_shape[i] = tmp_shape[tmp_axes[i]];
+		swaped_strides[i] = tmp_strides[tmp_axes[i]];
+	}
+
+	coords new_attr(swaped_shape, tmp_axes, swaped_strides, own_data);
+
+	return new_attr;
+}
+
+coords coords::reverse_permute(bool own_data) const {
+
+	shape_t tmp_axes = this->axes;
+
+	shape_t reaxes(this->ndim);
+
+	for (max_size_t i = 0; i < this->ndim; i++) {
+
+		reaxes[tmp_axes[i]] = i;
+	}
+
+	coords new_attr = this->permuted(reaxes, own_data);
+
+	return new_attr;
 }
 
 bool operator ==(const coords &attr1, const coords &attr2) {

@@ -17,6 +17,8 @@ private:
 
 	shape_t strides() const;
 	shape_t shape() const;
+	shape_t axes() const;
+
 	max_size_t ndim() const;
 	big_size_t size() const;
 
@@ -26,12 +28,15 @@ private:
 public:
 
 	RandomAccessNdIterator() = delete;
+
 	RandomAccessNdIterator(coords attr);
 
-	RandomAccessNdIterator& operator =(const coords &attr);
+	shape_t indices_at(big_size_t index_1d) const;
 
 	big_size_t index_at(shape_t indices) const;
 	big_size_t index_at(big_size_t index_1d) const;
+
+	big_size_t reversed_index_at(big_size_t index_1d) const;
 
 	virtual ~RandomAccessNdIterator();
 };

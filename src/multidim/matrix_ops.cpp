@@ -347,30 +347,7 @@ void nd::_matrix<T, ref_holder>::assign(shape_t indices, T val) {
 template<typename T, bool ref_holder>
 nd::matrix<T, false> nd::_matrix<T, ref_holder>::permute(shape_t axes) {
 
-	if (axes.size() != this->ndim()) {
-
-		throw nd::exception(
-				"Invalid number of axes, axes.size() != this->ndim()");
-	}
-
-	shape_t swaped_shape(this->ndim());
-	shape_t swaped_strides(this->ndim());
-
-	shape_t cur_shape = this->shape();
-	shape_t cur_strides = this->strides();
-
-	for (max_size_t i = 0; i < axes.size(); i++) {
-
-		if (axes[i] >= this->ndim()) {
-
-			throw nd::exception("Invalid axes, axes[i] >= this->ndim()");
-		}
-
-		swaped_shape[i] = cur_shape[axes[i]];
-		swaped_strides[i] = cur_strides[axes[i]];
-	}
-
-	coords new_attr(swaped_shape, swaped_strides, false);
+	coords new_attr = this->attr.permuted(axes, false);
 
 	nd::matrix<T, false> mat_chunk(new_attr, this->data, 0, this->size(), true);
 

@@ -63,6 +63,7 @@ public:
 	void pop_back();
 	void assign(const_iterator<T> begin, const_iterator<T> end);
 	void fill(big_size_t size, T val);
+	void range(T start, T end, T step);
 
 	const_iterator<T> begin();
 	const_iterator<T> end();

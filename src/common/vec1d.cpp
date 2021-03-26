@@ -91,6 +91,31 @@ void vec1d<T>::fill(big_size_t size, T val) {
 }
 
 template<typename T>
+void vec1d<T>::range(T start, T end, T step) {
+
+	if (step == 0) {
+		throw nd::exception("invalid range, step == 0");
+	}
+
+	else if (start >= end) {
+		throw nd::exception("invalid range, start >= end");
+	}
+
+	big_size_t size = (end - start) / step;
+
+	this->values.resize(size);
+
+	T cur = start;
+
+	for (big_size_t i = 0; i < size; i++) {
+
+		this->values[i] = cur;
+
+		cur += step;
+	}
+}
+
+template<typename T>
 T& vec1d<T>::operator [](big_size_t index) {
 
 	if (index >= this->values.size()) {
@@ -141,7 +166,7 @@ vec1d<T> vec1d<T>::operator =(const vec1d<T> &vec) {
 template<typename T>
 bool vec1d<T>::operator ==(const vec1d<T> &vec) {
 
-	vec1d<T> temp = std::move(vec);
+	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid boolean operation, "
@@ -162,7 +187,7 @@ bool vec1d<T>::operator ==(const vec1d<T> &vec) {
 template<typename T>
 bool vec1d<T>::operator !=(const vec1d<T> &vec) {
 
-	vec1d<T> temp = std::move(vec);
+	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid boolean operation, "
@@ -197,7 +222,7 @@ vec1d<bool> vec1d<T>::operator ==(const T &val) {
 template<typename T>
 vec1d<T> vec1d<T>::operator +(const vec1d<T> &vec) {
 
-	vec1d<T> temp = std::move(vec);
+	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -218,7 +243,7 @@ vec1d<T> vec1d<T>::operator +(const vec1d<T> &vec) {
 template<typename T>
 vec1d<T>& vec1d<T>::operator +=(const vec1d<T> &vec) {
 
-	vec1d<T> temp = std::move(vec);
+	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -263,7 +288,7 @@ vec1d<T>& vec1d<T>::operator +=(const T &val) {
 template<typename T>
 vec1d<T> vec1d<T>::operator -(const vec1d<T> &vec) {
 
-	vec1d<T> temp = std::move(vec);
+	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -284,7 +309,7 @@ vec1d<T> vec1d<T>::operator -(const vec1d<T> &vec) {
 template<typename T>
 vec1d<T>& vec1d<T>::operator -=(const vec1d<T> &vec) {
 
-	vec1d<T> temp = std::move(vec);
+	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -329,7 +354,7 @@ vec1d<T>& vec1d<T>::operator -=(const T &val) {
 template<typename T>
 vec1d<T> vec1d<T>::operator *(const vec1d<T> &vec) {
 
-	vec1d<T> temp = std::move(vec);
+	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -350,7 +375,7 @@ vec1d<T> vec1d<T>::operator *(const vec1d<T> &vec) {
 template<typename T>
 vec1d<T>& vec1d<T>::operator *=(const vec1d<T> &vec) {
 
-	vec1d<T> temp = std::move(vec);
+	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
 		throw nd::exception("Invalid element-wise operation, "
@@ -460,7 +485,7 @@ T vec1d<T>::sum(big_size_t begin, big_size_t end) {
 template<typename T>
 T vec1d<T>::multiply(big_size_t begin, big_size_t end) {
 
-	big_size_t result = 1;
+	T result = 1;
 
 	for (big_size_t i = begin; i < end; i++) {
 		result *= this->operator [](i);

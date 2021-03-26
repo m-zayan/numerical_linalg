@@ -28,6 +28,7 @@ public:
 	big_size_t size1d; // shape.multiply(0, n)
 
 	shape_t strides;
+	shape_t axes;
 
 	char order; // C-style, F-style, default : 'C'
 	bool own_data; // inspired by, Numpy ndarray's flags
@@ -40,8 +41,12 @@ public:
 	coords(shape_t shape, bool own_data);
 
 	coords(shape_t shape, shape_t strides, bool own_data);
+	coords(shape_t shape, shape_t axes, shape_t strides, bool own_data);
 
-	coords operator =(const coords &&attr);
+	coords& operator =(const coords &attr);
+
+	coords permuted(const shape_t &axes, bool own_data) const;
+	coords reverse_permute(bool own_data) const;
 
 	friend bool operator ==(const coords &attr1, const coords &attr2);
 
