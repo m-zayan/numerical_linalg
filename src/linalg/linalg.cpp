@@ -49,8 +49,8 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 }
 
 template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
-nd::matrix<RT> nd::linalg::matmul(nd::matrix<T1, rf_h0> m1,
-		nd::matrix<T2, rf_h1> m2) {
+nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
+		const nd::matrix<T2, rf_h1> &m2) {
 
 	nd::matrix<T1, true> mat1 = m1;
 	nd::matrix<T2, true> mat2 = m2;
@@ -192,8 +192,8 @@ nd::matrix<RT> nd::linalg::matmul(nd::matrix<T1, rf_h0> m1,
 }
 
 template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
-nd::matrix<RT> nd::linalg::dot(nd::matrix<T1, rf_h0> m1,
-		nd::matrix<T2, rf_h1> m2) {
+nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m1,
+		const nd::matrix<T2, rf_h1> &m2) {
 
 	nd::matrix<T1, true> mat1 = m1;
 	nd::matrix<T2, true> mat2 = m2;

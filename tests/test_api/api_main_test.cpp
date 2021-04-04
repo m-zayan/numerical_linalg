@@ -25,8 +25,9 @@ int main() {
 //	test_api::linalg_transpose();
 
 // [6]
-//	test_api::linalg_lu();
+	test_api::reorder_copy();
 
 // [7]
-	test_api::reorder_copy();
+//	test_api::linalg_lu();
+
 }

@@ -479,7 +479,8 @@ void vec1d<T>::apply_in_range(big_size_t begin, big_size_t end,
  */
 template<typename T>
 T vec1d<T>::sum(big_size_t begin, big_size_t end) {
-	return algorithm<T>::pairwise_summation(begin, end, this->values);
+	return algorithm::_h::__pairwise_summation<T>(begin, end,
+			&(this->values[0]));
 }
 
 template<typename T>

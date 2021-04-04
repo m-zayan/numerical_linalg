@@ -18,7 +18,7 @@ void print_vec1d(vec1d<T> vec) {
 
 	std::cout << "[";
 
-	for (big_size_t i = 0; i < vec.size() - 1; i++) {
+	for (max_size_t i = 0; i < vec.size() - 1; i++) {
 		std::cout << vec[i] << ", ";
 
 		if (i && i % 10 == 0)
@@ -31,7 +31,7 @@ void print_vec1d(vec1d<T> vec) {
 template<typename T>
 void print_vec1d(std::vector<T> vec) {
 	std::cout << "[";
-	for (big_size_t i = 0; i < vec.size() - 1; i++) {
+	for (max_size_t i = 0; i < vec.size() - 1; i++) {
 		std::cout << vec[i] << ", ";
 
 		if (i && i % 10 == 0)
@@ -96,7 +96,7 @@ void test_api::sum_alg(max_size_t test_size) {
 	// 1.0 + 2.1 + 3.2 + 4.3 + 5.5 = 16.1
 	std::vector<double> vec = { 1.0, 2.1, 3.2, 4.3, 5.5 };
 
-	big_size_t n = vec.size();
+	max_size_t n = vec.size();
 
 	std::cout << "vector :";
 
@@ -104,10 +104,10 @@ void test_api::sum_alg(max_size_t test_size) {
 
 	std::cout << "\n========================\n";
 
-	double sum1 = algorithm<double>::naive_summation(0, n, vec);
-	double sum2 = algorithm<double>::kahan_summation(0, n, vec);
-	double sum3 = algorithm<double>::shift_reduce_sum(0, n, vec);
-	double sum4 = algorithm<double>::pairwise_selection_sum(0, n, vec);
+	double sum1 = algorithm::naive_summation<double>(0, n, vec);
+	double sum2 = algorithm::kahan_summation<double>(0, n, vec);
+	double sum3 = algorithm::shift_reduce_sum<double>(0, n, vec);
+	double sum4 = algorithm::pairwise_selection_sum<double>(0, n, vec);
 
 	std::cout << "naive_summation :" << sum1 << ln;
 	std::cout << "kahan_summation :" << sum2 << ln;
@@ -119,7 +119,7 @@ void test_api::sum_alg(max_size_t test_size) {
 	// skip indices, 0, n-2 = 4
 
 	// 2.1 + 3.2 + 4.3 = 9.6
-	double sum = algorithm<double>::shift_reduce_sum(1, n - 1, vec);
+	double sum = algorithm::shift_reduce_sum<double>(1, n - 1, vec);
 
 	std::cout << "shift_reduce_sum - in range [1, 4)  :" << sum << ln;
 
@@ -127,7 +127,7 @@ void test_api::sum_alg(max_size_t test_size) {
 	// ================= Test apply_in_range ================
 
 	vec1d<double> vec2 = { 1, 2, 3, 4, 5 };
-	big_size_t n2 = vec2.size();
+	max_size_t n2 = vec2.size();
 
 	std::cout << "apply_in_range vec1d: \n";
 
@@ -158,7 +158,7 @@ void test_api::sum_alg(max_size_t test_size) {
 	srand(42); // seed
 
 	// Generate test
-	for (big_size_t i = 0; i < test_size - 1; i++) {
+	for (max_size_t i = 0; i < test_size - 1; i++) {
 
 		vec3[i] += i;
 
@@ -170,19 +170,19 @@ void test_api::sum_alg(max_size_t test_size) {
 
 	std::cout << "\n========================\n";
 
-	double s1 = exec_time_run(algorithm<double>::naive_summation, "Naive", 0,
-			test_size, vec3);
+	double s1 = exec_time_run(algorithm::naive_summation<double, double>,
+			"Naive", 0, test_size, vec3);
 
-	double s2 = exec_time_run(algorithm<double>::kahan_summation, "Kahan", 0,
-			test_size, vec3);
+	double s2 = exec_time_run(algorithm::kahan_summation<double, double>,
+			"Kahan", 0, test_size, vec3);
 
-	double s3 = exec_time_run(algorithm<double>::pairwise_summation, "Pairwise",
-			0, test_size, vec3);
+	double s3 = exec_time_run(algorithm::pairwise_summation<double, double>,
+			"Pairwise", 0, test_size, vec3);
 
-	double s4 = exec_time_run(algorithm<double>::shift_reduce_sum,
+	double s4 = exec_time_run(algorithm::shift_reduce_sum<double, double>,
 			"Shift Reduce", 0, test_size, vec3);
 
-	double s5 = exec_time_run(algorithm<double>::pairwise_selection_sum,
+	double s5 = exec_time_run(algorithm::pairwise_selection_sum<double, double>,
 			"Pairwise Selection", 0, test_size, vec3);
 
 	std::cout << "========================\n";

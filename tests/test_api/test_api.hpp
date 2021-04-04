@@ -1,11 +1,11 @@
 /*
- * test_api.h
+ * test_api.hpp
  *
  *	Author: Z. Mohamed
  */
 
-#ifndef TEST_API_TEST_API_H_
-#define TEST_API_TEST_API_H_
+#ifndef TEST_API_TEST_API_HPP
+#define TEST_API_TEST_API_HPP
 
 #include <chrono>
 #include <assert.h>
@@ -30,4 +30,4 @@ void reorder_copy();
 
 }
 
-#endif /* TEST_API_TEST_API_H_ */
+#endif /* TEST_API_TEST_API_HPP */

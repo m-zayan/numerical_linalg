@@ -15,7 +15,7 @@ public:
 
 	using std::weak_ptr<T>::weak_ptr;
 
-	std::shared_ptr<T> get() {
+	std::shared_ptr<T> get() const {
 		return this->lock();
 	}
 };

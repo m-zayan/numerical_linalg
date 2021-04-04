@@ -78,7 +78,7 @@ _type::data_t<T, ref_holder> nd::_matrix<T, ref_holder>::_m_ptr() const {
 template<typename T, bool ref_holder>
 vec1d<T> nd::_matrix<T, ref_holder>::_m_data() const {
 
-	return *this->data.get();
+	return *(this->data.get());
 }
 
 template<typename T, bool ref_holder>

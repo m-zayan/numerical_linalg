@@ -9,7 +9,7 @@
 namespace nd::out::_h {
 
 template<typename T>
-void print_vec1d(T *data, RandomAccessNdIterator iter, big_size_t begin,
+void print_vec1d(T *data, RandomAccessNdIterator &iter, big_size_t begin,
 		big_size_t end) {
 
 	std::cout << "[";
