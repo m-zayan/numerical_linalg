@@ -33,9 +33,6 @@ nd::matrix<RT> tensordot(const nd::matrix<T1, rf_h0> &m1,
 template<typename T, bool rf_h>
 nd::matrix<T> transpose(nd::matrix<T, rf_h> mat, shape_t axes);
 
-//template<typename T, bool rf_h>
-//void inplace_transpose(nd::matrix<T, rf_h> &mat, shape_t axes);
-
 template<typename RT, typename T, bool rf_h>
 nd::matrix<RT> inverse(nd::matrix<T, rf_h> mat);
 
@@ -44,6 +41,17 @@ nd::matrix<RT> pseudo_inverse(nd::matrix<T, rf_h> mat);
 
 //template<typename T>
 //nd::composite<nd::matrix<T>> eigen(nd::matrix<T> mat);
+
+}
+
+namespace nd::linalg::inplace {
+
+//template<typename T, bool rf_h>
+//void swapaxes(nd::matrix<T, rf_h> &mat, max_size_t ax0,
+//		max_size_t ax1);
+
+template<typename T, bool rf_h>
+void transpose(nd::matrix<T, rf_h> &mat, shape_t axes);
 
 }
 

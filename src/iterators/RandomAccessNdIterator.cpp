@@ -98,6 +98,40 @@ big_size_t RandomAccessNdIterator::reversed_index_at(
 	return reindex;
 }
 
+bool RandomAccessNdIterator::is_cycle_root(big_size_t index_1d) const {
+
+	big_size_t size = this->size();
+
+	big_size_t k = index_1d;
+	big_size_t xi = size;
+
+	big_size_t max_iter = 0;
+
+	while (true) {
+
+		xi = this->reversed_index_at(k);
+
+		if (xi == index_1d) {
+			break;
+		}
+
+		else if (xi < index_1d) {
+			return false;
+			break;
+		}
+
+		k = xi;
+
+		// debug
+		max_iter++;
+		if (max_iter == size) {
+			throw nd::exception(
+					"RandomAccessNdIterator::is_cycle_root(...), has been failed");
+		}
+	}
+
+	return true;
+}
 big_size_t RandomAccessNdIterator::size() const {
 	return this->attr.size1d;
 }

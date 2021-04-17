@@ -130,6 +130,7 @@ public:
 	// ===================
 
 	matrix<T, false> permute(shape_t axes);
+	void _m_permute_inplace(shape_t axes);
 
 	virtual ~_matrix();
 

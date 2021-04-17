@@ -7,7 +7,7 @@
 #include "./algorithm.hpp"
 
 template<typename RT, typename T>
-RT algorithm::_h::__naive_summation(big_size_t begin, big_size_t end, T *x) {
+RT algorithm::_h::naive_summation(big_size_t begin, big_size_t end, T *x) {
 
 	RT sum = 0;
 
@@ -19,18 +19,19 @@ RT algorithm::_h::__naive_summation(big_size_t begin, big_size_t end, T *x) {
 }
 
 template<typename RT, typename T>
-RT algorithm::_h::__pairwise_summation(big_size_t begin, big_size_t end, T *x) {
+RT algorithm::_h::pairwise_summation(big_size_t begin, big_size_t end, T *x) {
 
 	big_size_t n = (end - begin);
 
 	if (n <= 64) {
-		return algorithm::_h::__naive_summation<RT>(begin, end, x);
+		return algorithm::_h::naive_summation<RT>(begin, end, x);
 	}
 
 	else {
 		// big_size_t mid = n/2
-		return __pairwise_summation<RT>(begin, n / 2, x)
-				+ __pairwise_summation<RT>(begin, n - n / 2, x + n / 2);
+		return algorithm::_h::pairwise_summation<RT>(begin, n / 2, x)
+				+ algorithm::_h::pairwise_summation<RT>(begin, n - n / 2,
+						x + n / 2);
 	}
 }
 
@@ -38,7 +39,7 @@ RT algorithm::_h::__pairwise_summation(big_size_t begin, big_size_t end, T *x) {
 template<typename RT, typename T>
 RT algorithm::naive_summation(big_size_t begin, big_size_t end,
 		std::vector<T> vec) {
-	return algorithm::_h::__naive_summation<RT>(begin, end, &vec[0]);
+	return algorithm::_h::naive_summation<RT>(begin, end, &vec[0]);
 }
 
 /* Kahan summation, worst-case error that grows
@@ -71,7 +72,7 @@ template<typename RT, typename T>
 RT algorithm::pairwise_summation(big_size_t begin, big_size_t end,
 		std::vector<T> vec) {
 
-	return algorithm::_h::__pairwise_summation<RT>(begin, end, &vec[begin]);
+	return algorithm::_h::pairwise_summation<RT>(begin, end, &vec[begin]);
 }
 
 /*
@@ -111,7 +112,7 @@ RT algorithm::shift_reduce_sum(big_size_t begin, big_size_t end,
  * Time Complexity: O(n)
  * Space Complexity: O(MAX_EXTRA_SPACE) - Auxiliary Space, for n >= MAX_EXTRA_SPACE
  *
- * Very large constant factor: T(n) = 32 * log2(64) * n
+ * Comparatively large constant factor: T(n) = 32 * log2(64) * n
  */
 template<typename RT, typename T>
 RT algorithm::pairwise_selection_sum(big_size_t begin, big_size_t end,

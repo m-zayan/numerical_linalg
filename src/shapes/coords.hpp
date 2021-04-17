@@ -47,6 +47,7 @@ public:
 
 	coords permuted(const shape_t &axes, bool own_data) const;
 	coords reverse_permute(bool own_data) const;
+	coords swapaxes(max_size_t ax0, max_size_t ax1, bool own_data) const;
 
 	friend bool operator ==(const coords &attr1, const coords &attr2);
 

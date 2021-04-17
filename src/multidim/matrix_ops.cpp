@@ -354,3 +354,10 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::permute(shape_t axes) {
 	return mat_chunk;
 }
 
+template<typename T, bool ref_holder>
+void nd::_matrix<T, ref_holder>::_m_permute_inplace(shape_t axes) {
+
+	coords new_attr = this->attr.permuted(axes, true);
+	this->attr = coords(new_attr.shape);
+}
+

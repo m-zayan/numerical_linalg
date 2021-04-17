@@ -13,10 +13,10 @@
 
 namespace algorithm::_h {
 template<typename RT, typename T>
-RT __pairwise_summation(big_size_t begin, big_size_t end, T *x);
+RT pairwise_summation(big_size_t begin, big_size_t end, T *x);
 
 template<typename RT, typename T>
-RT __naive_summation(big_size_t begin, big_size_t end, T *x);
+RT naive_summation(big_size_t begin, big_size_t end, T *x);
 
 }
 

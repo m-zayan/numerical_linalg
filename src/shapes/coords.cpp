@@ -170,6 +170,24 @@ coords coords::reverse_permute(bool own_data) const {
 	return new_attr;
 }
 
+coords coords::swapaxes(max_size_t ax0, max_size_t ax1, bool own_data) const {
+
+	if (ax0 >= this->ndim || ax1 >= this->ndim) {
+
+		throw nd::exception(
+				"Invalid axis of axes, ax0 >= this->ndim || ax1 >= this->ndim");
+	}
+
+	;
+	shape_t swapped_axes = this->axes;
+
+	std::swap(swapped_axes[ax0], swapped_axes[ax1]);
+
+	coords new_attr = this->permuted(swapped_axes, own_data);
+
+	return new_attr;
+}
+
 bool operator ==(const coords &attr1, const coords &attr2) {
 
 	coords temp1 = attr1;

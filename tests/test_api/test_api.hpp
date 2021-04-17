@@ -27,6 +27,7 @@ void linalg_lu();
 void linalg_echelon();
 void linalg_hessenberg();
 void reorder_copy();
+void linalg_inplace();
 
 }
 

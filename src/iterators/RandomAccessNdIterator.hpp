@@ -38,6 +38,8 @@ public:
 
 	big_size_t reversed_index_at(big_size_t index_1d) const;
 
+	bool is_cycle_root(big_size_t index_1d) const;
+
 	virtual ~RandomAccessNdIterator();
 };
 
