@@ -117,7 +117,6 @@ bool RandomAccessNdIterator::is_cycle_root(big_size_t index_1d) const {
 
 		else if (xi < index_1d) {
 			return false;
-			break;
 		}
 
 		k = xi;
