@@ -392,8 +392,6 @@ nd::matrix<RT, true> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 						max_size_t)> func, max_size_t axis, T2 initial_acc,
 		std::function<RT(T2)> ppfunc) {
 
-	constexpr max_size_t AUX_VEC_SIZE = 2048;
-
 	nd::matrix<T1, false> tmp = mat;
 
 	if (axis >= tmp.ndim()) {
@@ -413,7 +411,7 @@ nd::matrix<RT, true> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 	max_size_t dim_size = attr.shape[axis];
 	big_size_t out_size = tmp.size() / dim_size;
 
-	max_size_t aux_size = std::min(dim_size, AUX_VEC_SIZE);
+	max_size_t aux_size = std::min(dim_size, nd::AUX_SIZE_2048);
 
 	max_size_t vi;
 	big_size_t index = 0;
@@ -446,9 +444,7 @@ nd::matrix<RT, true> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 		if (aux_size < dim_size) {
 
-			max_size_t remainder = dim_size % aux_size;
-
-			func(acc, indices, elems, 0, remainder);
+			func(acc, indices, elems, 0, vi);
 		}
 
 		d1[i] = ppfunc(acc);

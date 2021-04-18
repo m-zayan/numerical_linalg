@@ -52,8 +52,6 @@ template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
 nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
 		const nd::matrix<T2, rf_h1> &m2) {
 
-	constexpr max_size_t AUX_VEC_SIZE = 2048;
-
 	nd::matrix<T1, true> mat1 = m1;
 	nd::matrix<T2, true> mat2 = m2;
 
@@ -162,7 +160,7 @@ nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
 	T2 *d1 = mat2._m_begin();
 	RT *d2 = result._m_begin();
 
-	max_size_t aux_size = std::min(dim12, AUX_VEC_SIZE);
+	max_size_t aux_size = std::min(dim12, nd::AUX_SIZE_2048);
 
 	max_size_t vi;
 
@@ -205,8 +203,6 @@ nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
 template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
 nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m1,
 		const nd::matrix<T2, rf_h1> &m2) {
-
-	constexpr max_size_t AUX_VEC_SIZE = 2048;
 
 	nd::matrix<T1, true> mat1 = m1;
 	nd::matrix<T2, true> mat2 = m2;
@@ -277,7 +273,7 @@ nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m1,
 
 	big_size_t steps_1 = mat1.size() / step_size_1;
 
-	max_size_t aux_size = std::min(dim12, AUX_VEC_SIZE);
+	max_size_t aux_size = std::min(dim12, nd::AUX_SIZE_2048);
 
 	vec1d<RT> elems(aux_size, 0);
 

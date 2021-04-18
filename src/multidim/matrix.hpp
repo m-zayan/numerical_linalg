@@ -14,6 +14,8 @@
 // nd
 namespace nd {
 
+constexpr max_size_t AUX_SIZE_2048 = 2048;
+
 template<typename T, bool ref_holder = true>
 class matrix;
 
