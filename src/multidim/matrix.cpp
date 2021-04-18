@@ -6,6 +6,7 @@
 
 #include "./matrix_alloc.cpp"
 #include "./matrix_ops.cpp"
+#include "./matrix_numeric.cpp"
 #include "./matrix_stdout.cpp"
 
 // base

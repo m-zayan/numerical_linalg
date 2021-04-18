@@ -12,7 +12,7 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 	if (shape.size() < 2) {
 
 		nd::exception(
-				"shape, have to be greater than or equal 2, shape.size() >= 2");
+				"shape, has to be greater than or equal 2, shape.size() >= 2");
 	}
 
 	nd::matrix<T> mat(shape, 0);
@@ -52,6 +52,8 @@ template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
 nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
 		const nd::matrix<T2, rf_h1> &m2) {
 
+	constexpr max_size_t AUX_VEC_SIZE = 2048;
+
 	nd::matrix<T1, true> mat1 = m1;
 	nd::matrix<T2, true> mat2 = m2;
 
@@ -61,7 +63,7 @@ nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
 	if (!(ndim_1 >= 2 && ndim_2 >= 2)) {
 
 		throw nd::exception(
-				"Input dimension have to be greater than or equal 2, ndim >= 2");
+				"Input dimension has to be greater than or equal 2, ndim >= 2");
 	}
 
 	max_size_t dim01 = mat1.shape()[ndim_1 - 1];
@@ -160,6 +162,12 @@ nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
 	T2 *d1 = mat2._m_begin();
 	RT *d2 = result._m_begin();
 
+	max_size_t aux_size = std::min(dim12, AUX_VEC_SIZE);
+
+	max_size_t vi;
+
+	vec1d<RT> elems(aux_size, 0);
+
 	big_size_t index = 0;
 
 	for (big_size_t t = 0; t < n_chunk; t++) {
@@ -171,18 +179,21 @@ nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
 
 			for (big_size_t d02 = 0; d02 < dim02; d02++) {
 
-				vec1d<RT> element(dim12);
+				elems.fill(aux_size, 0);
+				vi = 0;
 
 				for (big_size_t d12 = 0; d12 < dim12; d12++) {
 
 					big_size_t l1 = s1 + (d12 + d11 * dim01);
 					big_size_t l2 = s2 + (d02 + d12 * dim02);
 
-					element[d12] = d0[l1] * d1[l2];
+					vi %= aux_size;
+
+					elems[vi++] += (d0[l1] * d1[l2]);
 
 				}
 
-				d2[index++] = element.sum(0, dim12);
+				d2[index++] = elems.sum(0, aux_size);
 			}
 		}
 
@@ -195,6 +206,8 @@ template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
 nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m1,
 		const nd::matrix<T2, rf_h1> &m2) {
 
+	constexpr max_size_t AUX_VEC_SIZE = 2048;
+
 	nd::matrix<T1, true> mat1 = m1;
 	nd::matrix<T2, true> mat2 = m2;
 
@@ -204,7 +217,7 @@ nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m1,
 	if (!(ndim_1 >= 2 && ndim_2 >= 2)) {
 
 		throw nd::exception(
-				"Input dimension have to be greater than or equal 2, ndim >= 2");
+				"Input dimension has to be greater than or equal 2, ndim >= 2");
 	}
 
 	if (ndim_1 == 2 || ndim_2 == 2) {
@@ -264,7 +277,11 @@ nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m1,
 
 	big_size_t steps_1 = mat1.size() / step_size_1;
 
-	vec1d<RT> elems(dim12);
+	max_size_t aux_size = std::min(dim12, AUX_VEC_SIZE);
+
+	vec1d<RT> elems(aux_size, 0);
+
+	max_size_t vi;
 
 	big_size_t index = 0;
 
@@ -282,14 +299,19 @@ nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m1,
 
 			for (max_size_t j = 0; j < dim02; j++) {
 
+				elems.fill(aux_size, 0);
+				vi = 0;
+
 				for (max_size_t k = 0; k < dim12; k++) {
 
 					ik = slice_2 + j * step_12 + k * step_02;
 
-					elems[k] = d0[start + k] * d1[ik];
+					vi %= aux_size;
+
+					elems[vi++] += (d0[start + k] * d1[ik]);
 				}
 
-				d2[index++] = elems.sum(0, dim12);
+				d2[index++] = elems.sum(0, aux_size);
 			}
 		}
 	}
@@ -385,5 +407,5 @@ void nd::linalg::inplace::transpose(nd::matrix<T, rf_h> &mat, shape_t axes) {
 		}
 	}
 
-	mat._m_permute_inplace(axes);
+	mat._m_reshape(new_attr.shape);
 }

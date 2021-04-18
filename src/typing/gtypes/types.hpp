@@ -33,6 +33,10 @@ using shared_ptr = std::shared_ptr<T>;
 template<typename T>
 using const_iterator = typename std::vector<T>::iterator;
 
+// value - index - pair
+template<typename T>
+using vipair = std::pair<T, max_size_t>;
+
 // ops
 template<typename T>
 using val_t = decltype(*std::declval<T>());
