@@ -1,13 +1,13 @@
 /*
- * nd_ufunc.hpp
+ * ufunc.hpp
  *
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_MULTIDIM_ND_UFUNC_HPP
-#define SRC_MULTIDIM_ND_UFUNC_HPP
+#ifndef SRC_MULTIDIM_UFUNC_HPP
+#define SRC_MULTIDIM_UFUNC_HPP
 
-#include "../iterators/RandomAccessNdIterator.hpp"
+#include "../iterators/RandomAccess.hpp"
 
 namespace _m_ops {
 
@@ -27,8 +27,8 @@ void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	if (req_iter0 && req_iter1) {
 
-		RandomAccessNdIterator rndIter0(attr0);
-		RandomAccessNdIterator rndIter1(attr1);
+		nd::iterator::RandomAccess rndIter0(attr0);
+		nd::iterator::RandomAccess rndIter1(attr1);
 
 		for (big_size_t i = 0; i < size0; i++) {
 
@@ -41,7 +41,7 @@ void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	else if (req_iter0) {
 
-		RandomAccessNdIterator rndIter0(attr0);
+		nd::iterator::RandomAccess rndIter0(attr0);
 
 		for (big_size_t i = 0; i < size0; i++) {
 
@@ -54,7 +54,7 @@ void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	else if (req_iter1) {
 
-		RandomAccessNdIterator rndIter1(attr1);
+		nd::iterator::RandomAccess rndIter1(attr1);
 
 		for (big_size_t i = 0; i < size0; i++) {
 
@@ -86,7 +86,7 @@ void write_val_vec(T1 *d, T2 val, coords attr,
 
 	if (req_iter) {
 
-		RandomAccessNdIterator rndIter(attr);
+		nd::iterator::RandomAccess rndIter(attr);
 
 		for (big_size_t i = 0; i < size; i++) {
 
@@ -116,7 +116,7 @@ void copy(RT *res, T *d, coords attr, bool req_iter) {
 
 	if (req_iter) {
 
-		RandomAccessNdIterator rndIter(attr);
+		nd::iterator::RandomAccess rndIter(attr);
 
 		for (big_size_t i = 0; i < size; i++) {
 
@@ -143,7 +143,7 @@ void write_vec_val_vec(RT *res, T1 *d, T2 val, coords attr,
 
 	if (req_iter) {
 
-		RandomAccessNdIterator rndIter(attr);
+		nd::iterator::RandomAccess rndIter(attr);
 
 		for (big_size_t i = 0; i < size; i++) {
 
@@ -181,8 +181,8 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	if (req_iter0 && req_iter1) {
 
-		RandomAccessNdIterator rndIter0(attr0);
-		RandomAccessNdIterator rndIter1(attr1);
+		nd::iterator::RandomAccess rndIter0(attr0);
+		nd::iterator::RandomAccess rndIter1(attr1);
 
 		for (big_size_t i = 0; i < size0; i++) {
 
@@ -195,7 +195,7 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	else if (req_iter0) {
 
-		RandomAccessNdIterator rndIter0(attr0);
+		nd::iterator::RandomAccess rndIter0(attr0);
 
 		for (big_size_t i = 0; i < size0; i++) {
 
@@ -208,7 +208,7 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	else if (req_iter1) {
 
-		RandomAccessNdIterator rndIter1(attr1);
+		nd::iterator::RandomAccess rndIter1(attr1);
 
 		for (big_size_t i = 0; i < size0; i++) {
 
@@ -232,4 +232,67 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 }
 }
 
-#endif /* SRC_MULTIDIM_ND_UFUNC_HPP */
+namespace nd::numeric::_h {
+
+template<typename T1, typename T2>
+using apply_func_t = std::function<
+void(T1&, vec1d<max_size_t>&, vec1d<T2>&, max_size_t, max_size_t)>;
+
+template<typename T>
+apply_func_t<vipair<T>, T> maximum = [](vipair<T> &acc,
+		vec1d<max_size_t> &indices, vec1d<T> &values, max_size_t begin,
+		max_size_t end) {
+
+	for (max_size_t i = begin; i < end; i++) {
+
+		if (acc.first == values[i])
+			continue;
+
+		acc = std::max(acc, { values[i], indices[i] });
+	}
+
+};
+
+template<typename T>
+apply_func_t<vipair<T>, T> minimum = [](vipair<T> &acc,
+		vec1d<max_size_t> &indices, vec1d<T> &values, max_size_t begin,
+		max_size_t end) {
+
+	for (max_size_t i = begin; i < end; i++) {
+
+		if (acc.first == values[i])
+			continue;
+
+		acc = std::min(acc, { values[i], indices[i] });
+	}
+
+};
+
+template<typename RT, typename T>
+apply_func_t<vec1d<RT>, T> sum = [](vec1d<RT> &acc, vec1d<max_size_t> &indices,
+		vec1d<T> &values, max_size_t begin, max_size_t end) {
+
+	for (max_size_t i = begin; i < end; i++) {
+		acc[i] += static_cast<RT>(values[i]);
+	}
+};
+
+template<typename RT, typename T>
+std::function<T(vipair<T>)> ppvalue = [](vipair<T> acc) {
+
+	return static_cast<RT>(acc.first);
+};
+
+template<typename RT, typename T>
+std::function<RT(vipair<T>)> ppindex = [](vipair<T> acc) {
+	return static_cast<RT>(acc.second);
+};
+
+template<typename RT>
+std::function<RT(vec1d<RT>)> v_sum = [](vec1d<RT> acc) {
+	return acc.sum(0, acc.size());
+};
+
+}  // namespace nd::numeric::_h
+
+#endif /* SRC_MULTIDIM_UFUNC_HPP */

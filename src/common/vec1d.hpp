@@ -138,8 +138,11 @@ public:
 
 	void print_vec1d(big_size_t begin, big_size_t end);
 
-	// overload output stream (<<  operator) for shape_t.
+	// overload output stream (<<  operator) &  for shape_t.
 	inline friend std::ostream& operator <<(std::ostream &os, shape_t shape);
+
+	inline friend uflag8_t operator &(const shape_t &shape1,
+			const shape_t &shape2);
 
 	virtual ~vec1d();
 

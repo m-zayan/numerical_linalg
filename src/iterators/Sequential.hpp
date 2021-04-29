@@ -1,43 +1,46 @@
 /*
- * SequentialNdIterator.hpp
+ * Sequential.hpp
  *
  *	Author: Z. Mohamed
  *
  *	N-dimensional iterator to index vec1d
  */
 
-#ifndef SRC_ITERATORS_SEQUENTIALNDITERATOR_HPP
-#define SRC_ITERATORS_SEQUENTIALNDITERATOR_HPP
+#ifndef SRC_ITERATORS_SEQUENTIAL_HPP
+#define SRC_ITERATORS_SEQUENTIAL_HPP
 
 #include "../typing/utypes/types.hpp"
 
-class SequentialNdIterator {
+namespace nd::iterator {
+
+class Sequential {
 
 private:
 
 	shape_t shape;
 	max_size_t dim_bounds;
 
-	// indices
-	shape_t current;
 	max_size_t axis;
 	max_size_t mov_axis;
+
+	// indices
+	shape_t current;
+
+	bool locked;
 
 	flag8_t proceed(big_t i);
 	flag8_t update_state(flag8_t state);
 	void next_prem();
 
-	bool locked;
-
 	void lock();
 
 public:
 
-	SequentialNdIterator() = delete;
+	Sequential() = delete;
 
-	SequentialNdIterator(shape_t shapes);
+	Sequential(shape_t shape);
 
-	shape_t next();
+	void next();
 	shape_t icurrent() const;
 
 	max_size_t iaxis();
@@ -46,7 +49,8 @@ public:
 	void unlock();
 	void reset();
 
-	virtual ~SequentialNdIterator();
+	virtual ~Sequential();
 };
+}
 
-#endif /* SRC_ITERATORS_SequentialNdIterator_HPP */
+#endif /* SRC_ITERATORS_SEQUENTIAL_HPP */

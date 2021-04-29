@@ -40,6 +40,7 @@ std::function<void(RT&, T1, T2)> bool_equal = [](RT &v0, T1 v1, T2 v2) {
 
 	v0 = (v1 == v2);
 };
+
 }
 
 #endif /* SRC_COMMON_VEC1D_UFUNC_HPP */

@@ -14,6 +14,8 @@
 
 // types
 using bool_t = bool;
+
+using uflag8_t = uint8_t;
 using flag8_t = int8_t;
 
 using min_t = short int;
@@ -32,6 +34,13 @@ using shared_ptr = std::shared_ptr<T>;
 
 template<typename T>
 using const_iterator = typename std::vector<T>::iterator;
+
+// value - index - pair
+template<typename T>
+using vipair = std::pair<T, max_size_t>;
+
+template<typename T>
+using pair_of = std::pair<T, T>;
 
 // ops
 template<typename T>

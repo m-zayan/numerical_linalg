@@ -337,7 +337,7 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::operator [](
 template<typename T, bool ref_holder>
 void nd::_matrix<T, ref_holder>::assign(shape_t indices, T val) {
 
-	RandomAccessNdIterator rndIter(this->attr);
+	nd::iterator::RandomAccess rndIter(this->attr);
 
 	big_size_t index = rndIter.index_at(indices);
 
@@ -354,3 +354,101 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::permute(shape_t axes) {
 	return mat_chunk;
 }
 
+template<typename T, bool ref_holder>
+nd::matrix<T, false> nd::_matrix<T, ref_holder>::reshape(shape_t shape) {
+
+	coords new_attr = coords(shape);
+
+	if (new_attr.size1d != this->size()) {
+
+		throw nd::exception("nd::matrix<T>::reshape(...), Invalid shape");
+
+	}
+
+	nd::matrix<T, false> mat_chunk(new_attr, this->data, 0, this->size(), true);
+
+	return mat_chunk;
+}
+
+template<typename T, bool ref_holder>
+void nd::_matrix<T, ref_holder>::_m_reshape(shape_t shape) {
+
+	coords new_attr = coords(shape);
+
+	if (new_attr.size1d != this->size()) {
+
+		throw nd::exception("nd::matrix<T>::_m_reshape(...), Invalid shape");
+
+	}
+
+	this->attr = new_attr;
+}
+
+// ...
+template<typename RT, typename T1, typename T2, bool rf_h>
+nd::matrix<RT, true> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
+		std::function<
+				void(T2&, vec1d<max_size_t>&, vec1d<T1>&, max_size_t,
+						max_size_t)> func, max_size_t axis, T2 initial_acc,
+		std::function<RT(T2)> ppfunc) {
+
+	nd::matrix<T1, false> tmp = mat;
+
+	if (axis >= tmp.ndim()) {
+		throw nd::exception("nd::matrix<T> - axis, Out of Range");
+	}
+
+	coords attr = tmp._m_coords();
+
+	coords tmp_attr = attr.swapaxes(0, axis, false);
+
+	coords new_attr = attr.reduce(axis);
+
+	nd::matrix<RT> result(new_attr.shape);
+
+	nd::iterator::RandomAccess rndIter(tmp_attr);
+
+	max_size_t dim_size = attr.shape[axis];
+	big_size_t out_size = tmp.size() / dim_size;
+
+	max_size_t aux_size = nd::mem::clip_dim(dim_size);
+
+	max_size_t vi;
+	big_size_t index = 0;
+
+	vec1d<T1> elems(aux_size);
+	vec1d<max_size_t> indices(aux_size);
+
+	T1 *d0 = tmp._m_begin();
+	RT *d1 = result._m_begin();
+
+	T2 acc;
+
+	for (big_size_t i = 0; i < out_size; i++) {
+
+		vi = 0;
+		acc = initial_acc;
+
+		for (max_size_t j = 0; j < dim_size; j++) {
+
+			elems[vi] = d0[rndIter.index_at(index++)];
+			indices[vi] = j;
+
+			vi++;
+
+			if (vi >= aux_size) {
+				vi = 0;
+				func(acc, indices, elems, 0, aux_size);
+			}
+		}
+
+		if (aux_size < dim_size) {
+
+			func(acc, indices, elems, 0, vi);
+		}
+
+		d1[i] = ppfunc(acc);
+	}
+
+	return result;
+}

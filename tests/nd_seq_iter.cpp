@@ -7,7 +7,7 @@
 //#include <iostream>
 //#include <memory>
 //
-//#include "../src/iterators/SequentialNdIterator.hpp"
+//#include "../src/iterators/Sequential.hpp"
 //
 //#define ln '\n'
 //
@@ -16,7 +16,7 @@
 //	shape_t shape = { 4, 3, 2, 2 };
 //	max_size_t ndim = shape.size();
 //
-//	SequentialNdIterator seqIter(shape);
+//	nd::iterator::Sequential seqIter(shape);
 //
 //	max_size_t count = 0;
 //
