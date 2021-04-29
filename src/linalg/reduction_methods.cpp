@@ -4,5 +4,5 @@
  *	Author: Z. Mohamed
  */
 
-#include "reduction_methods.hpp"
+#include "./linalg.hpp"
 

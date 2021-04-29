@@ -75,7 +75,7 @@ nd::matrix<RT, true> nd::numeric::sum(const nd::matrix<T, rf_h> &mat,
 		max_size_t axis) {
 
 	max_size_t dim_size = mat._m_coords().shape[axis];
-	max_size_t aux_size = std::min(dim_size, nd::AUX_SIZE_2048);
+	max_size_t aux_size = nd::mem::clip_dim(dim_size);
 
 	vec1d<RT> initial_acc(aux_size, 0);
 

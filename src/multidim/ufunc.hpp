@@ -7,7 +7,7 @@
 #ifndef SRC_MULTIDIM_UFUNC_HPP
 #define SRC_MULTIDIM_UFUNC_HPP
 
-#include "../iterators/RandomAccessNdIterator.hpp"
+#include "../iterators/RandomAccess.hpp"
 
 namespace _m_ops {
 
@@ -27,8 +27,8 @@ void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	if (req_iter0 && req_iter1) {
 
-		RandomAccessNdIterator rndIter0(attr0);
-		RandomAccessNdIterator rndIter1(attr1);
+		nd::iterator::RandomAccess rndIter0(attr0);
+		nd::iterator::RandomAccess rndIter1(attr1);
 
 		for (big_size_t i = 0; i < size0; i++) {
 
@@ -41,7 +41,7 @@ void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	else if (req_iter0) {
 
-		RandomAccessNdIterator rndIter0(attr0);
+		nd::iterator::RandomAccess rndIter0(attr0);
 
 		for (big_size_t i = 0; i < size0; i++) {
 
@@ -54,7 +54,7 @@ void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	else if (req_iter1) {
 
-		RandomAccessNdIterator rndIter1(attr1);
+		nd::iterator::RandomAccess rndIter1(attr1);
 
 		for (big_size_t i = 0; i < size0; i++) {
 
@@ -86,7 +86,7 @@ void write_val_vec(T1 *d, T2 val, coords attr,
 
 	if (req_iter) {
 
-		RandomAccessNdIterator rndIter(attr);
+		nd::iterator::RandomAccess rndIter(attr);
 
 		for (big_size_t i = 0; i < size; i++) {
 
@@ -116,7 +116,7 @@ void copy(RT *res, T *d, coords attr, bool req_iter) {
 
 	if (req_iter) {
 
-		RandomAccessNdIterator rndIter(attr);
+		nd::iterator::RandomAccess rndIter(attr);
 
 		for (big_size_t i = 0; i < size; i++) {
 
@@ -143,7 +143,7 @@ void write_vec_val_vec(RT *res, T1 *d, T2 val, coords attr,
 
 	if (req_iter) {
 
-		RandomAccessNdIterator rndIter(attr);
+		nd::iterator::RandomAccess rndIter(attr);
 
 		for (big_size_t i = 0; i < size; i++) {
 
@@ -181,8 +181,8 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	if (req_iter0 && req_iter1) {
 
-		RandomAccessNdIterator rndIter0(attr0);
-		RandomAccessNdIterator rndIter1(attr1);
+		nd::iterator::RandomAccess rndIter0(attr0);
+		nd::iterator::RandomAccess rndIter1(attr1);
 
 		for (big_size_t i = 0; i < size0; i++) {
 
@@ -195,7 +195,7 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	else if (req_iter0) {
 
-		RandomAccessNdIterator rndIter0(attr0);
+		nd::iterator::RandomAccess rndIter0(attr0);
 
 		for (big_size_t i = 0; i < size0; i++) {
 
@@ -208,7 +208,7 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	else if (req_iter1) {
 
-		RandomAccessNdIterator rndIter1(attr1);
+		nd::iterator::RandomAccess rndIter1(attr1);
 
 		for (big_size_t i = 0; i < size0; i++) {
 

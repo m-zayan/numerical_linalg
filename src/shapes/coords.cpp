@@ -188,7 +188,7 @@ coords coords::swapaxes(max_size_t ax0, max_size_t ax1, bool own_data) const {
 	return new_attr;
 }
 
-coords coords::reduce(max_size_t axis) {
+coords coords::reduce(max_size_t axis) const {
 
 	shape_t in_shape = this->shape;
 	shape_t out_shape(this->ndim - 1);
@@ -206,6 +206,48 @@ coords coords::reduce(max_size_t axis) {
 	coords new_attr = coords(out_shape);
 
 	return new_attr;
+}
+
+coords coords::pad_dim(max_size_t new_ndim) const {
+
+	max_size_t ndim = this->ndim;
+	max_size_t max_ndim = std::max(new_ndim, ndim);
+
+	max_size_t pad_size = max_ndim - ndim;
+
+	shape_t shape = this->shape;
+	shape_t strides = this->strides;
+	shape_t axes = this->axes;
+
+	shape_t new_shape(max_ndim, 1);
+	shape_t new_strides(max_ndim, strides[0]);
+	shape_t new_axes(max_ndim);
+
+	new_axes.range(0, max_ndim, 1);
+
+	for (max_size_t i = 0; i < ndim; i++) {
+
+		new_shape[pad_size + i] = shape[i];
+		new_strides[pad_size + i] = strides[i];
+		new_axes[pad_size + i] = axes[i];
+	}
+
+	coords new_attr(new_shape, new_axes, new_strides, this->own_data);
+
+	return new_attr;
+}
+
+void coords::swapaxes(max_size_t ax0, max_size_t ax1) {
+
+	if (ax0 >= this->ndim || ax1 >= this->ndim) {
+
+		throw nd::exception(
+				"Invalid axis of axes, ax0 >= this->ndim || ax1 >= this->ndim");
+	}
+
+	std::swap(this->axes[ax0], this->axes[ax1]);
+	std::swap(this->shape[ax0], this->shape[ax1]);
+	std::swap(this->strides[ax0], this->strides[ax1]);
 }
 
 bool operator ==(const coords &attr1, const coords &attr2) {
@@ -226,3 +268,4 @@ bool operator ==(const coords &attr1, const coords &attr2) {
 		return false;
 	}
 }
+

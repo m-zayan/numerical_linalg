@@ -7,8 +7,10 @@
 #ifndef SRC_TYPING_UTYPES_TYPES_HPP
 #define SRC_TYPING_UTYPES_TYPES_HPP
 
+#include "./mask.hpp"
+#include "./bounded_t.cpp"
+
 #include "../gtypes/types.hpp" // --> could be removed, i.e. (./common/vec1d.cpp)
-#include "../utypes/mask.hpp"
 
 #include "../../common/vec1d.cpp"
 

@@ -4,5 +4,5 @@
  *	Author: Z. Mohamed
  */
 
-#include "./decomposition.hpp"
+#include "./linalg.hpp"
 

@@ -538,3 +538,60 @@ std::ostream& operator <<(std::ostream &os, shape_t shape) {
 	}
 	return os;
 }
+
+// flags: {0: doesn't match, 1: match, 2: broadcastable}
+uflag8_t operator &(const shape_t &shape1, const shape_t &shape2) {
+
+	shape_t temp1 = shape1;
+	shape_t temp2 = shape2;
+
+	max_size_t size1 = temp1.size();
+	max_size_t size2 = temp2.size();
+
+	uflag8_t flag = 1;
+
+	if (size1 == size2) {
+		for (max_size_t i = 0; i < size1; i++) {
+			if (temp1[i] != temp2[i]) {
+
+				if (temp1[i] == 1 || temp2[i] == 1) {
+
+					flag = 2;
+				}
+
+				else {
+					return 0;
+				}
+			}
+		}
+		return flag;
+	}
+
+	else {
+
+		max_size_t i, j;
+
+		if (size1 > size2) {
+			i = size1 - size2;
+			j = 0;
+		}
+
+		else {
+			i = 0;
+			j = size2 - size1;
+		}
+
+		while (i < size1 && j < size2) {
+
+			if ((temp1[i] != temp2[j]) && !(temp1[i] == 1 || temp2[j] == 1)) {
+				return 0;
+			}
+
+			i++;
+			j++;
+		}
+
+		return 2;
+	}
+}
+

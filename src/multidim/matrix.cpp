@@ -97,7 +97,7 @@ T* nd::_matrix<T, ref_holder>::_m_end() {
 template<typename T, bool ref_holder>
 T& nd::_matrix<T, ref_holder>::at(shape_t indices) {
 
-	RandomAccessNdIterator rndIter(this->attr);
+	nd::iterator::RandomAccess rndIter(this->attr);
 
 	big_size_t index = rndIter.index_at(indices);
 
@@ -172,3 +172,4 @@ nd::matrix<T> nd::random::uniform(T low, T high, shape_t shape) {
 
 	return mat;
 }
+

@@ -1,50 +1,49 @@
 /*
- * SequentialNdIterator.cpp
+ * Sequential.cpp
  *
  *	Author: Z. Mohamed
  */
 
-#include "SequentialNdIterator.hpp"
+#include "Sequential.hpp"
 
-SequentialNdIterator::SequentialNdIterator(shape_t shape) {
+nd::iterator::Sequential::Sequential(shape_t shape) {
 
 	this->shape = shape;
 
 	this->dim_bounds = shape.size();
-	this->current.fill(this->dim_bounds, 0);
 
 	// last dimension
 	this->axis = this->dim_bounds - 1;
 	this->mov_axis = this->dim_bounds - 1;
 
+	this->current.fill(this->dim_bounds, 0);
+
 	this->locked = false;
 }
 
-shape_t SequentialNdIterator::icurrent() const {
+shape_t nd::iterator::Sequential::icurrent() const {
 
 	return this->current;
 }
 
-max_size_t SequentialNdIterator::iaxis() {
+max_size_t nd::iterator::Sequential::iaxis() {
 
 	return this->axis;
 }
 
-shape_t SequentialNdIterator::next() {
+void nd::iterator::Sequential::next() {
 
 	if (this->isLoked()) {
 
 		throw nd::exception("The iterator was locked, if you want to reuse it, "
-				"consider using SequentialNdIterator::unlock(), method.");
+				"consider using Sequential::unlock(), method.");
 	}
 
 	this->next_prem();
-
-	return this->current;
 }
 
 // update step & return a status flag
-flag8_t SequentialNdIterator::proceed(big_t i) {
+flag8_t nd::iterator::Sequential::proceed(big_t i) {
 
 	// If the current, is upper bound, lock the iterator
 	if (this->mov_axis + i < 0 || this->mov_axis + i >= this->dim_bounds) {
@@ -72,14 +71,14 @@ flag8_t SequentialNdIterator::proceed(big_t i) {
 	}
 
 }
-void SequentialNdIterator::next_prem() {
+void nd::iterator::Sequential::next_prem() {
 
 	flag8_t state = this->proceed(0);
 
 	state = this->update_state(state);
 }
 
-flag8_t SequentialNdIterator::update_state(flag8_t state) {
+flag8_t nd::iterator::Sequential::update_state(flag8_t state) {
 
 	// range: [lower bound, ...]
 	big_t lbound = -1;
@@ -96,27 +95,27 @@ flag8_t SequentialNdIterator::update_state(flag8_t state) {
 	return state;
 }
 
-void SequentialNdIterator::lock() {
+void nd::iterator::Sequential::lock() {
 
 	this->locked = true;
 }
 
-bool SequentialNdIterator::isLoked() {
+bool nd::iterator::Sequential::isLoked() {
 
 	return this->locked;
 }
 
-void SequentialNdIterator::unlock() {
+void nd::iterator::Sequential::unlock() {
 
 	this->locked = false;
 }
 
-void SequentialNdIterator::reset() {
+void nd::iterator::Sequential::reset() {
 
 	this->current.fill(this->dim_bounds, 0);
 	this->locked = false;
 }
 
-SequentialNdIterator::~SequentialNdIterator() {
+nd::iterator::Sequential::~Sequential() {
 }
 

@@ -1,15 +1,16 @@
 /*
- * RandomAccessNdIterator.hpp
+ * RandomAccess.hpp
  *
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_ITERATORS_RANDOMACCESSNDITERATOR_HPP
-#define SRC_ITERATORS_RANDOMACCESSNDITERATOR_HPP
+#ifndef SRC_ITERATORS_RandomAccess_HPP
+#define SRC_ITERATORS_RandomAccess_HPP
 
 #include "../shapes/coords.hpp"
 
-class RandomAccessNdIterator {
+namespace nd::iterator {
+class RandomAccess {
 
 private:
 
@@ -27,9 +28,9 @@ private:
 
 public:
 
-	RandomAccessNdIterator() = delete;
+	RandomAccess() = delete;
 
-	RandomAccessNdIterator(coords attr);
+	RandomAccess(coords attr);
 
 	shape_t indices_at(big_size_t index_1d) const;
 
@@ -40,7 +41,8 @@ public:
 
 	bool is_cycle_root(big_size_t index_1d) const;
 
-	virtual ~RandomAccessNdIterator();
+	virtual ~RandomAccess();
 };
+}
 
-#endif /* SRC_ITERATORS_RANDOMACCESSNDITERATOR_HPP */
+#endif /* SRC_ITERATORS_RandomAccess_HPP */

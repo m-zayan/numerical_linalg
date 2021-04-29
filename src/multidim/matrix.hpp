@@ -14,8 +14,6 @@
 // nd
 namespace nd {
 
-constexpr max_size_t AUX_SIZE_2048 = 2048;
-
 template<typename T, bool ref_holder = true>
 class matrix;
 
@@ -228,6 +226,43 @@ matrix<RT, true> mod(const matrix<T, rf_h> &mat, max_size_t axis);
 template<typename RT, typename T, bool rf_h, typename qT>
 matrix<RT, true> quantile(const matrix<T, rf_h> &mat, qT q, max_size_t axis);
 
+}
+
+namespace mem {
+/*
+ * Most of nd::matrix ops's implementation, follows D&C (iteratively),
+ *
+ * mainly to make
+ * 	np::apply_along_axis(...) reusable, for all numeric ops, (ex. sum, var)
+ *
+ * reciprocally, it improves the numerical stability for some numeric ops
+ *
+ * number_of_splits = shape[axis] / AUX_SIZE
+ */
+static bounded_t<max_size_t> AUX_SIZE( { 512, 1028, 2048 }, "AUX_SIZE", 2048);
+
+inline max_size_t clip_dim(max_size_t dim_size) {
+
+	return std::min(dim_size, static_cast<max_size_t>(nd::mem::AUX_SIZE));
+}
+
+}
+
+namespace state {
+/*
+ * BroadcastingLevel = 0, broadcasting in not allowed,
+ * i.e. for all nd::matrix ops shapes should exactly match.
+ *
+ * BroadcastingLevel = 1, padding for nd::matrix::shape() should be explicitly defined
+ *
+ * BroadcastingLevel = 2, implicit padding for nd::matrix::shape(),
+ * 	ex. (3, 3) might be considered as (1, 3, 3) implicitly
+ *
+ *
+ */
+
+//static bounded_t<uflag8_t> BroadcastingLevel( { 0, 1, 2 }, "BroadcastingLevel",
+//		0);
 }
 
 }

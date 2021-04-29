@@ -160,7 +160,7 @@ nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
 	T2 *d1 = mat2._m_begin();
 	RT *d2 = result._m_begin();
 
-	max_size_t aux_size = std::min(dim12, nd::AUX_SIZE_2048);
+	max_size_t aux_size = nd::mem::clip_dim(dim12);
 
 	max_size_t vi;
 
@@ -273,7 +273,7 @@ nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m1,
 
 	big_size_t steps_1 = mat1.size() / step_size_1;
 
-	max_size_t aux_size = std::min(dim12, nd::AUX_SIZE_2048);
+	max_size_t aux_size = nd::mem::clip_dim(dim12);
 
 	vec1d<RT> elems(aux_size, 0);
 
@@ -349,8 +349,8 @@ nd::matrix<T> nd::linalg::transpose(nd::matrix<T, rf_h> mat, shape_t axes) {
  *
  *	A possible optimization for [1], is to use BABE (Burn At Both Ends)
  *
- *	i.e. RandomAccessNdIterator::reversed_index_at(...), and
- *		 RandomAccessNdIterator::index_at(...), see also [2] section 3.
+ *	i.e. nd::iterator::RandomAccess::reversed_index_at(...), and
+ *		 nd::iterator::RandomAccess::index_at(...), see also [2] section 3.
  */
 template<typename T, bool rf_h>
 void nd::linalg::inplace::transpose(nd::matrix<T, rf_h> &mat, shape_t axes) {
@@ -369,7 +369,7 @@ void nd::linalg::inplace::transpose(nd::matrix<T, rf_h> &mat, shape_t axes) {
 	coords attr = mat._m_coords();
 	coords new_attr = attr.permuted(axes, true);
 
-	RandomAccessNdIterator rndIter(new_attr);
+	nd::iterator::RandomAccess rndIter(new_attr);
 
 	for (big_size_t i = 0; i < size; i++) {
 

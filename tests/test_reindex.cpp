@@ -5,11 +5,11 @@
 // */
 //
 //#include <iostream>
-//#include "../src/iterators/RandomAccessNdIterator.hpp"
+//#include "../src/iterators/RandomAccess.hpp"
 //
 //#define ln '\n'
 //
-//big_size_t validate(big_size_t index_1d, RandomAccessNdIterator rndIter,
+//big_size_t validate(big_size_t index_1d, nd::iterator::RandomAccess rndIter,
 //		big_size_t size) {
 //
 //	for (big_size_t i = 0; i < size; i++) {
@@ -27,7 +27,7 @@
 //	shape_t axes = { 0, 3, 1, 6, 5, 4, 2 };
 //	coords pattr = attr.permuted(axes, false);
 //
-//	RandomAccessNdIterator rndIter(pattr);
+//	nd::iterator::RandomAccess rndIter(pattr);
 //
 //	for (big_size_t i = 0; i < attr.size1d; i++) {
 //		if (validate(i, rndIter, attr.size1d) != rndIter.reversed_index_at(i))

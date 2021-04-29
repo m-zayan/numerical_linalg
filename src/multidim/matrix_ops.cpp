@@ -337,7 +337,7 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::operator [](
 template<typename T, bool ref_holder>
 void nd::_matrix<T, ref_holder>::assign(shape_t indices, T val) {
 
-	RandomAccessNdIterator rndIter(this->attr);
+	nd::iterator::RandomAccess rndIter(this->attr);
 
 	big_size_t index = rndIter.index_at(indices);
 
@@ -406,12 +406,12 @@ nd::matrix<RT, true> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 	nd::matrix<RT> result(new_attr.shape);
 
-	RandomAccessNdIterator rndIter(tmp_attr);
+	nd::iterator::RandomAccess rndIter(tmp_attr);
 
 	max_size_t dim_size = attr.shape[axis];
 	big_size_t out_size = tmp.size() / dim_size;
 
-	max_size_t aux_size = std::min(dim_size, nd::AUX_SIZE_2048);
+	max_size_t aux_size = nd::mem::clip_dim(dim_size);
 
 	max_size_t vi;
 	big_size_t index = 0;

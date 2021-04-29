@@ -9,7 +9,7 @@
 namespace nd::out::_h {
 
 template<typename T>
-void print_vec1d(T *data, RandomAccessNdIterator &iter, big_size_t begin,
+void print_vec1d(T *data, nd::iterator::RandomAccess &iter, big_size_t begin,
 		big_size_t end) {
 
 	std::cout << "[";
@@ -40,17 +40,19 @@ void print_vec1d(T *data, big_size_t begin, big_size_t end) {
 namespace nd::out {
 
 template<typename T, bool ref_holder, flag8_t d_round = 0>
-void print_matrix(matrix<T, ref_holder> mat) {
+void print_matrix(const matrix<T, ref_holder> &mat) {
 
-	RandomAccessNdIterator rndIter(mat._m_coords());
+	nd::iterator::RandomAccess rndIter(mat._m_coords());
 
-	T *data = mat._m_begin();
+	matrix<T, false> tmp = mat;
 
-	max_size_t step = mat.step_size();
-	max_size_t ndim = mat.ndim();
-	big_size_t size = mat.size();
+	T *data = tmp._m_begin();
 
-	shape_t strides = mat.strides();
+	max_size_t step = tmp.step_size();
+	max_size_t ndim = tmp.ndim();
+	big_size_t size = tmp.size();
+
+	shape_t strides = tmp.strides();
 
 	if (ndim > 1) {
 		std::cout << "[";
