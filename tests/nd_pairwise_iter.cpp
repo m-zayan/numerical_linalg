@@ -18,6 +18,10 @@ int main() {
 
 	nd::iterator::Pairwise iter(attr1, attr2);
 
+	std::cout << "axes 0 : " << iter.aligned_coords(0).axes << ln;
+	std::cout << "axes 1 : " << iter.aligned_coords(1).axes << ln;
+	std::cout << "axes 2 : " << iter.aligned_coords(2).axes << ln;
+
 	std::cout << "shape 0 : " << iter.aligned_coords(0).shape << ln;
 	std::cout << "shape 1 : " << iter.aligned_coords(1).shape << ln;
 	std::cout << "shape 2 : " << iter.aligned_coords(2).shape << ln;

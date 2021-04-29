@@ -223,13 +223,19 @@ coords coords::pad_dim(max_size_t new_ndim) const {
 	shape_t new_strides(max_ndim, strides[0]);
 	shape_t new_axes(max_ndim);
 
-	new_axes.range(0, max_ndim, 1);
+	shape_t tmp_axes(max_ndim);
+
+	tmp_axes.range(0, max_ndim, 1);
 
 	for (max_size_t i = 0; i < ndim; i++) {
 
 		new_shape[pad_size + i] = shape[i];
 		new_strides[pad_size + i] = strides[i];
-		new_axes[pad_size + i] = axes[i];
+	}
+
+	for (max_size_t i = 0; i < ndim; i++) {
+
+		new_axes[pad_size + i] = tmp_axes[pad_size + axes[i]];
 	}
 
 	coords new_attr(new_shape, new_axes, new_strides, this->own_data);

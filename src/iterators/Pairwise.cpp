@@ -80,7 +80,7 @@ shape_t nd::iterator::Pairwise::indices_at(big_size_t index_1d,
 	// clip indices
 	for (max_size_t i = 0; i < ndim; i++) {
 
-		cliped_indices[axes[i]] = indices[i];
+		cliped_indices[i] = indices[axes[i]];
 
 		if (shape[i] == 1) {
 
