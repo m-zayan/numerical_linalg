@@ -126,7 +126,7 @@ nd::matrix<T, false>::matrix(const coords &attr, shared_ptr<vec1d<T>> data,
 
 	if (attr.own_data || c_begin > c_end) {
 
-		// debuging
+		// Debugging
 		throw nd::exception("Invalid construction, "
 				"for a non-reference holder nd::matrix<T, ...>");
 	}
@@ -147,7 +147,7 @@ nd::matrix<T, false>::matrix(const coords &attr, weak_ptr<vec1d<T>> data,
 
 	if (attr.own_data || c_begin > c_end) {
 
-		// debuging
+		// Debugging
 		throw nd::exception("Invalid construction, "
 				"for a non-reference holder nd::matrix<T, ...>");
 	}

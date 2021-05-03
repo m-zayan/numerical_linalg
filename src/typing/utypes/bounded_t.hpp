@@ -29,7 +29,7 @@ public:
 	bounded_t(bounded_t&) = delete;
 
 	bounded_t(std::vector<T> bounds);
-	bounded_t(std::vector<T> bounds, std::string sig, T value);
+	bounded_t(std::vector<T> bounds, std::string signature, T value);
 
 	bounded_t& operator=(T value);
 

@@ -101,16 +101,16 @@ public:
 
 	// ===================
 
-	T* _m_begin();
-	T* _m_end();
+	vec1d<T> _m_data() const;
 
 	coords _m_coords() const;
 	data_t _m_ptr() const;
 
-	vec1d<T> _m_data() const;
-
 	big_size_t _m_c_begin() const;
 	big_size_t _m_c_end() const;
+
+	T* _m_begin();
+	T* _m_end();
 
 	bool _m_req_iter() const;
 
@@ -185,7 +185,7 @@ matrix<RT, true> apply_along_axis(const matrix<T1, rf_h> &mat,
 		std::function<
 				void(T2&, vec1d<max_size_t>&, vec1d<T1>&, max_size_t,
 						max_size_t)> func, max_size_t axis, T2 initial_acc,
-		std::function<RT(T2)> ppfunc);
+		std::function<RT(T2&)> ppfunc, bool reduce, bool keepdims);
 
 namespace random {
 
@@ -197,34 +197,52 @@ matrix<T> uniform(T low, T high, shape_t shape);
 namespace numeric {
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> min(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> min(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> max(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> max(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> argmax(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> argmax(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> argmin(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> argmin(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> sum(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> sum(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> mean(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> mean(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
+
+/*
+ * Updating Formulae and a Pairwise Algorithm for Computing Sample Variances:
+ *
+ * 		http://i.stanford.edu/pub/cstr/reports/cs/tr/79/773/CS-TR-79-773.pdf
+ */
+template<typename RT, typename T, bool rf_h>
+matrix<RT, true> var(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> var(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> std(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> std(const matrix<T, rf_h> &mat, max_size_t axis);
-
-template<typename RT, typename T, bool rf_h>
-matrix<RT, true> mod(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> mod(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h, typename qT>
-matrix<RT, true> quantile(const matrix<T, rf_h> &mat, qT q, max_size_t axis);
+matrix<RT, true> quantile(const matrix<T, rf_h> &mat, qT q, max_size_t axis,
+		bool keepdims = false);
+
+template<typename RT, typename T, bool rf_h>
+matrix<RT, true> cumsum(const matrix<T, rf_h> &mat, max_size_t axis);
 
 }
 

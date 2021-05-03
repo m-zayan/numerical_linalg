@@ -48,7 +48,7 @@ public:
 	coords permuted(const shape_t &axes, bool own_data) const;
 	coords reverse_permute(bool own_data) const;
 	coords swapaxes(max_size_t ax0, max_size_t ax1, bool own_data) const;
-	coords reduce(max_size_t axis) const;
+	coords reduce(max_size_t axis, bool keepdims) const;
 	coords pad_dim(max_size_t new_ndim) const;
 
 	void swapaxes(max_size_t ax0, max_size_t ax1);

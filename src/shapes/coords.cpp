@@ -188,17 +188,28 @@ coords coords::swapaxes(max_size_t ax0, max_size_t ax1, bool own_data) const {
 	return new_attr;
 }
 
-coords coords::reduce(max_size_t axis) const {
+coords coords::reduce(max_size_t axis, bool keepdims) const {
+
+	max_size_t ndim = this->ndim - 1;
+
+	if (keepdims) {
+		ndim += 1;
+	}
 
 	shape_t in_shape = this->shape;
-	shape_t out_shape(this->ndim - 1);
+	shape_t out_shape(ndim);
 
 	max_size_t k = 0;
 
-	for (max_size_t i = 0; i < this->ndim; i++) {
+	for (max_size_t i = 0; i < ndim; i++) {
 
-		if (i == axis)
+		if (i == axis) {
+			if (keepdims) {
+				out_shape[k++] = 1;
+			}
+
 			continue;
+		}
 
 		out_shape[k++] = in_shape[i];
 	}

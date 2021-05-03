@@ -31,7 +31,7 @@ void test_api::ops_nd_matrix() {
 
 	std::cout << "\n ============================= \n";
 
-	nd::matrix<int> out2 = nd::numeric::max<int>(m0, 1);
+	nd::matrix<int> out2 = nd::numeric::max<int>(m0, 0, true);
 
 	std::cout << " shape : " << out2.shape() << "\n -------------- \n";
 
@@ -39,7 +39,7 @@ void test_api::ops_nd_matrix() {
 
 	std::cout << "\n ============================= \n";
 
-	nd::matrix<max_size_t> out3 = nd::numeric::argmax<max_size_t>(m0, 1);
+	nd::matrix<max_size_t> out3 = nd::numeric::argmax<max_size_t>(m0, 1, true);
 
 	std::cout << " shape : " << out3.shape() << "\n -------------- \n";
 
@@ -52,4 +52,12 @@ void test_api::ops_nd_matrix() {
 	std::cout << " shape : " << out4.shape() << "\n -------------- \n";
 
 	nd::out::print_matrix(out4 + 0.5);
+
+	std::cout << "\n ============================= \n";
+
+	nd::matrix<double> out5 = nd::numeric::var<double>(m0, 1, true);
+
+	std::cout << " shape : " << out5.shape() << "\n -------------- \n";
+
+	nd::out::print_matrix(out5);
 }

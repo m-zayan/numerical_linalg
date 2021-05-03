@@ -75,20 +75,20 @@ shape_t nd::iterator::Pairwise::indices_at(big_size_t index_1d,
 
 	shape_t indices = this->rndIter2.indices_at(index_1d);
 
-	shape_t cliped_indices(ndim);
+	shape_t clipped_indices(ndim);
 
 	// clip indices
 	for (max_size_t i = 0; i < ndim; i++) {
 
-		cliped_indices[i] = indices[axes[i]];
+		clipped_indices[i] = indices[axes[i]];
 
 		if (shape[i] == 1) {
 
-			cliped_indices[i] = 0;
+			clipped_indices[i] = 0;
 		}
 	}
 
-	return cliped_indices;
+	return clipped_indices;
 
 }
 
@@ -132,7 +132,7 @@ coords nd::iterator::Pairwise::aligned_coords(uflag8_t pair_index) const {
 
 	else {
 		throw nd::exception("Invalid pair_index, "
-				"nd::iterator::Pairwise::indices_at(..., uflag8_t pair_index)");
+				"nd::iterator::Pairwise::aligned_coords(uflag8_t pair_index)");
 	}
 }
 

@@ -531,11 +531,14 @@ std::ostream& operator <<(std::ostream &os, shape_t shape) {
 		os << shape[i] << ',';
 	}
 
-	if (shape.size() > 1) {
-		os << shape[shape.size() - 1] << ')';
-	} else {
-		os << shape[shape.size() - 1] << ", " << 1 << ')';
+	os << shape[shape.size() - 1];
+
+	if (shape.size() == 1) {
+		os << ',';
 	}
+
+	os << ')';
+
 	return os;
 }
 

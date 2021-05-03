@@ -357,7 +357,7 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::permute(shape_t axes) {
 template<typename T, bool ref_holder>
 nd::matrix<T, false> nd::_matrix<T, ref_holder>::reshape(shape_t shape) {
 
-	coords new_attr = coords(shape);
+	coords new_attr = coords(shape, false);
 
 	if (new_attr.size1d != this->size()) {
 
@@ -390,7 +390,7 @@ nd::matrix<RT, true> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 		std::function<
 				void(T2&, vec1d<max_size_t>&, vec1d<T1>&, max_size_t,
 						max_size_t)> func, max_size_t axis, T2 initial_acc,
-		std::function<RT(T2)> ppfunc) {
+		std::function<RT(T2&)> ppfunc, bool reduce, bool keepdims) {
 
 	nd::matrix<T1, false> tmp = mat;
 
@@ -398,17 +398,35 @@ nd::matrix<RT, true> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 		throw nd::exception("nd::matrix<T> - axis, Out of Range");
 	}
 
+	if (!reduce && keepdims) {
+
+		// might set warning ...
+	}
+
 	coords attr = tmp._m_coords();
 
-	coords tmp_attr = attr.swapaxes(0, axis, false);
+	coords tmp_attr = attr.swapaxes(0, tmp.ndim() - axis - 1, false);
 
-	coords new_attr = attr.reduce(axis);
+	max_size_t dim_size = attr.shape[axis];
+
+	coords new_attr;
+
+	if (reduce) {
+
+		new_attr = attr.reduce(axis, keepdims);
+	}
+
+	else {
+
+		new_attr = attr;
+
+		dim_size = 1;
+	}
 
 	nd::matrix<RT> result(new_attr.shape);
 
 	nd::iterator::RandomAccess rndIter(tmp_attr);
 
-	max_size_t dim_size = attr.shape[axis];
 	big_size_t out_size = tmp.size() / dim_size;
 
 	max_size_t aux_size = nd::mem::clip_dim(dim_size);
