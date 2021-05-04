@@ -10,9 +10,25 @@
 #include <ostream>
 #include <sstream>
 
-#include "../typing/utypes/types.hpp"
+#include "../typing/types.hpp"
+#include "../handlers/exception.hpp"
 
-// matrix attributes (ex. dimensions)
+// =============================== shape_t ===============================
+class shape_t: public vec1d<max_size_t> {
+
+public:
+
+	using vec1d<max_size_t>::vec1d;
+
+	friend std::ostream& operator <<(std::ostream &os, shape_t shape);
+	friend uflag8_t operator &(const shape_t &shape1, const shape_t &shape2);
+};
+
+/* =============================== coords ===============================
+ *
+ * 		matrix attributes (ex. dimensions)
+ */
+
 class coords {
 
 private:

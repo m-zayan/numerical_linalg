@@ -107,10 +107,8 @@ nd::matrix<RT, true> nd::numeric::var(const nd::matrix<T, rf_h> &mat,
 
 	max_size_t n_splits = (dim_size + aux_size - 1) / aux_size;
 
-	max_size_t invalid_idx = std::numeric_limits<max_size_t>::max();
-
-	nd::numeric::_h::ppveci<RT> initial_acc = { { vec1d<RT>(n_splits),
-			vec1d<RT>(n_splits) }, { invalid_idx, 0, 0 } };
+	vec1d_args_wrapper<RT> initial_acc = { 0, vec1d_args<RT>(n_splits,
+			vec1d<RT>(3)) };
 
 	nd::matrix<RT, true> result = nd::apply_along_axis(mat,
 			nd::numeric::_h::var<RT, T>, axis, initial_acc,

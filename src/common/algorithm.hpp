@@ -9,9 +9,10 @@
 
 #include <algorithm>
 
-#include "../typing/gtypes/types.hpp"
+#include "./typing/gtypes/types.hpp"
 
 namespace algorithm::_h {
+
 template<typename RT, typename T>
 RT pairwise_summation(big_size_t begin, big_size_t end, T *x);
 
@@ -41,6 +42,14 @@ RT pairwise_selection_sum(big_size_t begin, big_size_t end, std::vector<T> vec);
 
 template<typename RT, typename T1, typename T2>
 RT gcd(T1 a, T2 b);
+
+/* return a merged samples' mean, variance and total size [2-samples].
+ *
+ * 	vec1d<RT> = {updated_mean, updated_var, total_size}
+ */
+template<typename RT, typename Size>
+std::vector<RT> update_variance(RT sum0, RT sum1, RT var0, RT var1, Size size0,
+		Size size1);
 
 }
 

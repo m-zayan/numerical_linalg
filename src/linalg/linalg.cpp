@@ -191,7 +191,7 @@ nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
 
 				}
 
-				d2[index++] = elems.sum(0, aux_size);
+				d2[index++] = algorithm::sum<RT>(0, aux_size, elems.ref(0));
 			}
 		}
 
@@ -307,7 +307,7 @@ nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m1,
 					elems[vi++] += (d0[start + k] * d1[ik]);
 				}
 
-				d2[index++] = elems.sum(0, aux_size);
+				d2[index++] = algorithm::sum<RT>(0, aux_size, elems.ref(0));
 			}
 		}
 	}
