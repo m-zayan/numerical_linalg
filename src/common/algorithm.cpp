@@ -127,11 +127,11 @@ RT algorithm::pairwise_selection_sum(big_size_t begin, big_size_t end,
 	min_size_t MAX_EXTRA_SPACE = 64;
 
 	big_size_t size = end - begin;
-	big_size_t n_step = end - begin - ((end - begin) % 2);
+	big_size_t n_step = size - (size % 2);
 
 	big_size_t start = begin;
 
-	std::queue<RT> memory;
+	temporary_queue<RT> memory;
 
 	T x1, x2;
 
@@ -153,11 +153,8 @@ RT algorithm::pairwise_selection_sum(big_size_t begin, big_size_t end,
 
 			while (memory.size() > 1) {
 
-				x1 = memory.front();
-				memory.pop();
-
-				x2 = memory.front();
-				memory.pop();
+				x1 = memory.next();
+				x2 = memory.next();
 
 				memory.push(x1 + x2);
 			}
@@ -172,11 +169,8 @@ RT algorithm::pairwise_selection_sum(big_size_t begin, big_size_t end,
 	// repeat-pair-wise selelction | neglected
 	while (memory.size() > 1) {
 
-		x1 = memory.front();
-		memory.pop();
-
-		x2 = memory.front();
-		memory.pop();
+		x1 = memory.next();
+		x2 = memory.next();
 
 		memory.push(x1 + x2);
 	}
@@ -192,3 +186,28 @@ RT algorithm::gcd(T1 a, T2 b) {
 
 	return gcd(b, a % b);
 }
+
+/*
+ * Updating Formulae and a Pairwise Algorithm for Computing Sample Variances:
+ *
+ * 		http://i.stanford.edu/pub/cstr/reports/cs/tr/79/773/CS-TR-79-773.pdf
+ */
+template<typename RT, typename Size>
+std::vector<RT> algorithm::update_variance(RT mean0, RT mean1, RT var0, RT var1,
+		Size size0, Size size1) {
+
+	RT m = static_cast<RT>(size0);
+	RT n = static_cast<RT>(size1);
+
+	RT c0 = m / (n * (m + n));
+	RT c1 = (m + n) / m;
+
+	RT mean_diff = (c1 * mean0 - mean1);
+
+	RT uvar = var0 + var1 + (c0 * mean_diff * mean_diff);
+
+	std::vector<RT> updated = { mean0 + mean1, uvar, n + m };
+
+	return updated;
+}
+

@@ -9,7 +9,7 @@
 #ifndef SRC_MULTIDIM_MATRIX_HPP
 #define SRC_MULTIDIM_MATRIX_HPP
 
-#include "ufunc.hpp"
+#include "./ufunc.hpp"
 
 // nd
 namespace nd {
@@ -220,11 +220,6 @@ template<typename RT, typename T, bool rf_h>
 matrix<RT, true> mean(const matrix<T, rf_h> &mat, max_size_t axis,
 		bool keepdims = false);
 
-/*
- * Updating Formulae and a Pairwise Algorithm for Computing Sample Variances:
- *
- * 		http://i.stanford.edu/pub/cstr/reports/cs/tr/79/773/CS-TR-79-773.pdf
- */
 template<typename RT, typename T, bool rf_h>
 matrix<RT, true> var(const matrix<T, rf_h> &mat, max_size_t axis,
 		bool keepdims = false);

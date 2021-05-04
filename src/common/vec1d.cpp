@@ -94,11 +94,11 @@ template<typename T>
 void vec1d<T>::range(T start, T end, T step) {
 
 	if (step == 0) {
-		throw nd::exception("invalid range, step == 0");
+		throw std::logic_error("invalid range, step == 0");
 	}
 
 	else if (start >= end) {
-		throw nd::exception("invalid range, start >= end");
+		throw std::logic_error("invalid range, start >= end");
 	}
 
 	big_size_t size = (end - start) / step;
@@ -119,7 +119,7 @@ template<typename T>
 T& vec1d<T>::operator [](big_size_t index) {
 
 	if (index >= this->values.size()) {
-		throw nd::exception("Index Out Of Range");
+		throw std::logic_error("Index Out Of Range");
 	}
 
 	return this->values[index];
@@ -129,7 +129,7 @@ template<typename T>
 T& vec1d<T>::operator ()(big_size_t index, big_size_t step) {
 
 	if (index * step >= this->values.size()) {
-		throw nd::exception("Index Out Of Range");
+		throw std::logic_error("Index Out Of Range");
 	}
 
 	return this->values[index * step];
@@ -169,7 +169,7 @@ bool vec1d<T>::operator ==(const vec1d<T> &vec) {
 	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
-		throw nd::exception("Invalid boolean operation, "
+		throw std::logic_error("Invalid boolean operation, "
 				"vectors must have the same shape");
 	}
 
@@ -190,7 +190,7 @@ bool vec1d<T>::operator !=(const vec1d<T> &vec) {
 	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
-		throw nd::exception("Invalid boolean operation, "
+		throw std::logic_error("Invalid boolean operation, "
 				"vectors must have the same shape");
 	}
 
@@ -225,7 +225,7 @@ vec1d<T> vec1d<T>::operator +(const vec1d<T> &vec) {
 	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
-		throw nd::exception("Invalid element-wise operation, "
+		throw std::logic_error("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
@@ -246,7 +246,7 @@ vec1d<T>& vec1d<T>::operator +=(const vec1d<T> &vec) {
 	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
-		throw nd::exception("Invalid element-wise operation, "
+		throw std::logic_error("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
@@ -291,7 +291,7 @@ vec1d<T> vec1d<T>::operator -(const vec1d<T> &vec) {
 	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
-		throw nd::exception("Invalid element-wise operation, "
+		throw std::logic_error("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
@@ -312,7 +312,7 @@ vec1d<T>& vec1d<T>::operator -=(const vec1d<T> &vec) {
 	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
-		throw nd::exception("Invalid element-wise operation, "
+		throw std::logic_error("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
@@ -357,7 +357,7 @@ vec1d<T> vec1d<T>::operator *(const vec1d<T> &vec) {
 	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
-		throw nd::exception("Invalid element-wise operation, "
+		throw std::logic_error("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
@@ -378,7 +378,7 @@ vec1d<T>& vec1d<T>::operator *=(const vec1d<T> &vec) {
 	vec1d<T> temp = vec;
 
 	if (this->size() != temp.size()) {
-		throw nd::exception("Invalid element-wise operation, "
+		throw std::logic_error("Invalid element-wise operation, "
 				"vectors must have the same shape");
 	}
 
@@ -441,11 +441,6 @@ vec1d<T>& vec1d<T>::operator /=(const T &val) {
 
 // ====================================================================
 
-/*
- * Apply custom void function, function parameter T vec1d[i]
- * function overwrite vector values, therefore value must be passed
- * by reference apply function on a specific, range of vector values.
- */
 template<typename T>
 void vec1d<T>::write_in_range(big_size_t begin, big_size_t end,
 		std::function<void(T &vec_i)> custom_func) {
@@ -455,10 +450,6 @@ void vec1d<T>::write_in_range(big_size_t begin, big_size_t end,
 	}
 }
 
-/*
- * Apply custom function with return type T, apply function
- * on a specific range of vector values.
- */
 template<typename T>
 void vec1d<T>::apply_in_range(big_size_t begin, big_size_t end,
 		std::function<T(T vec_i)> custom_func) {
@@ -468,18 +459,17 @@ void vec1d<T>::apply_in_range(big_size_t begin, big_size_t end,
 	}
 }
 
-/* Sum values in a specific range of the vector.
- *
- * algorithm.h - : (0, 1, 2, 3) -
- *-----------------------------
- * 0. Naive summation
- * 1. Pairwise summation (default)
- * 2. Kahan summation
- * 3. Shift reduce sum
- */
 template<typename T>
 T vec1d<T>::sum(big_size_t begin, big_size_t end) {
-	return algorithm::_h::pairwise_summation<T>(begin, end, &(this->values[0]));
+
+	T sum = 0;
+
+	for (big_size_t i = begin; i < end; i++) {
+
+		sum += this->operator[](i);
+	}
+
+	return sum;
 }
 
 template<typename T>
@@ -522,79 +512,3 @@ vec1d<T>::vec1d(const vec1d<T> &vec) noexcept {
 
 	this->values.assign(vec.values.begin(), vec.values.end());
 }
-
-std::ostream& operator <<(std::ostream &os, shape_t shape) {
-
-	os << '(';
-
-	for (max_size_t i = 0; i < shape.size() - 1; i++) {
-		os << shape[i] << ',';
-	}
-
-	os << shape[shape.size() - 1];
-
-	if (shape.size() == 1) {
-		os << ',';
-	}
-
-	os << ')';
-
-	return os;
-}
-
-// flags: {0: doesn't match, 1: match, 2: broadcastable}
-uflag8_t operator &(const shape_t &shape1, const shape_t &shape2) {
-
-	shape_t temp1 = shape1;
-	shape_t temp2 = shape2;
-
-	max_size_t size1 = temp1.size();
-	max_size_t size2 = temp2.size();
-
-	uflag8_t flag = 1;
-
-	if (size1 == size2) {
-		for (max_size_t i = 0; i < size1; i++) {
-			if (temp1[i] != temp2[i]) {
-
-				if (temp1[i] == 1 || temp2[i] == 1) {
-
-					flag = 2;
-				}
-
-				else {
-					return 0;
-				}
-			}
-		}
-		return flag;
-	}
-
-	else {
-
-		max_size_t i, j;
-
-		if (size1 > size2) {
-			i = size1 - size2;
-			j = 0;
-		}
-
-		else {
-			i = 0;
-			j = size2 - size1;
-		}
-
-		while (i < size1 && j < size2) {
-
-			if ((temp1[i] != temp2[j]) && !(temp1[i] == 1 || temp2[j] == 1)) {
-				return 0;
-			}
-
-			i++;
-			j++;
-		}
-
-		return 2;
-	}
-}
-

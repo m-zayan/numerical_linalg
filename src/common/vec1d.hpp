@@ -12,31 +12,7 @@
 #ifndef SRC_VEC1D_HPP
 #define SRC_VEC1D_HPP
 
-#include <iostream>
-#include <initializer_list>
-#include <functional>
-
-#include "../typing/gtypes/types.hpp"
-#include "../handlers/exception.hpp"
-
-#include "./vec1d_ufunc.hpp"
-
-#include "../typing/allocator.cpp"
-#include "../random/generator.cpp"
-
-#include "./algorithm.cpp"
-
-template<typename T>
-class vec1d;
-
-namespace nd {
-
-template<typename T>
-using composite = vec1d<T>;
-
-}
-
-using shape_t = vec1d<max_size_t>;
+#include "./typing/gtypes/types.hpp"
 
 template<typename T>
 class vec1d {
@@ -124,13 +100,9 @@ public:
 			std::function<T(T vec_i)> custom_func);
 
 	/* Sum values in a specific range of the vector.
+	 * 	### Naive summation,
 	 *
-	 * algorithm.h - : (0, 1, 2, 3) -
-	 *-----------------------------
-	 * 0. Naive summation
-	 * 1. Pairwise summation (default)
-	 * 2. Kahan summation
-	 * 3. Shift reduce sum
+	 * 		check: [./common/algorithm.hpp]
 	 */
 	T sum(big_size_t begin, big_size_t end);
 
@@ -138,15 +110,8 @@ public:
 
 	void print_vec1d(big_size_t begin, big_size_t end);
 
-	// overload output stream (<<  operator) &  for shape_t.
-	inline friend std::ostream& operator <<(std::ostream &os, shape_t shape);
-
-	inline friend uflag8_t operator &(const shape_t &shape1,
-			const shape_t &shape2);
-
 	virtual ~vec1d();
 
-	// nd_matrix<T>::data : shallow copy
 	vec1d(const vec1d<T> &vec) noexcept;
 	vec1d(const vec1d<T> &&vec) noexcept;
 

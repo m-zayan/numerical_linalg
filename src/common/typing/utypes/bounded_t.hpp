@@ -10,8 +10,6 @@
 #include <iostream>
 #include <vector>
 
-#include "../../handlers/exception.hpp"
-
 template<typename T>
 class bounded_t {
 private:
