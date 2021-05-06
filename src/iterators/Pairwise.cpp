@@ -6,13 +6,23 @@
 
 #include "Pairwise.hpp"
 
+// =================================================================
+
+bounded_t<max_size_t> nd::mem::AUX_SIZE( { 2, 512, 1028, 2048 },
+		"AUX_SIZE", 2048);
+
+bounded_t<uflag8_t> nd::state::BroadcastingLevel( { 0, 1, 2 },
+		"BroadcastingLevel", 2);
+
+// =================================================================
+
 // used for broadcasting [attr0 & attr1 will be modified]
-inline coords nd::iterator::align_dim(coords &attr0, coords &attr1) {
+coords nd::iterator::align_dim(coords &attr0, coords &attr1) {
 
 	if (!(attr0.shape & attr1.shape)) {
 
 		throw nd::exception(
-				"invalid align_dim(...), coords::shape have to be broadcastable");
+				"Invalid align_dim(...), coords::shape have to be broadcastable");
 	}
 
 	max_size_t ndim1 = attr0.ndim;
@@ -33,7 +43,7 @@ inline coords nd::iterator::align_dim(coords &attr0, coords &attr1) {
 		out_shape[i] = std::max(shape0[i], shape1[i]);
 	}
 
-	coords out_attr = coords(out_shape);
+	coords out_attr = coords(out_shape, true, 2);
 
 	return out_attr;
 }
@@ -75,20 +85,20 @@ shape_t nd::iterator::Pairwise::indices_at(big_size_t index_1d,
 
 	shape_t indices = this->rndIter2.indices_at(index_1d);
 
-	shape_t cliped_indices(ndim);
+	shape_t clipped_indices(ndim);
 
 	// clip indices
 	for (max_size_t i = 0; i < ndim; i++) {
 
-		cliped_indices[i] = indices[axes[i]];
+		clipped_indices[i] = indices[axes[i]];
 
 		if (shape[i] == 1) {
 
-			cliped_indices[i] = 0;
+			clipped_indices[i] = 0;
 		}
 	}
 
-	return cliped_indices;
+	return clipped_indices;
 
 }
 
@@ -132,7 +142,7 @@ coords nd::iterator::Pairwise::aligned_coords(uflag8_t pair_index) const {
 
 	else {
 		throw nd::exception("Invalid pair_index, "
-				"nd::iterator::Pairwise::indices_at(..., uflag8_t pair_index)");
+				"nd::iterator::Pairwise::aligned_coords(uflag8_t pair_index)");
 	}
 }
 

@@ -48,19 +48,33 @@
 ////		std::cout << c[i].get() << ln;
 ////	}
 //
-//	bounded_t<min_size_t> bndt( { 0, 1, 2 }, "EnableX", 2);
-//
-//	std::cout << bndt << ln;
-//
-//	max_size_t bs = std::min(static_cast<max_size_t>(1),
-//			static_cast<max_size_t>(bndt));
-//	std::cout << bs << ln;
+////	bounded_t<min_size_t> bndt( { 0, 1, 2 }, "EnableX", 2);
+////
+////	std::cout << bndt << ln;
+////
+////	max_size_t bs = std::min(static_cast<max_size_t>(1),
+////			static_cast<max_size_t>(bndt));
+////	std::cout << bs << ln;
 //
 ////	bndt = 3; // error
 //
-//	bounded_initializer<min_size_t, 0, 1, 3> bnd("II", 3);
-//	std::cout << bnd << ln;
+////	bounded_initializer<min_size_t, 0, 1, 3> bnd("II", 3);
+////	std::cout << bnd << ln;
 //
 ////	bounded_initializer<min_size_t, 0, 1, 2> ex("EnableX", 3); // error
+//
+//	temporary_queue<max_size_t> q;
+//
+//	for (max_size_t i = 0; i < 10; i++) {
+//		q.push(i);
+//	}
+//
+//	for (max_size_t i = 0; i < 10; i++) {
+//		std::cout << q.next() << ", ";
+//	}
+//
+//	std::cout << "\n is_empty : " << q.empty() << "\n";
+//
+////	std::cout << q.next() << '\n'; // error
 //
 //}

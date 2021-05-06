@@ -10,38 +10,37 @@
 #include "./matrix_stdout.cpp"
 
 // base
-
 template<typename T, bool ref_holder>
-big_size_t nd::_matrix<T, ref_holder>::size() {
+big_size_t nd::_matrix<T, ref_holder>::size() const {
 	return this->attr.size1d;
 }
 
 template<typename T, bool ref_holder>
-shape_t nd::_matrix<T, ref_holder>::shape() {
+shape_t nd::_matrix<T, ref_holder>::shape() const {
 
 	return this->attr.shape;
 }
 
 template<typename T, bool ref_holder>
-shape_t nd::_matrix<T, ref_holder>::strides() {
+shape_t nd::_matrix<T, ref_holder>::strides() const {
 
 	return this->attr.strides;
 }
 
 template<typename T, bool ref_holder>
-max_size_t nd::_matrix<T, ref_holder>::ndim() {
+max_size_t nd::_matrix<T, ref_holder>::ndim() const {
 
 	return this->attr.ndim;
 }
 
 template<typename T, bool ref_holder>
-max_size_t nd::_matrix<T, ref_holder>::step_size() {
+max_size_t nd::_matrix<T, ref_holder>::step_size() const {
 
 	return this->shape()[this->ndim() - 1];
 }
 
 template<typename T, bool ref_holder>
-bool nd::_matrix<T, ref_holder>::own_data() {
+bool nd::_matrix<T, ref_holder>::own_data() const {
 
 	return this->attr.own_data;
 }
@@ -65,9 +64,9 @@ big_size_t nd::_matrix<T, ref_holder>::_m_c_end() const {
 }
 
 template<typename T, bool ref_holder>
-bool nd::_matrix<T, ref_holder>::_m_req_iter() const {
+uflag8_t nd::_matrix<T, ref_holder>::_m_iter_type() const {
 
-	return this->req_iter;
+	return this->attr.iter_type;
 }
 
 template<typename T, bool ref_holder>

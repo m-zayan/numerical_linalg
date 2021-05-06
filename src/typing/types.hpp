@@ -7,12 +7,19 @@
 #ifndef SRC_TYPING_UTYPES_TYPES_HPP
 #define SRC_TYPING_UTYPES_TYPES_HPP
 
-#include "./mask.hpp"
-#include "./bounded_t.cpp"
+#include "../common/typing/utypes/mask.hpp"
+#include "../common/typing/utypes/bounded_t.cpp"
 
-#include "../gtypes/types.hpp" // --> could be removed, i.e. (./common/vec1d.cpp)
+// allocator.hpp --> #include "../common/typing/gtypes/types.hpp"
+#include "../common/typing/allocator.cpp"
 
-#include "../../common/vec1d.cpp"
+#include "../common/vec1d.cpp"
+
+template<typename T>
+using vec1d_args = vec1d<vec1d<T>>;
+
+template<typename T>
+using vec1d_args_wrapper = std::pair<max_size_t, vec1d_args<T>>;
 
 // types
 namespace _type {

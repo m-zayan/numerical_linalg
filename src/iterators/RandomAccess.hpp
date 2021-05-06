@@ -26,6 +26,8 @@ private:
 	char order() const;
 	bool own_data() const;
 
+	uflag8_t iter_type() const;
+
 public:
 
 	RandomAccess() = delete;

@@ -9,7 +9,7 @@
 #ifndef SRC_ITERATORS_SEQUENTIAL_HPP
 #define SRC_ITERATORS_SEQUENTIAL_HPP
 
-#include "../typing/utypes/types.hpp"
+#include "../shapes/coords.hpp"
 
 namespace nd::iterator {
 

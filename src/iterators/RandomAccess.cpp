@@ -51,10 +51,15 @@ big_size_t nd::iterator::RandomAccess::index_at(shape_t indices) const {
 	return index;
 }
 
-big_size_t nd::iterator::RandomAccess::index_at(big_size_t index_1d) const {
+big_size_t nd::iterator::RandomAccess::index_at(big_size_t index_1d) const{
 
 	if (index_1d >= this->size()) {
 		throw nd::exception("index_1d, out of range");
+	}
+
+	if (this->iter_type() == 0) {
+
+		return index_1d;
 	}
 
 	big_size_t index = 0;
@@ -163,6 +168,11 @@ char nd::iterator::RandomAccess::order() const {
 bool nd::iterator::RandomAccess::own_data() const {
 
 	return this->attr.own_data;
+}
+
+uflag8_t nd::iterator::RandomAccess::iter_type() const {
+
+	return this->attr.iter_type;
 }
 
 nd::iterator::RandomAccess::~RandomAccess() {
