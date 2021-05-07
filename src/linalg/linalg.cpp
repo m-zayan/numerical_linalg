@@ -4,7 +4,8 @@
  *	Author: Z. Mohamed
  */
 
-#include "./linalg.hpp"
+//#include "./linalg.hpp"
+#include "./preprocessing.cpp"
 
 template<typename T>
 nd::matrix<T> nd::linalg::eye(shape_t shape) {

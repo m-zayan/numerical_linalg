@@ -441,7 +441,7 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 	coords attr = tmp._m_coords();
 
-	coords tmp_attr = attr.swapaxes(0, axis, false);
+	coords tmp_attr = attr.swapaxes(ndim - 1, axis, false);
 
 	max_size_t dim_size = attr.shape[axis];
 
