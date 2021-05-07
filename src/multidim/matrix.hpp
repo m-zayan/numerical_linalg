@@ -39,10 +39,10 @@ protected:
 
 	static uflag8_t _m_validate_op(const coords &attr0, const coords &attr1);
 
-	static nd::matrix<T, true> _m_alloc_if_broadcastable(coords attr0,
+	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0,
 			coords attr1);
 
-	static nd::matrix<T, true> _m_alloc_if_broadcastable(coords attr0,
+	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0,
 			coords attr1, T val);
 
 public:
@@ -176,9 +176,6 @@ public:
 
 	matrix(const matrix &mat);
 	matrix(const matrix<T, true> &mat);
-
-	template<typename RT>
-	operator matrix<RT>() const;
 
 	~matrix();
 };

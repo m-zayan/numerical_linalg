@@ -11,8 +11,8 @@
 #include <assert.h>
 #include <math.h>
 
-#include "../../src/multidim/matrix.cpp"
-#include "../../src/linalg/linalg.cpp"
+#include "../../../src/multidim/matrix.cpp"
+#include "../../../src/linalg/linalg.cpp"
 
 #define ln '\n'
 

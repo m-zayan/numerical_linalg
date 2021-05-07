@@ -31,10 +31,10 @@ int main() {
 //	test_api::linalg_inplace();
 
 // [8]
-	test_api::nd_broadcasting();
+//	test_api::nd_broadcasting();
 
 // [9]
-//	test_api::ops_nd_matrix();
+	test_api::ops_nd_matrix();
 
 // [10]
 //	test_api::linalg_lu();

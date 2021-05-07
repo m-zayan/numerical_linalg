@@ -428,7 +428,9 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 	nd::matrix<T1, false> tmp = mat;
 
-	if (axis >= tmp.ndim()) {
+	max_size_t ndim = tmp.ndim();
+
+	if (axis >= ndim) {
 		throw nd::exception("nd::matrix<T> - axis, Out of Range");
 	}
 
@@ -439,7 +441,7 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 	coords attr = tmp._m_coords();
 
-	coords tmp_attr = attr.swapaxes(0, tmp.ndim() - axis - 1, false);
+	coords tmp_attr = attr.swapaxes(0, axis, false);
 
 	max_size_t dim_size = attr.shape[axis];
 

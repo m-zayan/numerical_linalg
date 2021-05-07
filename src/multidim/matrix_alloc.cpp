@@ -248,6 +248,8 @@ template<typename T>
 nd::matrix<T, false>::matrix(const nd::matrix<T, true> &mat) {
 
 	this->attr = mat._m_coords();
+	this->attr.own_data = false;
+
 	this->data = mat._m_ptr();
 
 	this->c_begin = mat._m_c_begin();

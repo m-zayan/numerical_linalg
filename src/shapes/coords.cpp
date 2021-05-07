@@ -209,7 +209,7 @@ coords coords::reduce(max_size_t axis, bool keepdims) const {
 
 	max_size_t k = 0;
 
-	for (max_size_t i = 0; i < ndim; i++) {
+	for (max_size_t i = 0; i < this->ndim; i++) {
 
 		if (i == axis) {
 			if (keepdims) {
