@@ -10,7 +10,7 @@
 #include "../iterators/Pairwise.hpp"
 #include "../wrappers/ops.hpp"
 
-#include "../random/generator.cpp"
+#include "../random/generator.hpp"
 
 namespace _m_ops {
 

@@ -337,7 +337,7 @@ void nd::_matrix<T, ref_holder>::assign(shape_t indices, T val) {
 
 	nd::iterator::RandomAccess rndIter(this->attr);
 
-	big_size_t index = rndIter.index_at(indices);
+	big_size_t index = rndIter.nd_index_at(indices);
 
 	(*this->data.get())[index] = val;
 }
@@ -441,7 +441,7 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 	coords attr = tmp._m_coords();
 
-	coords tmp_attr = attr.swapaxes(ndim - 1, axis, false);
+	coords tmp_attr = attr.swapaxes(0, axis, false);
 
 	max_size_t dim_size = attr.shape[axis];
 

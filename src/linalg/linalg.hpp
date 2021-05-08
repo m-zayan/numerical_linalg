@@ -94,4 +94,3 @@ void transpose(nd::matrix<T, rf_h> &mat, shape_t axes);
 }
 
 #endif /* SRC_MULTIDIM_LINALG_HPP */
-

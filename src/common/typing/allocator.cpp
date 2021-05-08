@@ -17,10 +17,3 @@ shared_ptr<T> allocator::val_to_shared_ptr(T val) {
 
 	return std::shared_ptr<T>(new T(val));
 }
-
-template<typename T>
-unique_ptr<T> allocator::val_to_unique_ptr(T val) {
-
-	return std::make_unique<T>(val);
-}
-

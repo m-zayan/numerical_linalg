@@ -52,7 +52,7 @@ void nd::linalg::_h::partial_pivoting(nd::matrix<T, ref_h> &mat,
 
 		indices[ndim - 2] = i;
 
-		index = rndIter.index_at(indices);
+		index = rndIter.nd_index_at(indices);
 
 		// largest absolute value
 		mx = std::max(mx, { std::abs(d[index]), i });
@@ -69,15 +69,14 @@ void nd::linalg::_h::partial_pivoting(nd::matrix<T, ref_h> &mat,
 		indices[ndim - 2] = column_index;
 		indices[ndim - 1] = i;
 
-		idx0 = rndIter.index_at(indices);
+		idx0 = rndIter.nd_index_at(indices);
 
 		indices[ndim - 2] = max_index;
 		indices[ndim - 1] = i;
 
-		idx1 = rndIter.index_at(indices);
+		idx1 = rndIter.nd_index_at(indices);
 
 		std::swap(d[idx0], d[idx1]);
 	}
 
 }
-

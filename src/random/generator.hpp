@@ -11,6 +11,8 @@
 #include <type_traits>
 #include <functional>
 
+namespace generator {
+
 static std::mt19937 e_19937 { std::random_device()() };
 
 // gen_type - {0: uniform, 1: normal}
@@ -35,19 +37,24 @@ using uniform_generator = typename generator_t<std::is_integral<T>::value, 0, T>
 template<typename T>
 using normal_generator = typename generator_t<false, 1, T>::generator;
 
+// ============================================================================================
+
 template<typename T>
-class generator {
+inline auto random_uniform(T low, T high) {
 
-protected:
+	uniform_generator<T> distribution(low, high);
 
-	static std::function<T()> bind_mt19937(uniform_generator<T> &distribution);
-	static std::function<T()> bind_mt19937(normal_generator<T> &distribution);
+	return std::bind(distribution, std::ref(e_19937));
+}
 
-public:
+template<typename T>
+inline auto random_normal(T mean, T sigma) {
 
-	static T random_uniform(T low, T high);
-	static T random_normal(T mean, T sigma);
+	normal_generator<T> distribution(mean, sigma);
 
-};
+	return std::bind(distribution, std::ref(e_19937));
+}
+
+}
 
 #endif /* SRC_RANDOM_GENERATOR_HPP */

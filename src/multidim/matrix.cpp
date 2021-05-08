@@ -98,7 +98,7 @@ T& nd::_matrix<T, ref_holder>::at(shape_t indices) {
 
 	nd::iterator::RandomAccess rndIter(this->attr);
 
-	big_size_t index = rndIter.index_at(indices);
+	big_size_t index = rndIter.nd_index_at(indices);
 
 	return (*this->data.get())[index];
 
@@ -164,9 +164,11 @@ nd::matrix<T> nd::random::uniform(T low, T high, shape_t shape) {
 
 	T *d = mat._m_begin();
 
+	auto generator_wrapper = generator::random_uniform<T>(low, high);
+
 	for (big_size_t i = 0; i < mat.size(); i++) {
 
-		d[i] = generator<T>::random_uniform(low, high);
+		d[i] = generator_wrapper();
 	}
 
 	return mat;
