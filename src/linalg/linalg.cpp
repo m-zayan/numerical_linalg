@@ -371,6 +371,11 @@ void nd::linalg::inplace::transpose(nd::matrix<T, rf_h> &mat, shape_t axes) {
 	coords new_attr = attr.permuted(axes, true);
 
 	nd::iterator::RandomAccess rndIter(new_attr);
+	nd::iterator::RandomAccess prev_rndIter(attr);
+
+	shape_t reordered_strides = coords(new_attr.shape).strides;
+
+	bool is_root;
 
 	for (big_size_t i = 0; i < size; i++) {
 
@@ -385,11 +390,15 @@ void nd::linalg::inplace::transpose(nd::matrix<T, rf_h> &mat, shape_t axes) {
 			continue;
 		}
 
-		if (rndIter.is_cycle_root(i)) {
+		is_root = rndIter.is_cycle_root(i, attr, prev_rndIter,
+				reordered_strides);
+
+		if (is_root) {
 
 			while (true) {
 
-				xi = rndIter.reversed_index_at(k);
+				xi = rndIter.reversed_index_at(k, attr, prev_rndIter,
+						reordered_strides);
 
 				if (xi == i) {
 					break;

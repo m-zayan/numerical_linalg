@@ -7,7 +7,7 @@
 //#include <iostream>
 //#include <memory>
 //
-//#include "../../src/iterators/Sequential.hpp"
+//#include "../src/iterators/Sequential.hpp"
 //
 //#define ln '\n'
 //
@@ -25,9 +25,7 @@
 //
 //	while (!seqIter.isLoked()) {
 //
-//		seqIter.next();
-//
-//		seqIter.icurrent().print_vec1d(0, ndim);
+//		seqIter.next().print_vec1d(0, ndim);
 //		std::cout << " : " << count++ << ln;
 //	}
 //}

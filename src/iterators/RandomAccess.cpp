@@ -73,63 +73,62 @@ big_size_t nd::iterator::RandomAccess::index_at(big_size_t index_1d) {
 }
 
 // reversed index
-//big_size_t nd::iterator::RandomAccess::reversed_index_at(big_size_t index_1d) {
-//
-//	if (index_1d >= this->size()) {
-//		throw nd::exception("index_1d, out of range");
-//	}
-//
-//	big_size_t reindex = 0;
-//
-//	coords prev_attr = this->attr.reverse_permute(false);
-//
-//	nd::iterator::RandomAccess prev_rndIter(prev_attr);
-//
-//	shape_t indices = prev_rndIter.indices_at(index_1d);
-//	shape_t axes = this->axes();
-//	shape_t reordered_strides = coords(this->shape()).strides;
-//
-//	for (max_size_t i = 0; i < this->ndim(); i++) {
-//
-//		reindex += indices[axes[i]] * reordered_strides[i];
-//	}
-//
-//	return reindex;
-//}
+big_size_t nd::iterator::RandomAccess::reversed_index_at(big_size_t index_1d,
+		coords &prev_attr, nd::iterator::RandomAccess &prev_rndIter,
+		shape_t &reordered_strides) {
 
-//bool nd::iterator::RandomAccess::is_cycle_root(big_size_t index_1d) {
-//
-//	big_size_t size = this->size();
-//
-//	big_size_t k = index_1d;
-//	big_size_t xi = size;
-//
-//	big_size_t max_iter = 0;
-//
-//	while (true) {
-//
-//		xi = this->reversed_index_at(k);
-//
-//		if (xi == index_1d) {
-//			break;
-//		}
-//
-//		else if (xi < index_1d) {
-//			return false;
-//		}
-//
-//		k = xi;
-//
-//		// Debugging
-//		max_iter++;
-//		if (max_iter == size) {
-//			throw nd::exception(
-//					"nd::iterator::RandomAccess::is_cycle_root(...), has been failed");
-//		}
-//	}
-//
-//	return true;
-//}
+	if (index_1d >= this->size()) {
+		throw nd::exception("index_1d, out of range");
+	}
+
+	big_size_t reindex = 0;
+
+	shape_t *indices = &(prev_rndIter.indices_at(index_1d));
+
+	for (max_size_t i = 0; i < this->ndim(); i++) {
+
+		reindex += (*indices)[this->axes()[i]] * reordered_strides[i];
+	}
+
+	return reindex;
+}
+
+bool nd::iterator::RandomAccess::is_cycle_root(big_size_t index_1d,
+		coords &prev_attr, nd::iterator::RandomAccess &prev_rndIter,
+		shape_t &reordered_strides) {
+
+	big_size_t size = this->size();
+
+	big_size_t k = index_1d;
+	big_size_t xi = size;
+
+	big_size_t max_iter = 0;
+
+	while (true) {
+
+		xi = this->reversed_index_at(k, prev_attr, prev_rndIter,
+				reordered_strides);
+
+		if (xi == index_1d) {
+			break;
+		}
+
+		else if (xi < index_1d) {
+			return false;
+		}
+
+		k = xi;
+
+		// Debugging
+		max_iter++;
+		if (max_iter == size) {
+			throw nd::exception(
+					"nd::iterator::RandomAccess::is_cycle_root(...), has been failed");
+		}
+	}
+
+	return true;
+}
 
 big_size_t nd::iterator::RandomAccess::size() const {
 	return this->attr.size1d;
