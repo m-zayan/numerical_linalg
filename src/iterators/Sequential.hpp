@@ -24,7 +24,7 @@ private:
 	max_size_t axis;
 	max_size_t mov_axis;
 
-	shape_t bounds;
+	vec1d<big_size_t> bounds;
 
 	// indices
 	shape_t current;

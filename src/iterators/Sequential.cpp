@@ -16,7 +16,7 @@ nd::iterator::Sequential::Sequential(coords attr) {
 	this->axis = this->dim_bounds - 1;
 	this->mov_axis = this->dim_bounds - 1;
 
-	this->bounds = shape_t(this->dim_bounds);
+	this->bounds.fill(this->dim_bounds, 0);
 
 	for (max_size_t i = 0; i < this->dim_bounds; i++) {
 		this->bounds[i] = (this->shape()[i] - 1) * this->strides()[i];
