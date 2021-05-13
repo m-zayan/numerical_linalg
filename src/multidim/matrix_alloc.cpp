@@ -90,7 +90,7 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::_m_alloc_if_broadcastable(
 	}
 
 	else {
-		new_attr = nd::iterator::align_dim(attr0, attr1);
+		new_attr = nd::align_dim(attr0, attr1);
 	}
 
 	nd::matrix<T> result(new_attr);
@@ -115,7 +115,7 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::_m_alloc_if_broadcastable(
 
 	else {
 
-		new_attr = nd::iterator::align_dim(attr0, attr1);
+		new_attr = nd::align_dim(attr0, attr1);
 	}
 
 	nd::matrix<T> result(new_attr, val);

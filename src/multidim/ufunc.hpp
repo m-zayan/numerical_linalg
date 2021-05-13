@@ -8,6 +8,12 @@
 #define SRC_MULTIDIM_UFUNC_HPP
 
 #include "../iterators/Pairwise.hpp"
+
+//#include "../iterators/Sequential.hpp"
+//#include "../iterators/PairwiseSequential.hpp"
+
+#include "../iterators/RandomAccess.hpp"
+
 #include "../wrappers/ops.hpp"
 
 #include "../random/generator.hpp"

@@ -28,7 +28,7 @@ shape_t& nd::iterator::RandomAccess::indices_at(big_size_t index_1d) {
 		index_1d /= this->shape()[ndim - i - 1];
 	}
 
-	return this->indices_cache;
+	return this->indices();
 }
 
 big_size_t nd::iterator::RandomAccess::nd_index_at(shape_t &indices) {
