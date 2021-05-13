@@ -7,10 +7,10 @@
 #ifndef SRC_MULTIDIM_UFUNC_HPP
 #define SRC_MULTIDIM_UFUNC_HPP
 
-#include "../iterators/Pairwise.hpp"
+//#include "../iterators/Pairwise.hpp"
 
-//#include "../iterators/Sequential.hpp"
-//#include "../iterators/PairwiseSequential.hpp"
+#include "../iterators/Sequential.hpp"
+#include "../iterators/PairwiseSequential.hpp"
 
 #include "../iterators/RandomAccess.hpp"
 
@@ -43,16 +43,17 @@ void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	// ==================================================================
 
-	nd::iterator::RandomAccess rndIter0(attr0);
-	nd::iterator::RandomAccess rndIter1(attr1);
+	nd::iterator::Sequential iter0(attr0);
+	nd::iterator::Sequential iter1(attr1);
 
-	for (big_size_t i = 0; i < size0; i++) {
+	do {
 
-		T1 *v0 = d0 + rndIter0.index_at(i);
-		T2 *v1 = d1 + rndIter1.index_at(i);
+		T1 *v0 = d0 + iter0.index();
+		T2 *v1 = d1 + iter1.index();
 
 		func(*v0, *v0, *v1);
-	}
+
+	} while (iter0.next() && iter1.next());
 
 }
 
@@ -60,8 +61,6 @@ void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 template<typename T1, typename T2>
 void write_val_vec(T1 *d, T2 val, coords attr,
 		std::function<void(T1&, T1, T2)> func) {
-
-	big_size_t size = attr.size1d;
 
 	uflag8_t iter_type = attr.iter_type;
 
@@ -72,14 +71,15 @@ void write_val_vec(T1 *d, T2 val, coords attr,
 
 	// ==================================================================
 
-	nd::iterator::RandomAccess rndIter(attr);
+	nd::iterator::Sequential iter(attr);
 
-	for (big_size_t i = 0; i < size; i++) {
+	do {
 
-		T1 *v = d + rndIter.index_at(i);
+		T1 *v = d + iter.index();
 
 		func(*v, *v, val);
-	}
+
+	} while (iter.next());
 }
 
 /* [2] - lhs = rhs | res = d | use-case -> type-casting
@@ -114,24 +114,26 @@ void copy(RT *res, T *d, coords attr, coords out_attr) {
 
 	if (out_iter_type == 0) {
 
-		nd::iterator::RandomAccess rndIter(attr);
+		nd::iterator::Sequential iter(attr);
+		big_size_t i = 0;
 
-		for (big_size_t i = 0; i < size; i++) {
+		do {
 
-			res[i] = static_cast<RT>(d[rndIter.index_at(i)]);
-		}
+			res[i++] = static_cast<RT>(d[iter.index()]);
+
+		} while (iter.next());
 
 	}
 
 	else {
 
-		nd::iterator::Pairwise pIter(attr, out_attr);
+		nd::iterator::PairwiseSequential pseqIter(attr, out_attr);
 
-		for (big_size_t i = 0; i < out_size; i++) {
+		do {
 
-			res[pIter.index_at(i, 2)] =
-					static_cast<RT>(d[pIter.index_at(i, 0)]);
-		}
+			res[pseqIter.index(2)] = static_cast<RT>(d[pseqIter.index(0)]);
+
+		} while (pseqIter.next());
 	}
 
 }
@@ -171,27 +173,31 @@ void write_vec_val_vec(RT *res, T1 *d, T2 val, coords attr, coords out_attr,
 
 	if (out_iter_type == 0) {
 
-		nd::iterator::RandomAccess rndIter(attr);
+		nd::iterator::Sequential iter(attr);
 
-		for (big_size_t i = 0; i < size; i++) {
+		big_size_t i = 0;
 
-			T1 *v = d + rndIter.index_at(i);
+		do {
 
-			func(res[i], *v, val);
-		}
+			T1 *v = d + iter.index();
+
+			func(res[i++], *v, val);
+
+		} while (iter.next());
 
 	}
 
 	else {
 
-		nd::iterator::Pairwise pIter(attr, out_attr);
+		nd::iterator::PairwiseSequential pseqIter(attr, out_attr);
 
-		for (big_size_t i = 0; i < out_size; i++) {
+		do {
 
-			T1 *v = d + pIter.index_at(i, 0);
+			T1 *v = d + pseqIter.index(0);
 
-			func(res[pIter.index_at(i, 2)], *v, val);
-		}
+			func(res[pseqIter.index(2)], *v, val);
+
+		} while (pseqIter.next());
 	}
 
 }
@@ -227,29 +233,33 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 	// case: 0  (i.e. no broadcast)
 	if (out_iter_type == 0) {
 
-		nd::iterator::RandomAccess rndIter0(attr0);
-		nd::iterator::RandomAccess rndIter1(attr1);
+		nd::iterator::Sequential iter0(attr0);
+		nd::iterator::Sequential iter1(attr1);
 
-		for (big_size_t i = 0; i < size0; i++) {
+		big_size_t i = 0;
 
-			T1 *v0 = d0 + rndIter0.index_at(i);
-			T2 *v1 = d1 + rndIter1.index_at(i);
+		do {
 
-			func(res[i], *v0, *v1);
-		}
+			T1 *v0 = d0 + iter0.index();
+			T2 *v1 = d1 + iter1.index();
+
+			func(res[i++], *v0, *v1);
+
+		} while (iter0.next() && iter1.next());
 	}
 
 	else {
 
-		nd::iterator::Pairwise pIter(attr0, attr1);
+		nd::iterator::PairwiseSequential pseqIter(attr0, attr1);
 
-		for (big_size_t i = 0; i < out_size; i++) {
+		do {
 
-			T1 *v0 = d0 + pIter.index_at(i, 0);
-			T2 *v1 = d1 + pIter.index_at(i, 1);
+			T1 *v0 = d0 + pseqIter.index(0);
+			T2 *v1 = d1 + pseqIter.index(1);
 
-			func(res[pIter.index_at(i, 2)], *v0, *v1);
-		}
+			func(res[pseqIter.index(2)], *v0, *v1);
+
+		} while (pseqIter.next());
 	}
 }
 
@@ -257,20 +267,21 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 template<typename RT, typename T>
 void write_vec(RT *res, T *d, coords attr, std::function<RT(T)> func) {
 
-	big_size_t size = attr.size1d;
-
 	if (attr.iter_type == 2) {
 
 		throw nd::exception("Invalid call for, _m_ops::write_vec(...), "
 				"coords::iter_type = 2");
 	}
 
-	nd::iterator::RandomAccess rndIter(attr);
+	nd::iterator::Sequential iter(attr);
 
-	for (big_size_t i = 0; i < size; i++) {
+	big_size_t i = 0;
 
-		res[i] = func(d[rndIter.index_at(i)]);
-	}
+	do {
+
+		res[i++] = func(d[iter.index()]);
+
+	} while (iter.next());
 }
 
 }
