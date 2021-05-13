@@ -32,7 +32,7 @@ void bounded_t<T>::validate_bounds(T val) {
 		}
 	}
 
-	throw nd::exception(
+	throw std::logic_error(
 			"Invalid assignment op: " + this->signature
 					+ ", Value Out of Range, [lower_bound, upper_bound]");
 

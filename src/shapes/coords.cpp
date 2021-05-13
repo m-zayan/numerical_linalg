@@ -6,16 +6,62 @@
 
 #include "./coords.hpp"
 
+
+// =================================================================
+
+bounded_t<max_size_t> nd::mem::AUX_SIZE( { 2, 512, 1028, 2048 }, "AUX_SIZE",
+		2048);
+
+bounded_t<uflag8_t> nd::state::BroadcastingLevel( { 0, 1, 2 },
+		"BroadcastingLevel", 2);
+
+// =================================================================
+
+// used for broadcasting [attr0 & attr1 will be modified]
+coords nd::align_dim(coords &attr0, coords &attr1) {
+
+	if (!(attr0.shape & attr1.shape)) {
+
+		throw nd::exception(
+				"Invalid align_dim(...), coords::shape have to be broadcastable");
+	}
+
+	max_size_t ndim1 = attr0.ndim;
+	max_size_t ndim2 = attr1.ndim;
+
+	max_size_t max_ndim = std::max(ndim1, ndim2);
+
+	attr0 = attr0.pad_dim(max_ndim);
+	attr1 = attr1.pad_dim(max_ndim);
+
+	shape_t shape0 = attr0.shape;
+	shape_t shape1 = attr1.shape;
+
+	shape_t out_shape(max_ndim);
+
+	for (max_size_t i = 0; i < max_ndim; i++) {
+
+		out_shape[i] = std::max(shape0[i], shape1[i]);
+	}
+
+	coords out_attr = coords(out_shape, true, 2);
+
+	return out_attr;
+}
+
+// ###########################################################################################################################
+
 coords::coords() :
 		shape( { }), ndim(0), size1d(0), strides( { }), axes( { }), order('C'), own_data(
-				1) {
+				1), iter_type(0) {
 
 }
 
 coords::coords(shape_t shape) :
 		shape(shape), ndim(shape.size()), size1d(
 				shape.multiply(0, shape.size())), strides(
-				this->get_strides(shape)), axes( { }), order('C'), own_data(1) {
+				this->get_strides(shape)), axes( { }), order('C'), own_data(1), iter_type(
+				0) {
 
 	this->axes.range(0, shape.size(), 1);
 }
@@ -26,13 +72,15 @@ coords::coords(shape_t shape, char order) :
 	this->order = order;
 }
 
-coords::coords(shape_t shape, bool own_data) :
+coords::coords(shape_t shape, bool own_data, uflag8_t iter_type) :
 		coords::coords(shape) {
 
 	this->own_data = own_data;
+	this->iter_type = iter_type;
 }
 
-coords::coords(shape_t shape, shape_t strides, bool own_data) {
+coords::coords(shape_t shape, shape_t strides, bool own_data,
+		uflag8_t iter_type) {
 
 	this->check_strides(shape, strides);
 
@@ -44,10 +92,13 @@ coords::coords(shape_t shape, shape_t strides, bool own_data) {
 	this->own_data = own_data;
 
 	this->axes.range(0, shape.size(), 1);
+
+	this->iter_type = iter_type;
 }
 
-coords::coords(shape_t shape, shape_t axes, shape_t strides, bool own_data) :
-		coords::coords(shape, strides, own_data) {
+coords::coords(shape_t shape, shape_t axes, shape_t strides, bool own_data,
+		uflag8_t iter_type) :
+		coords::coords(shape, strides, own_data, iter_type) {
 
 	this->axes = axes;
 }
@@ -58,14 +109,14 @@ coords::~coords() {
 coords::coords(const coords &attr) :
 		shape(attr.shape), ndim(attr.ndim), size1d(attr.size1d), strides(
 				attr.strides), axes(attr.axes), order(attr.order), own_data(
-				attr.own_data) {
+				attr.own_data), iter_type(attr.iter_type) {
 
 }
 
 coords::coords(const coords &&attr) :
 		shape(std::move(attr.shape)), ndim(attr.ndim), size1d(attr.size1d), strides(
 				std::move(attr.strides)), axes(std::move(attr.axes)), order(
-				attr.order), own_data(attr.own_data) {
+				attr.order), own_data(attr.own_data), iter_type(attr.iter_type) {
 }
 
 coords& coords::operator =(const coords &attr) {
@@ -78,6 +129,8 @@ coords& coords::operator =(const coords &attr) {
 	this->size1d = attr.size1d;
 	this->order = attr.order;
 	this->own_data = attr.own_data;
+
+	this->iter_type = attr.iter_type;
 
 	return (*this);
 }
@@ -149,7 +202,7 @@ coords coords::permuted(const shape_t &axes, bool own_data) const {
 		swaped_strides[i] = tmp_strides[tmp_axes[i]];
 	}
 
-	coords new_attr(swaped_shape, tmp_axes, swaped_strides, own_data);
+	coords new_attr(swaped_shape, tmp_axes, swaped_strides, own_data, 1);
 
 	return new_attr;
 }
@@ -188,17 +241,28 @@ coords coords::swapaxes(max_size_t ax0, max_size_t ax1, bool own_data) const {
 	return new_attr;
 }
 
-coords coords::reduce(max_size_t axis) const {
+coords coords::reduce(max_size_t axis, bool keepdims) const {
+
+	max_size_t ndim = this->ndim - 1;
+
+	if (keepdims) {
+		ndim += 1;
+	}
 
 	shape_t in_shape = this->shape;
-	shape_t out_shape(this->ndim - 1);
+	shape_t out_shape(ndim);
 
 	max_size_t k = 0;
 
 	for (max_size_t i = 0; i < this->ndim; i++) {
 
-		if (i == axis)
+		if (i == axis) {
+			if (keepdims) {
+				out_shape[k++] = 1;
+			}
+
 			continue;
+		}
 
 		out_shape[k++] = in_shape[i];
 	}
@@ -238,7 +302,8 @@ coords coords::pad_dim(max_size_t new_ndim) const {
 		new_axes[pad_size + i] = tmp_axes[pad_size + axes[i]];
 	}
 
-	coords new_attr(new_shape, new_axes, new_strides, this->own_data);
+	coords new_attr(new_shape, new_axes, new_strides, this->own_data,
+			this->iter_type);
 
 	return new_attr;
 }
@@ -254,6 +319,8 @@ void coords::swapaxes(max_size_t ax0, max_size_t ax1) {
 	std::swap(this->axes[ax0], this->axes[ax1]);
 	std::swap(this->shape[ax0], this->shape[ax1]);
 	std::swap(this->strides[ax0], this->strides[ax1]);
+
+	this->iter_type = 1;
 }
 
 bool operator ==(const coords &attr1, const coords &attr2) {
@@ -275,3 +342,79 @@ bool operator ==(const coords &attr1, const coords &attr2) {
 	}
 }
 
+// =============================== shape_t ===============================
+
+std::ostream& operator <<(std::ostream &os, shape_t shape) {
+
+	os << '(';
+
+	for (max_size_t i = 0; i < shape.size() - 1; i++) {
+		os << shape[i] << ',';
+	}
+
+	os << shape[shape.size() - 1];
+
+	if (shape.size() == 1) {
+		os << ',';
+	}
+
+	os << ')';
+
+	return os;
+}
+
+// flags: {0: doesn't match, 1: match, 2: broadcastable}
+uflag8_t operator &(const shape_t &shape1, const shape_t &shape2) {
+
+	shape_t temp1 = shape1;
+	shape_t temp2 = shape2;
+
+	max_size_t size1 = temp1.size();
+	max_size_t size2 = temp2.size();
+
+	uflag8_t flag = 1;
+
+	if (size1 == size2) {
+		for (max_size_t i = 0; i < size1; i++) {
+			if (temp1[i] != temp2[i]) {
+
+				if (temp1[i] == 1 || temp2[i] == 1) {
+
+					flag = 2;
+				}
+
+				else {
+					return 0;
+				}
+			}
+		}
+		return flag;
+	}
+
+	else {
+
+		max_size_t i, j;
+
+		if (size1 > size2) {
+			i = size1 - size2;
+			j = 0;
+		}
+
+		else {
+			i = 0;
+			j = size2 - size1;
+		}
+
+		while (i < size1 && j < size2) {
+
+			if ((temp1[i] != temp2[j]) && !(temp1[i] == 1 || temp2[j] == 1)) {
+				return 0;
+			}
+
+			i++;
+			j++;
+		}
+
+		return 2;
+	}
+}

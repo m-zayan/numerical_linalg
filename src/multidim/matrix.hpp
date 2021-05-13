@@ -9,7 +9,7 @@
 #ifndef SRC_MULTIDIM_MATRIX_HPP
 #define SRC_MULTIDIM_MATRIX_HPP
 
-#include "ufunc.hpp"
+#include "./ufunc.hpp"
 
 // nd
 namespace nd {
@@ -34,23 +34,29 @@ protected:
 	big_size_t c_begin;
 	big_size_t c_end;
 
-	bool req_iter;
-
 	template<typename RT, bool ref_h = ref_holder>
 	matrix<RT, ref_h>* _m_dynamic_cast();
 
+	static uflag8_t _m_validate_op(const coords &attr0, const coords &attr1);
+
+	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0,
+			coords attr1);
+
+	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0,
+			coords attr1, T val);
+
 public:
 
-	inline big_size_t size();
+	big_size_t size() const;
 
-	inline shape_t shape();
-	inline shape_t strides();
+	shape_t shape() const;
+	shape_t strides() const;
 
-	inline max_size_t ndim();
+	max_size_t ndim() const;
 
-	inline max_size_t step_size();
+	max_size_t step_size() const;
 
-	inline bool own_data();
+	bool own_data() const;
 
 	// ===================
 	matrix<T, false> operator [](max_size_t d_index);
@@ -99,20 +105,23 @@ public:
 
 	matrix<T> copy();
 
+	template<typename RT>
+	operator matrix<RT>() const;
+
 	// ===================
 
-	T* _m_begin();
-	T* _m_end();
+	vec1d<T> _m_data() const;
 
 	coords _m_coords() const;
 	data_t _m_ptr() const;
 
-	vec1d<T> _m_data() const;
-
 	big_size_t _m_c_begin() const;
 	big_size_t _m_c_end() const;
 
-	bool _m_req_iter() const;
+	T* _m_begin();
+	T* _m_end();
+
+	uflag8_t _m_iter_type() const;
 
 	// ===================
 
@@ -121,6 +130,7 @@ public:
 	matrix<T, false> reshape(shape_t shape);
 
 	void _m_reshape(shape_t shape);
+	void _m_clear_iter_type();
 
 	virtual ~_matrix();
 
@@ -140,6 +150,7 @@ public:
 
 	matrix(shape_t shape);
 	matrix(shape_t shape, T val);
+	matrix(const coords &attr, T val);
 	matrix(const coords &attr);
 
 	matrix(const matrix<T> &mat);
@@ -158,10 +169,10 @@ public:
 	matrix() = delete;
 
 	matrix(const coords &attr, shared_ptr<vec1d<T>> data, big_size_t c_begin,
-			big_size_t c_end, bool req_iter);
+			big_size_t c_end);
 
 	matrix(const coords &attr, weak_ptr<vec1d<T>> data, big_size_t c_begin,
-			big_size_t c_end, bool req_iter);
+			big_size_t c_end);
 
 	matrix(const matrix &mat);
 	matrix(const matrix<T, true> &mat);
@@ -176,16 +187,19 @@ public:
 template<typename T>
 matrix<T> stack(composite<matrix<T>> matrix_list);
 
+template<typename RT, typename T, bool rf_h>
+matrix<RT> apply(const nd::matrix<T, rf_h> &mat, std::function<RT(T)> func);
+
 /*
  * 	n_splits = dim_size / AUX_VEC_SIZE
  * 	func(acaccumulator, indices, values, _, _)
  */
 template<typename RT, typename T1, typename T2, bool rf_h>
-matrix<RT, true> apply_along_axis(const matrix<T1, rf_h> &mat,
+matrix<RT> apply_along_axis(const matrix<T1, rf_h> &mat,
 		std::function<
 				void(T2&, vec1d<max_size_t>&, vec1d<T1>&, max_size_t,
 						max_size_t)> func, max_size_t axis, T2 initial_acc,
-		std::function<RT(T2)> ppfunc);
+		std::function<RT(T2&)> ppfunc, bool reduce, bool keepdims);
 
 namespace random {
 
@@ -197,72 +211,49 @@ matrix<T> uniform(T low, T high, shape_t shape);
 namespace numeric {
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> min(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> min(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> max(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> max(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
+
+template<typename RT = max_size_t, typename T, bool rf_h>
+matrix<RT, true> argmax(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
+
+template<typename RT = max_size_t, typename T, bool rf_h>
+matrix<RT, true> argmin(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> argmax(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> sum(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
+
+template<typename RT = float_auto, typename T, bool rf_h>
+matrix<RT, true> mean(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
+
+template<typename RT = float_auto, typename T, bool rf_h>
+matrix<RT, true> var(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
+
+template<typename RT = float_auto, typename T, bool rf_h>
+matrix<RT, true> std(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> argmin(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> mod(const matrix<T, rf_h> &mat, max_size_t axis,
+		bool keepdims = false);
+
+template<typename RT = float_auto, typename T, bool rf_h,
+		typename qT = float_auto>
+matrix<RT, true> quantile(const matrix<T, rf_h> &mat, qT q, max_size_t axis,
+		bool keepdims = false);
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT, true> sum(const matrix<T, rf_h> &mat, max_size_t axis);
+matrix<RT, true> cumsum(const matrix<T, rf_h> &mat, max_size_t axis);
 
-template<typename RT, typename T, bool rf_h>
-matrix<RT, true> mean(const matrix<T, rf_h> &mat, max_size_t axis);
-
-template<typename RT, typename T, bool rf_h>
-matrix<RT, true> var(const matrix<T, rf_h> &mat, max_size_t axis);
-
-template<typename RT, typename T, bool rf_h>
-matrix<RT, true> std(const matrix<T, rf_h> &mat, max_size_t axis);
-
-template<typename RT, typename T, bool rf_h>
-matrix<RT, true> mod(const matrix<T, rf_h> &mat, max_size_t axis);
-
-template<typename RT, typename T, bool rf_h, typename qT>
-matrix<RT, true> quantile(const matrix<T, rf_h> &mat, qT q, max_size_t axis);
-
-}
-
-namespace mem {
-/*
- * Most of nd::matrix ops's implementation, follows D&C (iteratively),
- *
- * mainly to make
- * 	np::apply_along_axis(...) reusable, for all numeric ops, (ex. sum, var)
- *
- * reciprocally, it improves the numerical stability for some numeric ops
- *
- * number_of_splits = shape[axis] / AUX_SIZE
- */
-static bounded_t<max_size_t> AUX_SIZE( { 512, 1028, 2048 }, "AUX_SIZE", 2048);
-
-inline max_size_t clip_dim(max_size_t dim_size) {
-
-	return std::min(dim_size, static_cast<max_size_t>(nd::mem::AUX_SIZE));
-}
-
-}
-
-namespace state {
-/*
- * BroadcastingLevel = 0, broadcasting in not allowed,
- * i.e. for all nd::matrix ops shapes should exactly match.
- *
- * BroadcastingLevel = 1, padding for nd::matrix::shape() should be explicitly defined
- *
- * BroadcastingLevel = 2, implicit padding for nd::matrix::shape(),
- * 	ex. (3, 3) might be considered as (1, 3, 3) implicitly
- *
- *
- */
-
-//static bounded_t<uflag8_t> BroadcastingLevel( { 0, 1, 2 }, "BroadcastingLevel",
-//		0);
 }
 
 }

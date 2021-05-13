@@ -9,31 +9,29 @@
 nd::iterator::RandomAccess::RandomAccess(coords attr) {
 
 	this->attr = attr;
+	this->indices_cache = shape_t(this->ndim());
 }
 
-shape_t nd::iterator::RandomAccess::indices_at(big_size_t index_1d) const {
+shape_t& nd::iterator::RandomAccess::indices_at(big_size_t index_1d) {
 
 	if (index_1d >= this->size()) {
 		throw nd::exception("index_1d, out of range");
 	}
 
-	shape_t indices(this->ndim());
-
-	shape_t shape = this->shape();
-	shape_t strides = this->strides();
 	max_size_t ndim = this->ndim();
 
 	for (max_size_t i = 0; i < ndim; i++) {
 
-		indices[ndim - i - 1] = (index_1d % shape[ndim - i - 1]);
+		this->indices()[ndim - i - 1] =
+				(index_1d % this->shape()[ndim - i - 1]);
 
-		index_1d /= shape[ndim - i - 1];
+		index_1d /= this->shape()[ndim - i - 1];
 	}
 
-	return indices;
+	return this->indices();
 }
 
-big_size_t nd::iterator::RandomAccess::index_at(shape_t indices) const {
+big_size_t nd::iterator::RandomAccess::nd_index_at(shape_t &indices) {
 
 	if (indices.size() != this->ndim()) {
 		throw nd::exception("dimensions -> indices, doesn't match");
@@ -41,40 +39,43 @@ big_size_t nd::iterator::RandomAccess::index_at(shape_t indices) const {
 
 	big_size_t index = 0;
 
-	shape_t strides = this->strides();
-
 	for (max_size_t i = 0; i < this->ndim(); i++) {
 
-		index += (strides[i] * indices[i]);
+		index += (this->strides()[i] * indices[i]);
 	}
 
 	return index;
 }
 
-big_size_t nd::iterator::RandomAccess::index_at(big_size_t index_1d) const {
+big_size_t nd::iterator::RandomAccess::index_at(big_size_t index_1d) {
 
 	if (index_1d >= this->size()) {
 		throw nd::exception("index_1d, out of range");
 	}
 
-	big_size_t index = 0;
+	if (this->iter_type() == 0) {
 
-	shape_t shape = this->shape();
-	shape_t strides = this->strides();
+		return index_1d;
+	}
+
 	max_size_t ndim = this->ndim();
+
+	big_size_t index = 0;
 
 	for (max_size_t i = 0; i < ndim; i++) {
 
-		index += (strides[ndim - i - 1] * (index_1d % shape[ndim - i - 1]));
-		index_1d /= shape[ndim - i - 1];
+		index += (this->strides()[ndim - i - 1]
+				* (index_1d % this->shape()[ndim - i - 1]));
+		index_1d /= this->shape()[ndim - i - 1];
 	}
 
 	return index;
 }
 
 // reversed index
-big_size_t nd::iterator::RandomAccess::reversed_index_at(
-		big_size_t index_1d) const {
+big_size_t nd::iterator::RandomAccess::reversed_index_at(big_size_t index_1d,
+		coords &prev_attr, nd::iterator::RandomAccess &prev_rndIter,
+		shape_t &reordered_strides) {
 
 	if (index_1d >= this->size()) {
 		throw nd::exception("index_1d, out of range");
@@ -82,23 +83,19 @@ big_size_t nd::iterator::RandomAccess::reversed_index_at(
 
 	big_size_t reindex = 0;
 
-	coords prev_attr = this->attr.reverse_permute(false);
-
-	nd::iterator::RandomAccess prev_rndIter(prev_attr);
-
-	shape_t indices = prev_rndIter.indices_at(index_1d);
-	shape_t axes = this->axes();
-	shape_t reordered_strides = coords(this->shape()).strides;
+	shape_t *indices = &(prev_rndIter.indices_at(index_1d));
 
 	for (max_size_t i = 0; i < this->ndim(); i++) {
 
-		reindex += indices[axes[i]] * reordered_strides[i];
+		reindex += (*indices)[this->axes()[i]] * reordered_strides[i];
 	}
 
 	return reindex;
 }
 
-bool nd::iterator::RandomAccess::is_cycle_root(big_size_t index_1d) const {
+bool nd::iterator::RandomAccess::is_cycle_root(big_size_t index_1d,
+		coords &prev_attr, nd::iterator::RandomAccess &prev_rndIter,
+		shape_t &reordered_strides) {
 
 	big_size_t size = this->size();
 
@@ -109,7 +106,8 @@ bool nd::iterator::RandomAccess::is_cycle_root(big_size_t index_1d) const {
 
 	while (true) {
 
-		xi = this->reversed_index_at(k);
+		xi = this->reversed_index_at(k, prev_attr, prev_rndIter,
+				reordered_strides);
 
 		if (xi == index_1d) {
 			break;
@@ -121,7 +119,7 @@ bool nd::iterator::RandomAccess::is_cycle_root(big_size_t index_1d) const {
 
 		k = xi;
 
-		// debug
+		// Debugging
 		max_iter++;
 		if (max_iter == size) {
 			throw nd::exception(
@@ -131,23 +129,29 @@ bool nd::iterator::RandomAccess::is_cycle_root(big_size_t index_1d) const {
 
 	return true;
 }
+
 big_size_t nd::iterator::RandomAccess::size() const {
 	return this->attr.size1d;
 }
 
-shape_t nd::iterator::RandomAccess::shape() const {
+shape_t& nd::iterator::RandomAccess::shape() {
 
 	return this->attr.shape;
 }
 
-shape_t nd::iterator::RandomAccess::axes() const {
+shape_t& nd::iterator::RandomAccess::axes() {
 
 	return this->attr.axes;
 }
 
-shape_t nd::iterator::RandomAccess::strides() const {
+shape_t& nd::iterator::RandomAccess::strides() {
 
 	return this->attr.strides;
+}
+
+shape_t& nd::iterator::RandomAccess::indices() {
+
+	return this->indices_cache;
 }
 
 max_size_t nd::iterator::RandomAccess::ndim() const {
@@ -165,6 +169,12 @@ bool nd::iterator::RandomAccess::own_data() const {
 	return this->attr.own_data;
 }
 
+uflag8_t nd::iterator::RandomAccess::iter_type() const {
+
+	return this->attr.iter_type;
+}
+
 nd::iterator::RandomAccess::~RandomAccess() {
+
 }
 

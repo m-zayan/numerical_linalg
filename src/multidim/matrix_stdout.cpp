@@ -39,7 +39,7 @@ void print_vec1d(T *data, big_size_t begin, big_size_t end) {
 
 namespace nd::out {
 
-template<typename T, bool ref_holder, flag8_t d_round = 0>
+template<typename T, bool ref_holder, uflag8_t d_round = 0>
 void print_matrix(const matrix<T, ref_holder> &mat) {
 
 	nd::iterator::RandomAccess rndIter(mat._m_coords());

@@ -11,34 +11,29 @@
 
 namespace nd::iterator {
 
-coords align_dim(coords &attr0, coords &attr1);
-
 class Pairwise {
 
 private:
 
 	// aligned_attr
-	coords attr2;
+	vec1d<coords> attr_list;
+	vec1d<RandomAccess*> iter_list;
 
-	coords attr0;
-	coords attr1;
+	shape_t clipped_cache;
 
-	RandomAccess rndIter0;
-	RandomAccess rndIter1;
-
-	RandomAccess rndIter2;
+	shape_t& clipped_indices();
+	RandomAccess& iter_of(min_size_t pair_index);
 
 public:
 
 	Pairwise() = delete;
 	Pairwise(coords attr0, coords attr1);
 
-	coords aligned_coords(uflag8_t pair_index) const;
+	coords aligned_coords(min_size_t pair_index);
 
 	// pair_index --> {0: Pairwise::attr1, 1: Pairwise::attr2, 2: Pairwise::aligned_attr}
-
-	shape_t indices_at(big_size_t index_1d, uflag8_t pair_index) const;
-	big_size_t index_at(big_size_t index_1d, uflag8_t pair_index) const;
+	shape_t& indices_at(big_size_t index_1d, min_size_t pair_index);
+	big_size_t index_at(big_size_t index_1d, min_size_t pair_index);
 
 	virtual ~Pairwise();
 };

@@ -16,9 +16,11 @@ private:
 
 	coords attr;
 
-	shape_t strides() const;
-	shape_t shape() const;
-	shape_t axes() const;
+	shape_t indices_cache;
+
+	shape_t& strides();
+	shape_t& shape();
+	shape_t& axes();
 
 	max_size_t ndim() const;
 	big_size_t size() const;
@@ -26,20 +28,25 @@ private:
 	char order() const;
 	bool own_data() const;
 
+	uflag8_t iter_type() const;
+
+	shape_t& indices();
+
 public:
 
 	RandomAccess() = delete;
-
 	RandomAccess(coords attr);
 
-	shape_t indices_at(big_size_t index_1d) const;
+	shape_t& indices_at(big_size_t index_1d);
 
-	big_size_t index_at(shape_t indices) const;
-	big_size_t index_at(big_size_t index_1d) const;
+	big_size_t nd_index_at(shape_t &indices);
+	big_size_t index_at(big_size_t index_1d);
 
-	big_size_t reversed_index_at(big_size_t index_1d) const;
+	big_size_t reversed_index_at(big_size_t index_1d, coords& prev_attr, RandomAccess& prev_rndIter, shape_t &reordered_strides);
 
-	bool is_cycle_root(big_size_t index_1d) const;
+	bool is_cycle_root(big_size_t index_1d,
+			coords &prev_attr, nd::iterator::RandomAccess &prev_rndIter,
+			shape_t &reordered_strides);
 
 	virtual ~RandomAccess();
 };

@@ -25,6 +25,44 @@ nd::_matrix<T, ref_holder>::~_matrix() {
 }
 
 template<typename T, bool ref_holder>
+uflag8_t nd::_matrix<T, ref_holder>::_m_validate_op(const coords &attr0,
+		const coords &attr1) {
+
+	uflag8_t valid = (attr0.shape & attr1.shape);
+
+	if (!valid) {
+
+		throw nd::exception("Invalid element-wise operation, "
+				"matrices must have the same shape");
+
+	}
+
+	else if (valid == 1) {
+
+		return 1;
+	}
+
+	// case: valid = 2, (i.e. broadcastable)
+	else if (nd::state::BroadcastingLevel == 0) {
+
+		throw nd::exception("nd::state::BroadcastingLevel = 0, "
+				"Broadcasting in not allowed");
+	}
+
+	// case: valid = 2, (i.e. broadcastable)
+	else if (attr0.ndim != attr1.ndim && nd::state::BroadcastingLevel != 2) {
+
+		throw nd::exception("nd::state::BroadcastingLevel = 1, "
+				"Padding for nd::matrix::shape() should be explicitly defined");
+
+	}
+
+	else {
+		return 2;
+	}
+}
+
+template<typename T, bool ref_holder>
 nd::matrix<T> nd::_matrix<T, ref_holder>::copy() {
 
 	nd::matrix<T> result(this->shape());
@@ -32,7 +70,55 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::copy() {
 	T *d = this->_m_begin();
 	T *res = result._m_begin();
 
-	_m_ops::copy<T, T>(res, d, this->_m_coords(), this->req_iter);
+	_m_ops::copy<T, T>(res, d, this->_m_coords(), result._m_coords());
+
+	return result;
+}
+
+template<typename T, bool ref_holder>
+nd::matrix<T> nd::_matrix<T, ref_holder>::_m_alloc_if_broadcastable(
+		coords attr0, coords attr1) {
+
+	uflag8_t op_state = nd::_matrix<T, true>::_m_validate_op(attr0, attr1);
+
+	coords new_attr;
+
+	if (op_state == 1) {
+
+		// attr0.shape == attr1.shape
+		new_attr = coords(attr0.shape);
+	}
+
+	else {
+		new_attr = nd::align_dim(attr0, attr1);
+	}
+
+	nd::matrix<T> result(new_attr);
+
+	return result;
+
+}
+
+template<typename T, bool ref_holder>
+nd::matrix<T> nd::_matrix<T, ref_holder>::_m_alloc_if_broadcastable(
+		coords attr0, coords attr1, T val) {
+
+	uflag8_t op_state = nd::_matrix<T, true>::_m_validate_op(attr0, attr1);
+
+	coords new_attr;
+
+	if (op_state == 1) {
+
+		// attr0.shape == attr1.shape
+		new_attr = coords(attr0.shape);
+	}
+
+	else {
+
+		new_attr = nd::align_dim(attr0, attr1);
+	}
+
+	nd::matrix<T> result(new_attr, val);
 
 	return result;
 }
@@ -46,8 +132,6 @@ nd::matrix<T, true>::matrix(shape_t shape) {
 
 	this->c_begin = 0;
 	this->c_end = this->size();
-
-	this->req_iter = false;
 }
 
 template<typename T>
@@ -58,8 +142,16 @@ nd::matrix<T, true>::matrix(shape_t shape, T val) {
 
 	this->c_begin = 0;
 	this->c_end = this->size();
+}
 
-	this->req_iter = false;
+template<typename T>
+nd::matrix<T, true>::matrix(const coords &attr, T val) {
+
+	this->attr = attr;
+	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size(), val));
+
+	this->c_begin = 0;
+	this->c_end = this->size();
 }
 
 template<typename T>
@@ -72,8 +164,6 @@ nd::matrix<T, true>::matrix(const coords &attr) {
 	this->c_end = this->size();
 
 	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size()));
-
-	this->req_iter = false;
 }
 
 template<typename T>
@@ -87,12 +177,10 @@ nd::matrix<T, true>::matrix(const nd::matrix<T> &mat) {
 	this->c_begin = 0;
 	this->c_end = this->size();
 
-	this->req_iter = false;
-
 	T *d = temp._m_begin();
 	T *res = this->_m_begin();
 
-	_m_ops::copy<T, T>(res, d, mat._m_coords(), mat._m_req_iter());
+	_m_ops::copy<T, T>(res, d, mat._m_coords(), this->attr);
 }
 
 template<typename T>
@@ -106,12 +194,10 @@ nd::matrix<T, true>::matrix(const nd::matrix<T, false> &mat) {
 	this->c_begin = 0;
 	this->c_end = this->size();
 
-	this->req_iter = false;
-
 	T *d = temp._m_begin();
 	T *res = this->_m_begin();
 
-	_m_ops::copy<T, T>(res, d, mat._m_coords(), mat._m_req_iter());
+	_m_ops::copy<T, T>(res, d, mat._m_coords(), this->attr);
 }
 
 template<typename T>
@@ -122,11 +208,11 @@ nd::matrix<T, true>::~matrix() {
 // false
 template<typename T>
 nd::matrix<T, false>::matrix(const coords &attr, shared_ptr<vec1d<T>> data,
-		big_size_t c_begin, big_size_t c_end, bool req_iter) {
+		big_size_t c_begin, big_size_t c_end) {
 
 	if (attr.own_data || c_begin > c_end) {
 
-		// debuging
+		// Debugging
 		throw nd::exception("Invalid construction, "
 				"for a non-reference holder nd::matrix<T, ...>");
 	}
@@ -137,17 +223,15 @@ nd::matrix<T, false>::matrix(const coords &attr, shared_ptr<vec1d<T>> data,
 
 	this->c_begin = c_begin;
 	this->c_end = c_end;
-
-	this->req_iter = req_iter;
 }
 
 template<typename T>
 nd::matrix<T, false>::matrix(const coords &attr, weak_ptr<vec1d<T>> data,
-		big_size_t c_begin, big_size_t c_end, bool req_iter) {
+		big_size_t c_begin, big_size_t c_end) {
 
 	if (attr.own_data || c_begin > c_end) {
 
-		// debuging
+		// Debugging
 		throw nd::exception("Invalid construction, "
 				"for a non-reference holder nd::matrix<T, ...>");
 	}
@@ -158,20 +242,18 @@ nd::matrix<T, false>::matrix(const coords &attr, weak_ptr<vec1d<T>> data,
 
 	this->c_begin = c_begin;
 	this->c_end = c_end;
-
-	this->req_iter = req_iter;
 }
 
 template<typename T>
 nd::matrix<T, false>::matrix(const nd::matrix<T, true> &mat) {
 
 	this->attr = mat._m_coords();
+	this->attr.own_data = false;
+
 	this->data = mat._m_ptr();
 
 	this->c_begin = mat._m_c_begin();
 	this->c_end = mat._m_c_end();
-
-	this->req_iter = mat._m_req_iter();
 }
 
 template<typename T>
@@ -182,8 +264,6 @@ nd::matrix<T, false>::matrix(const nd::matrix<T, false> &mat) {
 
 	this->c_begin = mat._m_c_begin();
 	this->c_end = mat._m_c_end();
-
-	this->req_iter = mat._m_req_iter();
 }
 
 template<typename T>

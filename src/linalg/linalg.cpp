@@ -4,7 +4,8 @@
  *	Author: Z. Mohamed
  */
 
-#include "./linalg.hpp"
+//#include "./linalg.hpp"
+#include "./preprocessing.cpp"
 
 template<typename T>
 nd::matrix<T> nd::linalg::eye(shape_t shape) {
@@ -191,7 +192,7 @@ nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
 
 				}
 
-				d2[index++] = elems.sum(0, aux_size);
+				d2[index++] = algorithm::sum<RT>(0, aux_size, elems.ref(0));
 			}
 		}
 
@@ -307,7 +308,7 @@ nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m1,
 					elems[vi++] += (d0[start + k] * d1[ik]);
 				}
 
-				d2[index++] = elems.sum(0, aux_size);
+				d2[index++] = algorithm::sum<RT>(0, aux_size, elems.ref(0));
 			}
 		}
 	}
@@ -370,6 +371,11 @@ void nd::linalg::inplace::transpose(nd::matrix<T, rf_h> &mat, shape_t axes) {
 	coords new_attr = attr.permuted(axes, true);
 
 	nd::iterator::RandomAccess rndIter(new_attr);
+	nd::iterator::RandomAccess prev_rndIter(attr);
+
+	shape_t reordered_strides = coords(new_attr.shape).strides;
+
+	bool is_root;
 
 	for (big_size_t i = 0; i < size; i++) {
 
@@ -384,11 +390,15 @@ void nd::linalg::inplace::transpose(nd::matrix<T, rf_h> &mat, shape_t axes) {
 			continue;
 		}
 
-		if (rndIter.is_cycle_root(i)) {
+		is_root = rndIter.is_cycle_root(i, attr, prev_rndIter,
+				reordered_strides);
+
+		if (is_root) {
 
 			while (true) {
 
-				xi = rndIter.reversed_index_at(k);
+				xi = rndIter.reversed_index_at(k, attr, prev_rndIter,
+						reordered_strides);
 
 				if (xi == i) {
 					break;

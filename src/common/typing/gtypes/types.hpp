@@ -7,10 +7,16 @@
 #ifndef SRC_TYPING_GTYPES_TYPES_HPP
 #define SRC_TYPING_GTYPES_TYPES_HPP
 
+#include <iostream>
+
+#include <initializer_list>
+
 #include <vector>
 #include <queue>
+#include <functional>
 
 #include "./stl_wrapper/weak_ptr.hpp"
+#include "./stl_wrapper/temporary_queue.hpp"
 
 // types
 using bool_t = bool;
@@ -25,6 +31,10 @@ using big_t = long long;
 using min_size_t = unsigned short int;
 using max_size_t = unsigned int;
 using big_size_t = unsigned long long;
+
+using float_32 = float;
+using float_64 = double;
+using float_auto = long double;
 
 template<typename T>
 using unique_ptr = std::unique_ptr<T>;
