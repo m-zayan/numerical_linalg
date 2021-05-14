@@ -169,7 +169,7 @@ bool nd::iterator::RandomAccess::own_data() const {
 	return this->attr.own_data;
 }
 
-uflag8_t nd::iterator::RandomAccess::iter_type() const {
+IteratorType nd::iterator::RandomAccess::iter_type() const {
 
 	return this->attr.iter_type;
 }

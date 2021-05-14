@@ -6,7 +6,6 @@
 
 #include "./coords.hpp"
 
-
 // =================================================================
 
 bounded_t<max_size_t> nd::mem::AUX_SIZE( { 2, 512, 1028, 2048 }, "AUX_SIZE",
@@ -44,7 +43,7 @@ coords nd::align_dim(coords &attr0, coords &attr1) {
 		out_shape[i] = std::max(shape0[i], shape1[i]);
 	}
 
-	coords out_attr = coords(out_shape, true, 2);
+	coords out_attr = coords(out_shape, true, IteratorType::Pair);
 
 	return out_attr;
 }
@@ -53,7 +52,7 @@ coords nd::align_dim(coords &attr0, coords &attr1) {
 
 coords::coords() :
 		shape( { }), ndim(0), size1d(0), strides( { }), axes( { }), order('C'), own_data(
-				1), iter_type(0) {
+				1), iter_type(IteratorType::None) {
 
 }
 
@@ -61,7 +60,7 @@ coords::coords(shape_t shape) :
 		shape(shape), ndim(shape.size()), size1d(
 				shape.multiply(0, shape.size())), strides(
 				this->get_strides(shape)), axes( { }), order('C'), own_data(1), iter_type(
-				0) {
+				IteratorType::None) {
 
 	this->axes.range(0, shape.size(), 1);
 }
@@ -72,7 +71,7 @@ coords::coords(shape_t shape, char order) :
 	this->order = order;
 }
 
-coords::coords(shape_t shape, bool own_data, uflag8_t iter_type) :
+coords::coords(shape_t shape, bool own_data, IteratorType iter_type) :
 		coords::coords(shape) {
 
 	this->own_data = own_data;
@@ -80,7 +79,7 @@ coords::coords(shape_t shape, bool own_data, uflag8_t iter_type) :
 }
 
 coords::coords(shape_t shape, shape_t strides, bool own_data,
-		uflag8_t iter_type) {
+		IteratorType iter_type) {
 
 	this->check_strides(shape, strides);
 
@@ -97,7 +96,7 @@ coords::coords(shape_t shape, shape_t strides, bool own_data,
 }
 
 coords::coords(shape_t shape, shape_t axes, shape_t strides, bool own_data,
-		uflag8_t iter_type) :
+		IteratorType iter_type) :
 		coords::coords(shape, strides, own_data, iter_type) {
 
 	this->axes = axes;
@@ -202,7 +201,8 @@ coords coords::permuted(const shape_t &axes, bool own_data) const {
 		swaped_strides[i] = tmp_strides[tmp_axes[i]];
 	}
 
-	coords new_attr(swaped_shape, tmp_axes, swaped_strides, own_data, 1);
+	coords new_attr(swaped_shape, tmp_axes, swaped_strides, own_data,
+			IteratorType::Linear);
 
 	return new_attr;
 }
@@ -320,7 +320,7 @@ void coords::swapaxes(max_size_t ax0, max_size_t ax1) {
 	std::swap(this->shape[ax0], this->shape[ax1]);
 	std::swap(this->strides[ax0], this->strides[ax1]);
 
-	this->iter_type = 1;
+	this->iter_type = IteratorType::Linear;
 }
 
 bool operator ==(const coords &attr1, const coords &attr2) {

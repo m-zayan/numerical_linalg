@@ -7,7 +7,7 @@
 #ifndef SRC_ITERATORS_PAIRWISESEQUENTIAL_HPP
 #define SRC_ITERATORS_PAIRWISESEQUENTIAL_HPP
 
-#include "./Sequential.hpp"
+#include "./Iterator.hpp"
 
 namespace nd::iterator {
 
@@ -66,7 +66,7 @@ public:
 	big_size_t index(min_size_t pair_index);
 
 	max_size_t iaxis();
-	bool isLoked();
+	bool isLocked();
 
 	void unlock();
 	void reset();

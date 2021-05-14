@@ -8,9 +8,8 @@
 
 template<typename T>
 bounded_t<T>::bounded_t(std::vector<T> bounds) :
-		bounds(bounds), signature("") {
+		bounds(bounds), signature(""), value(bounds[0]) {
 
-	this->value = this->bounds[0];
 }
 
 template<typename T>

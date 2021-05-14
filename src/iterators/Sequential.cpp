@@ -38,7 +38,7 @@ shape_t& nd::iterator::Sequential::strides() {
 	return this->attr.strides;
 }
 
-shape_t nd::iterator::Sequential::icurrent() const {
+shape_t nd::iterator::Sequential::indices() const {
 
 	return this->current;
 }
@@ -55,7 +55,7 @@ max_size_t nd::iterator::Sequential::iaxis() {
 
 bool nd::iterator::Sequential::next() {
 
-	if (this->isLoked()) {
+	if (this->isLocked()) {
 
 		throw nd::exception("The iterator was locked, if you want to reuse it, "
 				"consider using Sequential::unlock(), method.");
@@ -63,7 +63,7 @@ bool nd::iterator::Sequential::next() {
 
 	this->next_prem();
 
-	return !this->isLoked();
+	return !this->isLocked();
 }
 
 // update step & return a status flag
@@ -132,7 +132,7 @@ void nd::iterator::Sequential::lock() {
 	this->locked = true;
 }
 
-bool nd::iterator::Sequential::isLoked() {
+bool nd::iterator::Sequential::isLocked() {
 
 	return this->locked;
 }

@@ -4,23 +4,9 @@
 // *	Author: Z. Mohamed
 // */
 //#include <iostream>
-//#include "../src/typing/utypes/types.hpp"
+//#include "../src/typing/types.hpp"
 //
 //#define ln '\n'
-//
-////template<typename T, T ...Bounds>
-////class const_bounded_t: public bounded_t<T> {
-////
-////public:
-////
-////	using bounded_t<T>::bounds;
-////
-////
-////	const_bounded_t(std::string sig, T val) :
-////			bounded_t<T>::bounded_t( { }, sig, val) {
-////	}
-////
-////};
 //
 //int main() {
 //

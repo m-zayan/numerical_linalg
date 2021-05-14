@@ -39,7 +39,7 @@ nd::iterator::PairwiseSequential::PairwiseSequential(coords attr0,
 
 bool nd::iterator::PairwiseSequential::next() {
 
-	if (this->isLoked()) {
+	if (this->isLocked()) {
 
 		throw nd::exception("The iterator was locked, if you want to reuse it, "
 				"consider using PairwiseSequential::unlock(), method.");
@@ -47,7 +47,7 @@ bool nd::iterator::PairwiseSequential::next() {
 
 	this->next_prem();
 
-	return !this->isLoked();
+	return !this->isLocked();
 }
 
 void nd::iterator::PairwiseSequential::next_prem() {
@@ -190,7 +190,7 @@ void nd::iterator::PairwiseSequential::lock() {
 	this->locked = true;
 }
 
-bool nd::iterator::PairwiseSequential::isLoked() {
+bool nd::iterator::PairwiseSequential::isLocked() {
 
 	return this->locked;
 }

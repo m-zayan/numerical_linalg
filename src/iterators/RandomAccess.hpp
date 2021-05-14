@@ -7,7 +7,7 @@
 #ifndef SRC_ITERATORS_RandomAccess_HPP
 #define SRC_ITERATORS_RandomAccess_HPP
 
-#include "../shapes/coords.hpp"
+#include "./Iterator.hpp"
 
 namespace nd::iterator {
 class RandomAccess {
@@ -28,7 +28,7 @@ private:
 	char order() const;
 	bool own_data() const;
 
-	uflag8_t iter_type() const;
+	IteratorType iter_type() const;
 
 	shape_t& indices();
 
@@ -42,10 +42,11 @@ public:
 	big_size_t nd_index_at(shape_t &indices);
 	big_size_t index_at(big_size_t index_1d);
 
-	big_size_t reversed_index_at(big_size_t index_1d, coords& prev_attr, RandomAccess& prev_rndIter, shape_t &reordered_strides);
+	big_size_t reversed_index_at(big_size_t index_1d, coords &prev_attr,
+			RandomAccess &prev_rndIter, shape_t &reordered_strides);
 
-	bool is_cycle_root(big_size_t index_1d,
-			coords &prev_attr, nd::iterator::RandomAccess &prev_rndIter,
+	bool is_cycle_root(big_size_t index_1d, coords &prev_attr,
+			nd::iterator::RandomAccess &prev_rndIter,
 			shape_t &reordered_strides);
 
 	virtual ~RandomAccess();

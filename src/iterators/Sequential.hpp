@@ -9,11 +9,11 @@
 #ifndef SRC_ITERATORS_SEQUENTIAL_HPP
 #define SRC_ITERATORS_SEQUENTIAL_HPP
 
-#include "../shapes/coords.hpp"
+#include "./Iterator.hpp"
 
 namespace nd::iterator {
 
-class Sequential {
+class Sequential: public Iterator {
 
 private:
 
@@ -49,13 +49,14 @@ public:
 
 	Sequential(coords attr);
 
-	bool next();
+	virtual bool next();
 
-	shape_t icurrent() const;
-	big_size_t index() const;
+	virtual big_size_t index() const;
+
+	shape_t indices() const;
 
 	max_size_t iaxis();
-	bool isLoked();
+	bool isLocked();
 
 	void unlock();
 	void reset();

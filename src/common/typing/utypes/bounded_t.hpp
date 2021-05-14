@@ -10,6 +10,8 @@
 #include <iostream>
 #include <vector>
 
+// =========================== bounded_t ===========================
+
 template<typename T>
 class bounded_t {
 private:
@@ -39,6 +41,8 @@ public:
 
 	virtual ~bounded_t();
 };
+
+// =========================== bounded_initializer ===========================
 
 template<typename T, T ... Bounds>
 class bounded_initializer: public bounded_t<T> {

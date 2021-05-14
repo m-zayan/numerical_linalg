@@ -15,6 +15,8 @@
 #include <queue>
 #include <functional>
 
+#include <unordered_map>
+
 #include "./stl_wrapper/weak_ptr.hpp"
 #include "./stl_wrapper/temporary_queue.hpp"
 

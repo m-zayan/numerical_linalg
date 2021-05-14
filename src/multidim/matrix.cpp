@@ -64,7 +64,7 @@ big_size_t nd::_matrix<T, ref_holder>::_m_c_end() const {
 }
 
 template<typename T, bool ref_holder>
-uflag8_t nd::_matrix<T, ref_holder>::_m_iter_type() const {
+IteratorType nd::_matrix<T, ref_holder>::_m_iter_type() const {
 
 	return this->attr.iter_type;
 }

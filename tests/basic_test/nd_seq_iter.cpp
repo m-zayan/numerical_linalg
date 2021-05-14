@@ -21,12 +21,12 @@
 //
 //	max_size_t count = 0;
 //
-//	seqIter.icurrent().print_vec1d(0, ndim);
+//	seqIter.indices().print_vec1d(0, ndim);
 //	std::cout << " : " << count++ << ln;
 //
 //	while (seqIter.next()) {
 //
-//		seqIter.icurrent().print_vec1d(0, ndim);
+//		seqIter.indices().print_vec1d(0, ndim);
 //
 //		std::cout << ", " << seqIter.index() << " : " << count++ << ln;
 //	}
@@ -60,7 +60,7 @@
 //
 //	std::cout << "Done\n";
 //}
-//int main() {
 //
+//int main() {
 //	test_1();
 //}

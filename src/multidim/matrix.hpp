@@ -39,11 +39,10 @@ protected:
 
 	static uflag8_t _m_validate_op(const coords &attr0, const coords &attr1);
 
-	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0,
-			coords attr1);
+	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0, coords attr1);
 
-	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0,
-			coords attr1, T val);
+	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0, coords attr1,
+			T val);
 
 public:
 
@@ -121,7 +120,7 @@ public:
 	T* _m_begin();
 	T* _m_end();
 
-	uflag8_t _m_iter_type() const;
+	IteratorType _m_iter_type() const;
 
 	// ===================
 

@@ -13,6 +13,7 @@
 #include "../typing/types.hpp"
 #include "../handlers/exception.hpp"
 
+// =============================== nd::mem ===============================
 namespace nd::mem {
 /*
  * Most of nd::matrix ops's implementation, follows D&C (iteratively),
@@ -32,6 +33,8 @@ inline max_size_t clip_dim(max_size_t dim_size) {
 }
 
 }
+
+// =============================== nd::state ===============================
 
 namespace nd::state {
 /*
@@ -61,6 +64,12 @@ public:
 	friend uflag8_t operator &(const shape_t &shape1, const shape_t &shape2);
 };
 
+/* =============================== IteratorType =============================== */
+
+enum IteratorType {
+	None, Linear, Random, Pair
+};
+
 /* =============================== coords ===============================
  *
  * 		matrix attributes (ex. dimensions)
@@ -86,7 +95,7 @@ public:
 	char order; // C-style, F-style, default : 'C'
 	bool own_data; // inspired by, Numpy ndarray's flags;
 
-	uflag8_t iter_type;
+	IteratorType iter_type;
 
 	coords();
 
@@ -94,12 +103,13 @@ public:
 
 	coords(shape_t shape, char order);
 
-	coords(shape_t shape, bool own_data, uflag8_t iter_type);
+	coords(shape_t shape, bool own_data, IteratorType iter_type);
 
-	coords(shape_t shape, shape_t strides, bool own_data, uflag8_t iter_type);
+	coords(shape_t shape, shape_t strides, bool own_data,
+			IteratorType iter_type);
 
 	coords(shape_t shape, shape_t axes, shape_t strides, bool own_data,
-			uflag8_t iter_type);
+			IteratorType iter_type);
 
 	coords& operator =(const coords &attr);
 
@@ -120,10 +130,29 @@ public:
 
 };
 
+// ======================================================================
+
 namespace nd {
 
 coords align_dim(coords &attr0, coords &attr1);
 
+}
+
+// ======================================================================
+
+inline bool require_no_iterator(const coords &attr) {
+
+	return (attr.iter_type == IteratorType::None);
+}
+
+inline bool require_linear_iterator(const coords &attr) {
+
+	return (attr.iter_type == IteratorType::Linear);
+}
+
+inline bool require_pair_iterator(const coords &attr) {
+
+	return (attr.iter_type == IteratorType::Pair);
 }
 
 #endif /* SRC_SHAPES_COORDS_HPP */
