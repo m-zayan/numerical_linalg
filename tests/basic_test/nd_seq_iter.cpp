@@ -15,7 +15,6 @@
 void test_0() {
 
 	shape_t shape = { 4, 3, 2, 2 };
-	max_size_t ndim = shape.size();
 
 	nd::iterator::Sequential seqIter(shape);
 
@@ -67,7 +66,7 @@ void test_3() {
 
 	nd::iterator::Sequential seqIter(attr);
 
-	seqIter.slice( { 0 }, { 1 });
+	seqIter.slice( { 2, 1 }, { 2, 1 });
 
 	do {
 

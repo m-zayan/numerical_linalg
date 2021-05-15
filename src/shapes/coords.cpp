@@ -419,7 +419,33 @@ uflag8_t operator &(const shape_t &shape1, const shape_t &shape2) {
 	}
 }
 
-// flags: {0: invalid, 1: slice}
+// flags: {0: invalid, 1: empty, 2: lower-bound}
+uflag8_t operator |(const shape_t &lhs, const shape_t &rhs) {
+
+	shape_t temp_lhs = lhs;
+	shape_t temp_rhs = rhs;
+
+	max_size_t n_chunk = std::min(temp_lhs.size(), temp_rhs.size());
+
+	// case: invalid
+	for (max_size_t i = 0; i < n_chunk; i++) {
+		if (temp_lhs[i] < temp_rhs[i]) {
+			return 0;
+		}
+	}
+
+	// case: empty
+	for (max_size_t i = 0; i < n_chunk; i++) {
+		if (temp_lhs[i] == temp_rhs[i]) {
+			return 1;
+		}
+	}
+
+	// case: lower-bound
+	return 2;
+}
+
+// flags: {0: invalid, 1: empty, 2: slice}
 uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 
 	shape_t temp_lhs = lhs;
@@ -427,12 +453,30 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 
 	max_size_t n_chunk = std::min(temp_lhs.size(), temp_rhs.size());
 
+	// case: invalid
 	for (max_size_t i = 0; i < n_chunk; i++) {
-		if (temp_lhs[i] <= temp_rhs[i]) {
-			return 0;
+		if (temp_lhs[i] < temp_rhs[i]) {
+
+			if (i > 0 && (temp_lhs[i - 1] > temp_rhs[i - 1])) {
+				continue;
+			}
+
+			else {
+
+				return 0;
+			}
 		}
 	}
 
+	// case: slice
+	for (max_size_t i = 0; i < n_chunk; i++) {
+		if (temp_lhs[i] != temp_rhs[i]) {
+
+			return 2;
+		}
+	}
+
+	// case: empty
 	return 1;
 }
 

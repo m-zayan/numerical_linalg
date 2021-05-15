@@ -64,6 +64,7 @@ public:
 
 	friend uflag8_t operator &(const shape_t &shape1, const shape_t &shape2);
 
+	friend uflag8_t operator |(const shape_t &lhs, const shape_t &rhs);
 	friend uflag8_t operator %(const shape_t &lhs, const shape_t &rhs);
 
 };
