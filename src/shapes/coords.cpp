@@ -453,18 +453,23 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 
 	max_size_t n_chunk = std::min(temp_lhs.size(), temp_rhs.size());
 
+	bool lb_exist = 0;
+
 	// case: invalid
-	for (max_size_t i = 0; i < n_chunk; i++) {
-		if (temp_lhs[i] < temp_rhs[i]) {
+	if (temp_lhs[0] < temp_rhs[0]) {
 
-			if (i > 0 && (temp_lhs[i - 1] > temp_rhs[i - 1])) {
-				continue;
-			}
+		return 0;
+	}
 
-			else {
+	for (max_size_t i = 1; i < n_chunk; i++) {
 
-				return 0;
-			}
+		if (temp_lhs[i - 1] > temp_rhs[i - 1]) {
+
+			lb_exist = 1;
+		}
+
+		if (temp_lhs[i] < temp_rhs[i] && !lb_exist) {
+			return 0;
 		}
 	}
 
