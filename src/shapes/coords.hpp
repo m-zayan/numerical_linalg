@@ -61,7 +61,11 @@ public:
 	using vec1d<max_size_t>::vec1d;
 
 	friend std::ostream& operator <<(std::ostream &os, shape_t shape);
+
 	friend uflag8_t operator &(const shape_t &shape1, const shape_t &shape2);
+
+	friend uflag8_t operator %(const shape_t &lhs, const shape_t &rhs);
+
 };
 
 /* =============================== IteratorType =============================== */

@@ -38,6 +38,11 @@ shape_t& nd::iterator::Sequential::strides() {
 	return this->attr.strides;
 }
 
+max_size_t nd::iterator::Sequential::ndim() {
+
+	return this->attr.ndim;
+}
+
 shape_t nd::iterator::Sequential::indices() const {
 
 	return this->current;
@@ -150,6 +155,42 @@ void nd::iterator::Sequential::reset() {
 	this->axis = this->dim_bounds - 1;
 
 	this->locked = false;
+}
+
+void nd::iterator::Sequential::slice(shape_t start, shape_t end) {
+
+	if (start.size() > this->ndim() || end.size() > this->ndim()) {
+
+		throw nd::exception("nd::iterator::Sequential::slice(...), "
+				"Dimensions Out of Range");
+	}
+
+	uflag8_t valid_s = (this->shape() % start);
+	uflag8_t valid_e = (this->shape() % end);
+	uflag8_t valid_order = (end % start);
+
+	if (valid_s == 0 || valid_e == 0 || valid_order == 0) {
+
+		throw nd::exception("Invalid, "
+				"nd::iterator::Sequential::slice(...)");
+	}
+
+	this->reset();
+
+	for (max_size_t i = 0; i < start.size(); i++) {
+
+		this->current[i] = start[i];
+	}
+
+	for (max_size_t i = 0; i < end.size(); i++) {
+
+		this->shape()[i] = end[i];
+	}
+
+	for (max_size_t i = 0; i < this->ndim(); i++) {
+
+		this->index_1d += (this->current[i] * this->strides()[i]);
+	}
 }
 
 nd::iterator::Sequential::~Sequential() {

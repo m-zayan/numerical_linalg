@@ -36,6 +36,7 @@ private:
 
 	shape_t& shape();
 	shape_t& strides();
+	max_size_t ndim();
 
 	flag8_t proceed(big_t i);
 	flag8_t update_state(flag8_t state);
@@ -60,6 +61,8 @@ public:
 
 	void unlock();
 	void reset();
+
+	void slice(shape_t start, shape_t end);
 
 	virtual ~Sequential();
 };

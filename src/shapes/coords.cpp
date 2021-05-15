@@ -418,3 +418,21 @@ uflag8_t operator &(const shape_t &shape1, const shape_t &shape2) {
 		return 2;
 	}
 }
+
+// flags: {0: invalid, 1: slice}
+uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
+
+	shape_t temp_lhs = lhs;
+	shape_t temp_rhs = rhs;
+
+	max_size_t n_chunk = std::min(temp_lhs.size(), temp_rhs.size());
+
+	for (max_size_t i = 0; i < n_chunk; i++) {
+		if (temp_lhs[i] <= temp_rhs[i]) {
+			return 0;
+		}
+	}
+
+	return 1;
+}
+

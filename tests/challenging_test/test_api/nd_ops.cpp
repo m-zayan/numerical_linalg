@@ -18,7 +18,7 @@ void test_api::nd_ops() {
 
 	auto t_start = std::chrono::high_resolution_clock::now();
 
-	// O0: 6775 ms | O3 : 750 ms
+	// about - O0: 6775 ms | O3 : 750 ms
 	nd::matrix<double> out = m0 + m1;
 
 	auto t_end = std::chrono::high_resolution_clock::now();

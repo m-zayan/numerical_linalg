@@ -441,7 +441,7 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 	coords attr = tmp._m_coords();
 
-	coords tmp_attr = attr.swapaxes(0, axis, false);
+	coords tmp_attr = attr.swapaxes(ndim - 1, axis, false);
 
 	max_size_t dim_size = attr.shape[axis];
 
@@ -461,14 +461,14 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 	nd::matrix<RT> result(new_attr.shape);
 
-	nd::iterator::RandomAccess rndIter(tmp_attr);
+	// [0]
+	nd::iterator::Iterator *iter = nd::iterator::init_iterator(tmp_attr);
 
 	big_size_t out_size = tmp.size() / dim_size;
 
 	max_size_t aux_size = nd::mem::clip_dim(dim_size);
 
-	max_size_t vi;
-	big_size_t index = 0;
+	max_size_t vi, j;
 
 	vec1d<T1> elems(aux_size);
 	vec1d<max_size_t> indices(aux_size);
@@ -480,21 +480,24 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 	for (big_size_t i = 0; i < out_size; i++) {
 
+		j = 0;
 		vi = 0;
 		acc = initial_acc;
 
-		for (max_size_t j = 0; j < dim_size; j++) {
+		do {
 
-			elems[vi] = d0[rndIter.index_at(index++)];
+			elems[vi] = d0[iter->index()];
 			indices[vi] = j;
 
+			j++;
 			vi++;
 
 			if (vi >= aux_size) {
 				vi = 0;
 				func(acc, indices, elems, 0, aux_size);
 			}
-		}
+
+		} while (iter->next() && (j < dim_size));
 
 		if (dim_size % aux_size) {
 
@@ -503,6 +506,9 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 		d1[i] = ppfunc(acc);
 	}
+
+	// [1]
+	nd::iterator::free_iterator(iter);
 
 	return result;
 }
