@@ -66,7 +66,7 @@ void test_3() {
 
 	nd::iterator::Sequential seqIter(attr);
 
-	seqIter.slice( { 2, 1 }, { 2, 1 });
+	seqIter.slice( { 2, 1 }, { });
 
 	do {
 

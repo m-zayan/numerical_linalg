@@ -456,7 +456,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 	bool lb_exist = 0;
 
 	// case: invalid
-	if (temp_lhs[0] < temp_rhs[0]) {
+	if (n_chunk > 0 && temp_lhs[0] < temp_rhs[0]) {
 
 		return 0;
 	}
