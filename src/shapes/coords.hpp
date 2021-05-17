@@ -10,7 +10,9 @@
 #include <ostream>
 #include <sstream>
 
-#include "../typing/types.hpp"
+// allocator.hpp --> #include "../typing/types.hpp"
+#include "../typing/allocator.hpp"
+
 #include "../handlers/exception.hpp"
 
 // =============================== nd::mem ===============================

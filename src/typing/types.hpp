@@ -10,8 +10,7 @@
 #include "../common/typing/utypes/mask.hpp"
 #include "../common/typing/utypes/bounded_t.cpp"
 
-// allocator.hpp --> #include "../common/typing/gtypes/types.hpp"
-#include "../common/typing/allocator.cpp"
+#include "../common/typing/gtypes/types.hpp"
 
 #include "../common/vec1d.cpp"
 

@@ -128,7 +128,7 @@ template<typename T>
 nd::matrix<T, true>::matrix(shape_t shape) {
 
 	this->attr = coords(shape);
-	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size()));
+	this->data = allocator::init_data<T>(this->size());
 
 	this->c_begin = 0;
 	this->c_end = this->size();
@@ -138,7 +138,7 @@ template<typename T>
 nd::matrix<T, true>::matrix(shape_t shape, T val) {
 
 	this->attr = coords(shape);
-	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size(), val));
+	this->data = allocator::init_data<T>(this->size(), val);
 
 	this->c_begin = 0;
 	this->c_end = this->size();
@@ -148,7 +148,7 @@ template<typename T>
 nd::matrix<T, true>::matrix(const coords &attr, T val) {
 
 	this->attr = attr;
-	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size(), val));
+	this->data = allocator::init_data<T>(this->size(), val);
 
 	this->c_begin = 0;
 	this->c_end = this->size();
@@ -163,7 +163,7 @@ nd::matrix<T, true>::matrix(const coords &attr) {
 	this->c_begin = 0;
 	this->c_end = this->size();
 
-	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size()));
+	this->data = allocator::init_data<T>(this->size());
 }
 
 template<typename T>
@@ -172,7 +172,7 @@ nd::matrix<T, true>::matrix(const nd::matrix<T> &mat) {
 	nd::matrix<T, false> temp = mat;
 
 	this->attr = temp._m_coords();
-	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size()));
+	this->data = allocator::init_data<T>(this->size());
 
 	this->c_begin = 0;
 	this->c_end = this->size();
@@ -189,7 +189,7 @@ nd::matrix<T, true>::matrix(const nd::matrix<T, false> &mat) {
 	nd::matrix<T, false> temp = mat;
 
 	this->attr = coords(temp.shape());
-	this->data = allocator::val_to_shared_ptr(vec1d<T>(this->size()));
+	this->data = allocator::init_data<T>(this->size());
 
 	this->c_begin = 0;
 	this->c_end = this->size();

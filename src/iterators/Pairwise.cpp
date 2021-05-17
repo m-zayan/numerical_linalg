@@ -16,8 +16,7 @@ nd::iterator::Pairwise::Pairwise(coords attr0, coords attr1) {
 
 	for (min_size_t i = 0; i < 3; i++) {
 
-		this->iter_list[i] = allocator::val_to_raw_ptr(
-				RandomAccess(this->attr_list[i]));
+		this->iter_list[i] = new RandomAccess(this->attr_list[i]);
 
 	}
 
@@ -40,7 +39,7 @@ shape_t& nd::iterator::Pairwise::indices_at(big_size_t index_1d,
 	max_size_t axis;
 	max_size_t dim_size;
 
-	// clip indices
+// clip indices
 	for (max_size_t i = 0; i < ndim; i++) {
 
 		axis = this->attr_list[pair_index].axes[i];
