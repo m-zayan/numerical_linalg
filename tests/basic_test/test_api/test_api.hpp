@@ -32,7 +32,6 @@ void ops_nd_matrix();
 void linalg_preprocessing();
 void linalg_lu();
 
-
 }
 
 #endif /* TEST_API_TEST_API_HPP */

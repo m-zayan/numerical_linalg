@@ -16,7 +16,7 @@
 ////	test_api::alloc_nd_matrix();
 //
 ////	[3]
-////	test_api::linalg_matmul();
+//	test_api::linalg_matmul();
 //
 ////	[4]
 ////	test_api::linalg_dot();
@@ -34,7 +34,7 @@
 ////	test_api::nd_broadcasting();
 //
 //// [9]
-//	test_api::ops_nd_matrix();
+////	test_api::ops_nd_matrix();
 //
 //// [10]
 ////	test_api::linalg_preprocessing();

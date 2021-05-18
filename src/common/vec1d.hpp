@@ -30,14 +30,18 @@ public:
 	vec1d(const std::initializer_list<T> &std_init_list);
 	vec1d(const_iterator<T> begin, const_iterator<T> end);
 
+	bool contains_scalar() const;
 	big_size_t size() const;
 
 	T* ref(big_size_t index);
+
+	std::vector<T> as_std_vec();
 
 	void reserve(big_size_t size);
 	void resize(big_size_t size);
 
 	void push_back(T val);
+	void emplace_back(T val);
 	void pop_back();
 	void assign(const_iterator<T> begin, const_iterator<T> end);
 	void fill(big_size_t size, T val);
@@ -86,6 +90,8 @@ public:
 	vec1d<T> operator /(const T &val);
 	vec1d<T>& operator /=(const T &val);
 
+	vec1d<T> merge(vec1d<T> vec);
+
 	/*
 	 * Apply custom void function, function parameter T vec1d[i]
 	 * function overwrite vector values, therefore value must be passed
@@ -109,6 +115,8 @@ public:
 	T sum(big_size_t begin, big_size_t end);
 
 	T multiply(big_size_t begin, big_size_t end);
+
+	vec1d<T> reduce_multiply(big_size_t begin, big_size_t end);
 
 	void print_vec1d(big_size_t begin, big_size_t end);
 

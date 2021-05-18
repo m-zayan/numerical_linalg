@@ -36,7 +36,7 @@ nd::matrix<RT> inner(const nd::matrix<T1, rf_h0> &m1,
 
 template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
 nd::matrix<RT> tensordot(const nd::matrix<T1, rf_h0> &m1,
-		const nd::matrix<T2, rf_h1> &m2, shape_t axes);
+		const nd::matrix<T2, rf_h1> &m2, vec1d<shape_t> axes);
 
 template<typename T, bool rf_h>
 nd::matrix<T> transpose(nd::matrix<T, rf_h> mat, shape_t axes);

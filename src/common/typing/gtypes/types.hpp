@@ -16,6 +16,9 @@
 #include <functional>
 
 #include <unordered_map>
+#include <unordered_set>
+
+#include <sstream>
 
 #include "./stl_wrapper/weak_ptr.hpp"
 #include "./stl_wrapper/temporary_queue.hpp"
@@ -86,5 +89,20 @@ struct is_weak_ptr: std::false_type {
 template<typename T>
 struct is_weak_ptr<weak_ptr<T>> : std::true_type {
 };
+
+// type conversion
+template<typename T>
+std::string to_string(T value) {
+
+	std::string str_num;
+
+	std::stringstream str_stream;
+
+	str_stream << value;
+
+	str_stream >> str_num;
+
+	return str_num;
+}
 
 #endif /* SRC_TYPING_GTYPES_TYPES_HPP */

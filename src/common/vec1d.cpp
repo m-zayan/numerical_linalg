@@ -7,7 +7,8 @@
 #include "./vec1d.hpp"
 
 template<typename T>
-vec1d<T>::vec1d() {
+vec1d<T>::vec1d() :
+		values( { }) {
 
 }
 
@@ -43,8 +44,18 @@ vec1d<T>::vec1d(const_iterator<T> begin, const_iterator<T> end) {
 // ====================================================================
 
 template<typename T>
+std::vector<T> vec1d<T>::as_std_vec() {
+	return this->values;
+}
+
+template<typename T>
 T* vec1d<T>::ref(big_size_t index) {
 	return &(this->values[index]);
+}
+
+template<typename T>
+bool vec1d<T>::contains_scalar() const {
+	return std::is_scalar<T>::value;
 }
 
 template<typename T>
@@ -65,6 +76,11 @@ void vec1d<T>::resize(big_size_t size) {
 template<typename T>
 void vec1d<T>::push_back(T val) {
 	this->values.push_back(val);
+}
+
+template<typename T>
+void vec1d<T>::emplace_back(T val) {
+	this->values.emplace_back(val);
 }
 
 template<typename T>
@@ -447,6 +463,28 @@ vec1d<T>& vec1d<T>::operator /=(const T &val) {
 // ====================================================================
 
 template<typename T>
+vec1d<T> vec1d<T>::merge(vec1d<T> vec) {
+
+	big_size_t new_size = this->size() + vec.size();
+
+	vec1d<T> res_vec(new_size);
+
+	for (big_size_t i = 0; i < this->size(); i++) {
+
+		res_vec[i] = this->operator()[i];
+	}
+
+	for (big_size_t i = this->size(); i < new_size; i++) {
+
+		res_vec[i] = vec[i - this->size()];
+	}
+
+	return res_vec;
+}
+
+// ====================================================================
+
+template<typename T>
 void vec1d<T>::write_in_range(big_size_t begin, big_size_t end,
 		std::function<void(T &vec_i)> custom_func) {
 
@@ -487,6 +525,41 @@ T vec1d<T>::multiply(big_size_t begin, big_size_t end) {
 	}
 
 	return result;
+}
+
+template<typename T>
+vec1d<T> vec1d<T>::reduce_multiply(big_size_t begin, big_size_t end) {
+
+	if (begin > end || end > this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::reduce_multiply(...)");
+	}
+
+	big_size_t new_size = this->size() - (end - begin) + 1;
+	vec1d<T> res_vec(new_size);
+
+	T result = 1;
+
+	for (big_size_t i = begin; i < end; i++) {
+		result *= this->operator [](i);
+	}
+
+	for (big_size_t i = 0; i < begin; i++) {
+
+		res_vec[i] = this->operator [](i);
+	}
+
+	big_size_t j = begin + 1;
+
+	for (big_size_t i = end; i < this->size(); i++) {
+
+		res_vec[j++] = this->operator [](i);
+	}
+
+	// new_size > begin
+	res_vec[begin] = result;
+
+	return res_vec;
 }
 
 template<typename T>

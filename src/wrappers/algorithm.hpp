@@ -95,6 +95,28 @@ RT sum(big_size_t begin, big_size_t end, T *x) {
 	return algorithm::_h::pairwise_summation<RT, T>(begin, end, x);
 }
 
+// a ∩ b'
+template<typename T>
+vec1d<T> a_intersect_b_comp(vec1d<T> a, vec1d<T> b) {
+
+	vec1d<T> result;
+
+	std::unordered_set<T> b_set;
+
+	for (auto &elem : b) {
+		b_set.insert(elem);
+	}
+
+	for (auto &elem : a) {
+
+		if (b_set.find(elem) == b_set.end()) {
+			result.emplace_back(elem);
+		}
+	}
+
+	return result;
+}
+
 }
 
 #endif /* SRC_WRAPPERS_ALGORITHM_HPP */
