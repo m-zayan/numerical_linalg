@@ -724,17 +724,17 @@ coords nd::align_dim_2d(coords &attr0, coords &attr1, std::string &&signature) {
 		out_shape[i] = std::max(shape0[i], shape1[i]);
 	}
 
-	out_shape[max_ndim - 2] = shape0[ndim0 - 2];
-	out_shape[max_ndim - 1] = shape1[ndim1 - 1];
+	out_shape[max_ndim - 2] = shape0[max_ndim - 2];
+	out_shape[max_ndim - 1] = shape1[max_ndim - 1];
 
 	coords out_attr = coords(out_shape, true, IteratorType::Pair);
 
 	// [3]
-	attr1.swapaxes(ndim1 - 1, ndim1 - 2);
+	attr1.swapaxes(max_ndim - 1, max_ndim - 2);
 
 	// [4]
-	attr0 = attr0.pad_dim(ndim0 - 1, 1);
-	attr1 = attr1.pad_dim(ndim1 - 2, 1);
+	attr0 = attr0.pad_dim(max_ndim - 1, 1);
+	attr1 = attr1.pad_dim(max_ndim - 2, 1);
 
 	return out_attr;
 }

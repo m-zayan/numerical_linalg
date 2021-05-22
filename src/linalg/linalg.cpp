@@ -56,11 +56,11 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 //	coords attr0 = m0._m_coords();
 //	coords attr1 = m1._m_coords();
 //
+//	attr0.own_data = false;
+//	attr1.own_data = false;
+//
 //	coords out_attr = nd::align_dim_2d(attr0, attr1,
 //			"nd::linalg::matmul(...), ");
-//
-//	max_size_t ndim0 = attr0.ndim;
-//	max_size_t ndim1 = attr1.ndim;
 //
 //	nd::matrix<T1, true> mat0 = m0.set_new_coords(attr0);
 //	nd::matrix<T2, true> mat1 = m1.set_new_coords(attr1);
