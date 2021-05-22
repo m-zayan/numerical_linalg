@@ -23,10 +23,9 @@ coords::coords() :
 }
 
 coords::coords(shape_t shape) :
-		shape(shape), ndim(shape.size()), size1d(
-				shape.multiply(0, shape.size())), strides(
-				this->get_strides(shape)), axes( { }), order('C'), own_data(1), iter_type(
-				IteratorType::None) {
+		shape(shape), ndim(shape.size()), size1d(coords::get_size1d(shape)), strides(
+				coords::get_strides(shape)), axes( { }), order('C'), own_data(
+				1), iter_type(IteratorType::None) {
 
 	this->axes.range(0, shape.size(), 1);
 }
@@ -47,12 +46,12 @@ coords::coords(shape_t shape, bool own_data, IteratorType iter_type) :
 coords::coords(shape_t shape, shape_t strides, bool own_data,
 		IteratorType iter_type) {
 
-	this->check_strides(shape, strides);
+	coords::check_strides(shape, strides);
 
 	this->shape = shape;
 	this->strides = strides;
 	this->ndim = shape.size();
-	this->size1d = shape.multiply(0, shape.size());
+	this->size1d = coords::get_size1d(shape);
 	this->order = 'C';
 	this->own_data = own_data;
 
@@ -100,24 +99,39 @@ coords& coords::operator =(const coords &attr) {
 	return (*this);
 }
 
-shape_t coords::get_strides(shape_t shape) {
+big_size_t coords::get_size1d(shape_t &shape) {
+
+	max_size_t ndim = shape.size();
+
+	big_size_t size = 1;
+
+	for (max_size_t i = 0; i < ndim; i++) {
+
+		size *= shape[i];
+	}
+
+	return size;
+}
+
+shape_t coords::get_strides(shape_t &shape) {
 
 	shape_t strides;
 
-	if (shape.size() > 1) {
+	max_size_t ndim = shape.size();
+
+	if (ndim > 1) {
 
 		strides.reserve(shape.size());
 
-		for (max_size_t i = 1; i < shape.size() - 1; i++) {
+		for (max_size_t i = 1; i < ndim - 1; i++) {
 
 			max_size_t begin = i;
 			max_size_t end = ndim - 1;
 
-			strides.push_back(
-					shape.multiply(begin, end) * shape[shape.size() - 1]);
+			strides.push_back(shape.multiply(begin, end) * shape[ndim - 1]);
 		}
 
-		strides.push_back(shape[shape.size() - 1]);
+		strides.push_back(shape[ndim - 1]);
 		strides.push_back(1);
 
 	} else {
@@ -130,7 +144,9 @@ shape_t coords::get_strides(shape_t shape) {
 
 void coords::check_strides(shape_t &shape, shape_t &strides) {
 
-	for (max_size_t i = 0; i < shape.size() - 1; i++) {
+	max_size_t ndim = shape.size();
+
+	for (max_size_t i = 0; i < ndim - 1; i++) {
 
 		if (strides[i] % shape[i] != 0
 				|| (strides[i] / shape[i]) != strides[i + 1]) {
@@ -271,7 +287,9 @@ coords coords::reduce_ndim(max_size_t begin, max_size_t end) const {
 	}
 
 	shape_t in_shape = this->shape;
-	shape_t out_shape = in_shape.reduce_multiply(begin, end).as_std_vec();
+
+	shape_t out_shape = in_shape.reduce_multiply(begin, end).as_std_vec<
+			max_size_t>();
 
 	coords out_attr = coords(out_shape);
 
@@ -289,24 +307,39 @@ coords coords::pad_dim(max_size_t new_ndim) const {
 	shape_t strides = this->strides;
 	shape_t axes = this->axes;
 
-	shape_t new_shape(max_ndim, 1);
-	shape_t new_strides(max_ndim, strides[0]);
-	shape_t new_axes(max_ndim);
+	shape_t new_shape = shape.pad(0, pad_size, 1).as_std_vec<max_size_t>();
+	shape_t new_strides = strides.pad(0, pad_size).as_std_vec<max_size_t>();
 
-	shape_t tmp_axes(max_ndim);
+	max_size_t snew_axis = axes.max(0, axes.size()) + 1;
 
-	tmp_axes.range(0, max_ndim, 1);
+	shape_t new_axes =
+			axes.pad(0, pad_size, snew_axis, 1).as_std_vec<max_size_t>();
 
-	for (max_size_t i = 0; i < ndim; i++) {
+	coords new_attr(new_shape, new_axes, new_strides, this->own_data,
+			this->iter_type);
 
-		new_shape[pad_size + i] = shape[i];
-		new_strides[pad_size + i] = strides[i];
+	return new_attr;
+}
+
+coords coords::pad_dim(max_size_t begin, max_size_t pad_size) const {
+
+	max_size_t ndim = this->ndim;
+
+	if (begin >= ndim) {
+		throw nd::exception("coords::pad_dim(...), begin >= end");
 	}
 
-	for (max_size_t i = 0; i < ndim; i++) {
+	shape_t shape = this->shape;
+	shape_t strides = this->strides;
+	shape_t axes = this->axes;
 
-		new_axes[pad_size + i] = tmp_axes[pad_size + axes[i]];
-	}
+	shape_t new_shape = shape.pad(begin, pad_size, 1).as_std_vec<max_size_t>();
+	shape_t new_strides = strides.pad(begin, pad_size).as_std_vec<max_size_t>();
+
+	max_size_t snew_axis = axes.max(0, axes.size()) + 1;
+
+	shape_t new_axes = axes.pad(begin, pad_size, snew_axis, 1).as_std_vec<
+			max_size_t>();
 
 	coords new_attr(new_shape, new_axes, new_strides, this->own_data,
 			this->iter_type);
@@ -370,21 +403,21 @@ std::ostream& operator <<(std::ostream &os, shape_t shape) {
 }
 
 // flags: {0: doesn't match, 1: match, 2: broadcastable}
-uflag8_t operator &(const shape_t &shape1, const shape_t &shape2) {
+uflag8_t operator &(const shape_t &shape0, const shape_t &shape1) {
 
+	shape_t temp0 = shape0;
 	shape_t temp1 = shape1;
-	shape_t temp2 = shape2;
 
+	max_size_t size0 = temp0.size();
 	max_size_t size1 = temp1.size();
-	max_size_t size2 = temp2.size();
 
 	uflag8_t flag = 1;
 
-	if (size1 == size2) {
-		for (max_size_t i = 0; i < size1; i++) {
-			if (temp1[i] != temp2[i]) {
+	if (size0 == size1) {
+		for (max_size_t i = 0; i < size0; i++) {
+			if (temp0[i] != temp1[i]) {
 
-				if (temp1[i] == 1 || temp2[i] == 1) {
+				if (temp0[i] == 1 || temp1[i] == 1) {
 
 					flag = 2;
 				}
@@ -401,19 +434,19 @@ uflag8_t operator &(const shape_t &shape1, const shape_t &shape2) {
 
 		max_size_t i, j;
 
-		if (size1 > size2) {
-			i = size1 - size2;
+		if (size0 > size1) {
+			i = size0 - size1;
 			j = 0;
 		}
 
 		else {
 			i = 0;
-			j = size2 - size1;
+			j = size1 - size0;
 		}
 
-		while (i < size1 && j < size2) {
+		while (i < size0 && j < size1) {
 
-			if ((temp1[i] != temp2[j]) && !(temp1[i] == 1 || temp2[j] == 1)) {
+			if ((temp0[i] != temp1[j]) && !(temp0[i] == 1 || temp1[j] == 1)) {
 				return 0;
 			}
 
@@ -583,36 +616,46 @@ coords nd::align_dim(coords &attr0, coords &attr1, vec1d<shape_t> axes,
 	}
 
 	// [1]
-	attr0 = attr0.permuted(axes0, false);
-	attr1 = attr1.permuted(axes1, false);
-
-	// [2]
 	vec1d<max_size_t> a_axes = algorithm::a_intersect_b_comp(attr0.axes,
 			axes[0]);
 	vec1d<max_size_t> b_axes = algorithm::a_intersect_b_comp(attr1.axes,
 			axes[1]);
 
-	// [3] - might use insertion-sort later
-	std::sort(a_axes.begin(), a_axes.end());
-	std::sort(b_axes.begin(), b_axes.end());
-
-	// [4]
+	// [2]
 	shape_t out_shape;
+
+	max_size_t i = 0;
 
 	for (auto &ax : a_axes) {
 		out_shape.emplace_back(shape0[ax]);
+
+		axes0[i++] = ax;
 	}
+
+	i = 0;
 
 	for (auto &ax : b_axes) {
 		out_shape.emplace_back(shape1[ax]);
+
+		axes1[i++] = ax;
 	}
 
-	coords out_attr(out_shape);
+	coords out_attr(out_shape, true, IteratorType::Pair);
+
+	// [3]
+	attr0 = attr0.permuted(axes0, false);
+	attr1 = attr1.permuted(axes1, false);
+
+	// [4]
+	max_size_t nsum_axes = a_axes.size();
+
+	attr0 = attr0.pad_dim(nsum_axes, nsum_axes);
+	attr1 = attr1.pad_dim(0, nsum_axes);
 
 	return out_attr;
 }
 
-/*used for linalg-broadcasting [attr0 & attr1 | not-modified]
+/*used for linalg-broadcasting [attr0 & attr1 will be modified - pad]
  *
  * ex.
  *
@@ -626,6 +669,15 @@ coords nd::align_dim_2d(coords &attr0, coords &attr1, std::string &&signature) {
 
 	shape_t shape0 = attr0.shape;
 	shape_t shape1 = attr1.shape;
+
+	if (ndim0 != ndim1 && !nd::state::BroadcastingLevel) {
+
+		throw nd::exception(
+				signature
+						+ "ndim0 != ndim1 && nd::state::BroadcastingLevel != 2\n\t"
+								"nd::state::BroadcastingLevel = 0, "
+								"Broadcasting in not allowed");
+	}
 
 	if (!(ndim0 >= 2 && ndim1 >= 2)) {
 
@@ -642,39 +694,26 @@ coords nd::align_dim_2d(coords &attr0, coords &attr1, std::string &&signature) {
 		throw nd::exception("Input: mismatch dimension 0");
 	}
 
-	max_size_t i, j;
+	shape_t slice0 = shape0.slice(0, ndim0 - 2).as_std_vec<max_size_t>();
+	shape_t slice1 = shape1.slice(0, ndim1 - 2).as_std_vec<max_size_t>();
 
-	if (ndim0 > ndim1) {
+	uflag8_t valid_op = (slice0 & slice1);
 
-		i = ndim0 - ndim1;
-		j = 0;
+	if (!valid_op) {
 
-	}
-
-	else {
-		i = 0;
-		j = ndim1 - ndim0;
+		throw nd::exception(signature + ", Inputs: could not be broadcast, "
+				"shapes are not aligned for: ndim > 2\n\t");
 
 	}
 
-	while (i < ndim0 - 2 && j < ndim1 - 2) {
-
-		if (shape0[i] != shape1[j] && (shape0[i] != 1 && shape1[j] != 1)) {
-			throw nd::exception(
-					signature + ", Inputs: could not be broadcast, "
-							"shapes are not aligned for: ndim > 2\n\t dim: "
-							+ to_string(i) + " - " + to_string(j));
-		}
-
-		i++;
-		j++;
-	}
-
+	// [0]
 	max_size_t max_ndim = std::max(ndim0, ndim1);
 
+	// [1]
 	attr0 = attr0.pad_dim(max_ndim);
 	attr1 = attr1.pad_dim(max_ndim);
 
+	// [2]
 	shape0 = attr0.shape;
 	shape1 = attr1.shape;
 
@@ -689,6 +728,13 @@ coords nd::align_dim_2d(coords &attr0, coords &attr1, std::string &&signature) {
 	out_shape[max_ndim - 1] = shape1[ndim1 - 1];
 
 	coords out_attr = coords(out_shape, true, IteratorType::Pair);
+
+	// [3]
+	attr1.swapaxes(ndim1 - 1, ndim1 - 2);
+
+	// [4]
+	attr0 = attr0.pad_dim(ndim0 - 1, 1);
+	attr1 = attr1.pad_dim(ndim1 - 2, 1);
 
 	return out_attr;
 }

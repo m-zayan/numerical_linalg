@@ -34,7 +34,7 @@ private:
 	bool locked;
 
 	max_size_t shape(max_size_t axis, min_size_t pair_index);
-	max_size_t strides(max_size_t axis, min_size_t pair_index);
+	big_size_t strides(max_size_t axis, min_size_t pair_index);
 
 	big_size_t& ibounds(max_size_t axis, min_size_t pair_index);
 

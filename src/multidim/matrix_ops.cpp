@@ -343,7 +343,7 @@ void nd::_matrix<T, ref_holder>::assign(shape_t indices, T val) {
 }
 
 template<typename T, bool ref_holder>
-nd::matrix<T, false> nd::_matrix<T, ref_holder>::permute(shape_t axes) {
+nd::matrix<T, false> nd::_matrix<T, ref_holder>::permute(shape_t axes) const {
 
 	coords new_attr = this->attr.permuted(axes, false);
 
@@ -353,7 +353,7 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::permute(shape_t axes) {
 }
 
 template<typename T, bool ref_holder>
-nd::matrix<T, false> nd::_matrix<T, ref_holder>::reshape(shape_t shape) {
+nd::matrix<T, false> nd::_matrix<T, ref_holder>::reshape(shape_t shape) const {
 
 	coords new_attr = coords(shape, false, this->attr.iter_type);
 
@@ -366,6 +366,29 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::reshape(shape_t shape) {
 	nd::matrix<T, false> mat_chunk(new_attr, this->data, 0, this->size());
 
 	return mat_chunk;
+}
+
+template<typename T, bool ref_holder>
+nd::matrix<T, false> nd::_matrix<T, ref_holder>::set_new_coords(
+		const coords &attr) const {
+
+	if (attr.own_data) {
+
+		// Debugging
+		throw nd::exception("Invalid coords::*, "
+				"for a non-reference holder nd::matrix<T, ...>");
+	}
+
+	if (attr.size1d != this->size()) {
+
+		// Debugging
+		throw nd::exception("Invalid construction, "
+				"coords::size(...) != nd::matrix<T, false>::size()");
+	}
+
+	nd::matrix<T, false> result(attr, this->data, this->c_begin, this->c_end);
+
+	return result;
 }
 
 template<typename T, bool ref_holder>

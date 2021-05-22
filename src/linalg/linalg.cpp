@@ -50,8 +50,20 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 }
 
 //template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
-//nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m1,
-//		const nd::matrix<T2, rf_h1> &m2) {
+//nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m0,
+//		const nd::matrix<T2, rf_h1> &m1) {
+//
+//	coords attr0 = m0._m_coords();
+//	coords attr1 = m1._m_coords();
+//
+//	coords out_attr = nd::align_dim_2d(attr0, attr1,
+//			"nd::linalg::matmul(...), ");
+//
+//	max_size_t ndim0 = attr0.ndim;
+//	max_size_t ndim1 = attr1.ndim;
+//
+//	nd::matrix<T1, true> mat0 = m0.set_new_coords(attr0);
+//	nd::matrix<T2, true> mat1 = m1.set_new_coords(attr1);
 //
 //}
 
@@ -63,7 +75,8 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 //}
 
 template<typename T, bool rf_h>
-nd::matrix<T> nd::linalg::transpose(nd::matrix<T, rf_h> mat, shape_t axes) {
+nd::matrix<T> nd::linalg::transpose(const nd::matrix<T, rf_h> &mat,
+		shape_t axes) {
 
 	return mat.permute(axes).copy();
 }

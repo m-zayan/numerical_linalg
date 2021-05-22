@@ -22,10 +22,8 @@ int main() {
 	std::cout << attr1.shape << ln;
 	std::cout << out_attr0.shape << ln;
 
-	std::cout << "--------------------\n";
-
-	std::cout << attr0.reduce_ndim(0, 2).reduce_ndim(1, 3).shape << ln;
-	std::cout << attr0.reduce_ndim(1, 3).shape << ln;
+	std::cout << "---------------\n";
+	std::cout << attr0.reduce_ndim(0, 4).shape << ln;
 
 	std::cout << "====================\n";
 
@@ -36,8 +34,9 @@ int main() {
 
 	coords out_attr1 = nd::align_dim_2d(attr2, attr3);
 
-	std::cout << attr2.shape << ln;
-	std::cout << attr3.shape << ln;
+	std::cout << attr2.shape << ", " << attr2.axes << ln;
+	std::cout << attr3.shape << ", " << attr3.axes << ln;
 	std::cout << out_attr1.shape << ln;
+
 }
 

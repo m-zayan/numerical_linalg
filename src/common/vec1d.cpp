@@ -44,9 +44,34 @@ vec1d<T>::vec1d(const_iterator<T> begin, const_iterator<T> end) {
 // ====================================================================
 
 template<typename T>
-std::vector<T> vec1d<T>::as_std_vec() {
-	return this->values;
+template<typename RT>
+std::vector<RT> vec1d<T>::as_std_vec() const {
+
+	std::vector<RT> std_vec(this->size());
+
+	for (big_size_t i = 0; i < this->size(); i++) {
+
+		std_vec[i] = static_cast<RT>(this->values[i]);
+	}
+
+	return std_vec;
 }
+
+template<typename T>
+template<typename RT>
+vec1d<T>::operator vec1d<RT>() const {
+
+	vec1d<RT> res_vec(this->size());
+
+	for (big_size_t i = 0; i < this->size(); i++) {
+
+		res_vec[i] = static_cast<RT>(this->values[i]);
+	}
+
+	return res_vec;
+}
+
+// ====================================================================
 
 template<typename T>
 T* vec1d<T>::ref(big_size_t index) {
@@ -463,6 +488,26 @@ vec1d<T>& vec1d<T>::operator /=(const T &val) {
 // ====================================================================
 
 template<typename T>
+vec1d<T> vec1d<T>::slice(big_size_t begin, big_size_t end) {
+
+	if (begin > end || end > this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::slice(...)");
+	}
+
+	big_size_t new_size = end - begin;
+
+	vec1d<T> res_vec(new_size);
+
+	for (big_size_t i = begin; i < end; i++) {
+
+		res_vec[i - begin] = this->operator [](i);
+	}
+
+	return res_vec;
+}
+
+template<typename T>
 vec1d<T> vec1d<T>::merge(vec1d<T> vec) {
 
 	big_size_t new_size = this->size() + vec.size();
@@ -471,7 +516,7 @@ vec1d<T> vec1d<T>::merge(vec1d<T> vec) {
 
 	for (big_size_t i = 0; i < this->size(); i++) {
 
-		res_vec[i] = this->operator()[i];
+		res_vec[i] = this->operator [](i);
 	}
 
 	for (big_size_t i = this->size(); i < new_size; i++) {
@@ -480,6 +525,51 @@ vec1d<T> vec1d<T>::merge(vec1d<T> vec) {
 	}
 
 	return res_vec;
+}
+
+template<typename T>
+vec1d<T> vec1d<T>::pad(big_size_t begin, big_size_t pad_size, T pad_val,
+		T step) {
+
+	if (begin >= this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::pad(...)");
+	}
+
+	vec1d<T> pad_vec(pad_size, pad_val);
+	pad_vec.cumstep(step);
+
+	vec1d<T> slice0 = this->slice(0, begin);
+	vec1d<T> slice1 = this->slice(begin, this->size());
+
+	return slice0.merge(pad_vec).merge(slice1);
+}
+
+template<typename T>
+vec1d<T> vec1d<T>::pad(big_size_t begin, big_size_t pad_size) {
+
+	if (begin >= this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::pad(...)");
+	}
+
+	T pad_val;
+
+	if (begin == 0) {
+
+		pad_val = this->operator[](begin);
+	}
+
+	else {
+
+		pad_val = this->operator[](begin - 1);
+	}
+
+	vec1d<T> pad_vec(pad_size, pad_val);
+	vec1d<T> slice0 = this->slice(0, begin);
+	vec1d<T> slice1 = this->slice(begin, this->size());
+
+	return slice0.merge(pad_vec).merge(slice1);
 }
 
 // ====================================================================
@@ -503,13 +593,49 @@ void vec1d<T>::apply_in_range(big_size_t begin, big_size_t end,
 }
 
 template<typename T>
+T vec1d<T>::min(big_size_t begin, big_size_t end) {
+
+	if (begin > end || end > this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::min(...)");
+	}
+
+	T min_val = std::numeric_limits<T>::max();
+
+	for (max_size_t i = begin; i < end; i++) {
+
+		min_val = std::min(min_val, this->operator [](i));
+	}
+
+	return min_val;
+}
+
+template<typename T>
+T vec1d<T>::max(big_size_t begin, big_size_t end) {
+
+	if (begin > end || end > this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::max(...)");
+	}
+
+	T max_val = std::numeric_limits<T>::min();
+
+	for (max_size_t i = begin; i < end; i++) {
+
+		max_val = std::max(max_val, this->operator [](i));
+	}
+
+	return max_val;
+}
+
+template<typename T>
 T vec1d<T>::sum(big_size_t begin, big_size_t end) {
 
 	T sum = 0;
 
 	for (big_size_t i = begin; i < end; i++) {
 
-		sum += this->operator[](i);
+		sum += this->operator [](i);
 	}
 
 	return sum;
@@ -560,6 +686,15 @@ vec1d<T> vec1d<T>::reduce_multiply(big_size_t begin, big_size_t end) {
 	res_vec[begin] = result;
 
 	return res_vec;
+}
+
+template<typename T>
+void vec1d<T>::cumstep(T step) {
+
+	for (max_size_t i = 1; i < this->size(); i++) {
+
+		this->operator[](i) = this->operator[](i - 1) + step;
+	}
 }
 
 template<typename T>

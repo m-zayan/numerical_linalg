@@ -169,7 +169,7 @@ max_size_t nd::iterator::PairwiseSequential::shape(max_size_t axis,
 	return this->attr_list[pair_index].shape[axis];
 }
 
-max_size_t nd::iterator::PairwiseSequential::strides(max_size_t axis,
+big_size_t nd::iterator::PairwiseSequential::strides(max_size_t axis,
 		min_size_t pair_index) {
 
 	return this->attr_list[pair_index].strides[axis];

@@ -35,7 +35,11 @@ public:
 
 	T* ref(big_size_t index);
 
-	std::vector<T> as_std_vec();
+	template<typename RT>
+	std::vector<RT> as_std_vec() const;
+
+	template<typename RT>
+	operator vec1d<RT>() const;
 
 	void reserve(big_size_t size);
 	void resize(big_size_t size);
@@ -90,7 +94,12 @@ public:
 	vec1d<T> operator /(const T &val);
 	vec1d<T>& operator /=(const T &val);
 
+	vec1d<T> slice(big_size_t begin, big_size_t end);
 	vec1d<T> merge(vec1d<T> vec);
+
+	// step: cumulative-step: vec1d<T>::cumstep(...)
+	vec1d<T> pad(big_size_t begin, big_size_t pad_size, T pad_val, T step = 0);
+	vec1d<T> pad(big_size_t begin, big_size_t pad_size);
 
 	/*
 	 * Apply custom void function, function parameter T vec1d[i]
@@ -107,6 +116,9 @@ public:
 	void apply_in_range(big_size_t begin, big_size_t end,
 			std::function<T(T vec_i)> custom_func);
 
+	T min(big_size_t begin, big_size_t end);
+	T max(big_size_t begin, big_size_t end);
+
 	/* Sum values in a specific range of the vector.
 	 * 	### Naive summation,
 	 *
@@ -117,6 +129,8 @@ public:
 	T multiply(big_size_t begin, big_size_t end);
 
 	vec1d<T> reduce_multiply(big_size_t begin, big_size_t end);
+
+	void cumstep(T step);
 
 	void print_vec1d(big_size_t begin, big_size_t end);
 

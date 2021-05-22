@@ -20,6 +20,8 @@
 
 #include <sstream>
 
+#include <limits>
+
 #include "./stl_wrapper/weak_ptr.hpp"
 #include "./stl_wrapper/temporary_queue.hpp"
 

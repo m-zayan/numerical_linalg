@@ -124,9 +124,11 @@ public:
 
 	// ===================
 
-	matrix<T, false> permute(shape_t axes);
+	matrix<T, false> permute(shape_t axes) const;
 
-	matrix<T, false> reshape(shape_t shape);
+	matrix<T, false> reshape(shape_t shape) const;
+
+	matrix<T, false> set_new_coords(const coords &attr) const;
 
 	void _m_reshape(shape_t shape);
 	void _m_clear_iter_type();

@@ -65,7 +65,7 @@ public:
 
 	friend std::ostream& operator <<(std::ostream &os, shape_t shape);
 
-	friend uflag8_t operator &(const shape_t &shape1, const shape_t &shape2);
+	friend uflag8_t operator &(const shape_t &shape0, const shape_t &shape1);
 
 	friend uflag8_t operator |(const shape_t &lhs, const shape_t &rhs);
 	friend uflag8_t operator %(const shape_t &lhs, const shape_t &rhs);
@@ -87,8 +87,10 @@ class coords {
 
 private:
 
-	shape_t get_strides(shape_t shape);
-	void check_strides(shape_t &shape, shape_t &strides);
+	static big_size_t get_size1d(shape_t &shape);
+	static shape_t get_strides(shape_t &shape);
+
+	static void check_strides(shape_t &shape, shape_t &strides);
 
 public:
 
@@ -130,6 +132,7 @@ public:
 	coords reduce_ndim(max_size_t start, max_size_t end) const;
 
 	coords pad_dim(max_size_t new_ndim) const;
+	coords pad_dim(max_size_t begin, max_size_t pad_size) const;
 
 	void swapaxes(max_size_t ax0, max_size_t ax1);
 
