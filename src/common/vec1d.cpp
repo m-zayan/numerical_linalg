@@ -140,11 +140,11 @@ template<typename T>
 void vec1d<T>::range(T start, T end, T step) {
 
 	if (step == 0) {
-		throw std::logic_error("invalid range, step == 0");
+		throw std::logic_error("Invalid Range, step == 0");
 	}
 
 	else if (start >= end) {
-		throw std::logic_error("invalid range, start >= end");
+		throw std::logic_error("Invalid Range, start >= end");
 	}
 
 	big_size_t size = (end - start) / step;
@@ -578,6 +578,11 @@ template<typename T>
 void vec1d<T>::write_in_range(big_size_t begin, big_size_t end,
 		std::function<void(T &vec_i)> custom_func) {
 
+	if (begin > end || end > this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::write_in_range(...)");
+	}
+
 	for (big_size_t i = begin; i < end; i++) {
 		custom_func(this->operator [](i));
 	}
@@ -586,6 +591,11 @@ void vec1d<T>::write_in_range(big_size_t begin, big_size_t end,
 template<typename T>
 void vec1d<T>::apply_in_range(big_size_t begin, big_size_t end,
 		std::function<T(T vec_i)> custom_func) {
+
+	if (begin > end || end > this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::apply_in_range(...)");
+	}
 
 	for (big_size_t i = begin; i < end; i++) {
 		this->operator [](i) = custom_func(this->operator [](i));
@@ -631,6 +641,11 @@ T vec1d<T>::max(big_size_t begin, big_size_t end) {
 template<typename T>
 T vec1d<T>::sum(big_size_t begin, big_size_t end) {
 
+	if (begin > end || end > this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::sum(...)");
+	}
+
 	T sum = 0;
 
 	for (big_size_t i = begin; i < end; i++) {
@@ -643,6 +658,11 @@ T vec1d<T>::sum(big_size_t begin, big_size_t end) {
 
 template<typename T>
 T vec1d<T>::multiply(big_size_t begin, big_size_t end) {
+
+	if (begin > end || end > this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::multiply(...)");
+	}
 
 	T result = 1;
 
@@ -699,6 +719,11 @@ void vec1d<T>::cumstep(T step) {
 
 template<typename T>
 void vec1d<T>::print_vec1d(big_size_t begin, big_size_t end) {
+
+	if (begin > end || end > this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::print_vec1d(...)");
+	}
 
 	std::cout << "[";
 

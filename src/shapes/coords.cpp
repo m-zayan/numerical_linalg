@@ -466,21 +466,21 @@ uflag8_t operator |(const shape_t &lhs, const shape_t &rhs) {
 
 	max_size_t n_chunk = std::min(temp_lhs.size(), temp_rhs.size());
 
-// case: invalid
+	// case: invalid
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (temp_lhs[i] < temp_rhs[i]) {
 			return 0;
 		}
 	}
 
-// case: empty
+	// case: empty
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (temp_lhs[i] == temp_rhs[i]) {
 			return 1;
 		}
 	}
 
-// case: lower-bound
+	// case: lower-bound
 	return 2;
 }
 
@@ -494,7 +494,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 
 	bool lb_exist = 0;
 
-// case: invalid
+	// case: invalid
 	if (n_chunk > 0 && temp_lhs[0] < temp_rhs[0]) {
 
 		return 0;
@@ -512,7 +512,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 		}
 	}
 
-// case: slice
+	// case: slice
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (temp_lhs[i] != temp_rhs[i]) {
 
@@ -520,7 +520,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 		}
 	}
 
-// case: empty
+	// case: empty
 	return 1;
 }
 
@@ -674,8 +674,7 @@ coords nd::align_dim_2d(coords &attr0, coords &attr1, std::string &&signature) {
 
 		throw nd::exception(
 				signature
-						+ "ndim0 != ndim1 && nd::state::BroadcastingLevel != 2\n\t"
-								"nd::state::BroadcastingLevel = 0, "
+						+ "ndim0 != ndim1 && nd::state::BroadcastingLevel = 0,\n\t"
 								"Broadcasting in not allowed");
 	}
 

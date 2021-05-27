@@ -10,7 +10,7 @@ void test_api::linalg_matmul() {
 
 //	nd::matrix<int> mat1 = nd::random::uniform<int>(1, 10, { 3, 3, 2 });
 //
-//	nd::matrix<int> mat2 = nd::random::uniform<int>(1, 10, { 1, 2, 4 });
+//	nd::matrix<int> mat2 = nd::random::uniform<int>(1, 10, { 2, 4 });
 //
 //	std::cout << "=============== (3, 3, 2) ================\n";
 //

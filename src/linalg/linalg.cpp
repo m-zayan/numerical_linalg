@@ -64,7 +64,6 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 //
 //	nd::matrix<T1, true> mat0 = m0.set_new_coords(attr0);
 //	nd::matrix<T2, true> mat1 = m1.set_new_coords(attr1);
-//
 //}
 
 //template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>

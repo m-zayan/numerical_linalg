@@ -1,4 +1,4 @@
-# Numerical Linear Algebra C++/API
+# Numerical Linear Algebra C++/Template Library
 
 ### Summation Algorithms: Error Reduction 
 
@@ -67,20 +67,16 @@ Generated Test Case - TXT - File :test_api/gen_test_cases.txt
 ```c++
 
 shape_t shape = { 4, 3, 2, 2 };
-max_size_t ndim = shape.size();
 
-SequentialNdIterator seqIter(shape);
+nd::iterator::Sequential seqIter(shape);
 
-max_size_t count = 0;
+big_size_t count = 0;
 
-seqIter.icurrent().print_vec1d(0, ndim);
-std::cout << " : " << count++ << ln;
+do {
 
-while (!seqIter.isLoked()) {
+	std::cout << seqIter.indices() << " : " << count++ << ln;
 
-	seqIter.next().print_vec1d(0, ndim);
-	std::cout << " : " << count++ << ln;
-}
+} while (seqIter.next());
 
 ```
 
