@@ -612,7 +612,7 @@ T vec1d<T>::min(big_size_t begin, big_size_t end) {
 
 	T min_val = std::numeric_limits<T>::max();
 
-	for (max_size_t i = begin; i < end; i++) {
+	for (big_size_t i = begin; i < end; i++) {
 
 		min_val = std::min(min_val, this->operator [](i));
 	}
@@ -630,7 +630,7 @@ T vec1d<T>::max(big_size_t begin, big_size_t end) {
 
 	T max_val = std::numeric_limits<T>::min();
 
-	for (max_size_t i = begin; i < end; i++) {
+	for (big_size_t i = begin; i < end; i++) {
 
 		max_val = std::max(max_val, this->operator [](i));
 	}
@@ -709,9 +709,27 @@ vec1d<T> vec1d<T>::reduce_multiply(big_size_t begin, big_size_t end) {
 }
 
 template<typename T>
+bool vec1d<T>::is_sorted(big_size_t begin, big_size_t end) {
+
+	if (begin > end || end > this->size()) {
+
+		throw std::logic_error("Invalid Range, vec1d<T>::is_sorted(...)");
+	}
+
+	for (big_size_t i = begin + 1; i < end; i++) {
+
+		if (this->operator[](i) < this->operator[](i - 1)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+template<typename T>
 void vec1d<T>::cumstep(T step) {
 
-	for (max_size_t i = 1; i < this->size(); i++) {
+	for (big_size_t i = 1; i < this->size(); i++) {
 
 		this->operator[](i) = this->operator[](i - 1) + step;
 	}

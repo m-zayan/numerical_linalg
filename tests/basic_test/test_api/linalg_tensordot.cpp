@@ -1,16 +1,16 @@
 /*
- * linalg_matmul.cpp
+ * linalg_tensordot.cpp
  *
- *	Author: Z. Mohamed
+ *      Author: Z. Mohamed
  */
 
 #include "./test_api.hpp"
 
-void test_api::linalg_matmul() {
+void test_api::linalg_tensordot() {
 
-	nd::matrix<int> mat1 = nd::random::uniform<int>(1, 10, { 3, 3, 2 });
+	nd::matrix<int> mat1 = nd::random::uniform<int>(1, 10, { 3, 4, 5 });
 
-	nd::matrix<int> mat2 = nd::random::uniform<int>(1, 10, { 2, 4 });
+	nd::matrix<int> mat2 = nd::random::uniform<int>(1, 10, { 4, 3, 2 });
 
 	std::cout << "=============== (3, 3, 2) ================\n";
 
@@ -20,8 +20,10 @@ void test_api::linalg_matmul() {
 
 	nd::out::_h::print_vec1d(mat2._m_begin(), 0, mat2.size());
 
-	std::cout << "\n============= matmul: (3, 3, 2) - (2, 4) ================\n";
-	nd::matrix<int> result = nd::linalg::matmul<int>(mat1, mat2);
+	std::cout << "\n============= tensordot ================\n";
+
+	nd::matrix<int> result = nd::linalg::tensordot<int>(mat1, mat2, { { 1, 0 },
+			{ 0, 1 } });
 
 	std::cout << "shape :" << result.shape() << " -- own-data :"
 			<< result.own_data() << ln;

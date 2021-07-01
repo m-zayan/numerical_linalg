@@ -312,11 +312,19 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::operator [](
 
 	max_size_t step = this->strides()[0];
 
-	if (d_index >= this->shape()[0] || this->size() == this->step_size()) {
+	if (d_index >= this->shape()[0]) {
 
-		throw nd::exception("nd::matrix<T> - Index Out Of Range");
+		throw nd::exception("nd::matrix<T> - Dim-Index Out Of Range");
 
-	} else {
+	}
+
+	// case: scalar-like nd::matrix<T>
+	else if (this->size() == this->step_size()) {
+
+		throw nd::exception("scalar-like nd::matrix<T>, is not supported yet");
+	}
+
+	else {
 
 		shape_t cur_shape = this->shape();
 
@@ -387,6 +395,17 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::set_new_coords(
 	}
 
 	nd::matrix<T, false> result(attr, this->data, this->c_begin, this->c_end);
+
+	return result;
+}
+
+template<typename T, bool ref_holder>
+nd::matrix<T, false> nd::_matrix<T, ref_holder>::op_view_2d() const {
+
+	coords new_attr = this->attr.reduce_ndim(0, this->ndim() - 2, false);
+
+	nd::matrix<T, false> result(new_attr, this->data, this->c_begin,
+			this->c_end);
 
 	return result;
 }

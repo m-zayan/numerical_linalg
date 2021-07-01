@@ -6,15 +6,19 @@
 
 #ifndef SRC_MULTIDIM_LINALG_HPP
 #define SRC_MULTIDIM_LINALG_HPP
-
+#define E
 #include "../multidim/matrix.hpp"
 
 namespace nd::linalg::_h {
 
 template<typename T, bool ref_h>
-void partial_pivoting(nd::matrix<T, ref_h> &mat, shape_t chunk_indices,
-		max_size_t column_index);
+void partial_pivoting_step(nd::matrix<T, ref_h> &mat,
+		nd::iterator::RandomAccess &rndIter, max_size_t column_index,
+		bool scale = false);
 
+template<typename T, bool ref_h>
+void forward_substitution_step(nd::matrix<T, ref_h> &mat,
+		nd::iterator::RandomAccess &rndIter, max_size_t column_index);
 }
 
 namespace nd::linalg {

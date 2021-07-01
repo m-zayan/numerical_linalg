@@ -129,7 +129,7 @@ public:
 	coords transpose(bool own_data) const;
 
 	coords reduce(max_size_t axis, bool keepdims) const;
-	coords reduce_ndim(max_size_t start, max_size_t end) const;
+	coords reduce_ndim(max_size_t start, max_size_t end, bool own_data) const;
 
 	coords pad_dim(max_size_t new_ndim) const;
 	coords pad_dim(max_size_t begin, max_size_t pad_size) const;

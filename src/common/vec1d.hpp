@@ -130,6 +130,8 @@ public:
 
 	vec1d<T> reduce_multiply(big_size_t begin, big_size_t end);
 
+	bool is_sorted(big_size_t begin, big_size_t end);
+
 	void cumstep(T step);
 
 	void print_vec1d(big_size_t begin, big_size_t end);

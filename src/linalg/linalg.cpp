@@ -49,29 +49,127 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 	return mat;
 }
 
-//template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
-//nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m0,
-//		const nd::matrix<T2, rf_h1> &m1) {
-//
-//	coords attr0 = m0._m_coords();
-//	coords attr1 = m1._m_coords();
-//
-//	attr0.own_data = false;
-//	attr1.own_data = false;
-//
-//	coords out_attr = nd::align_dim_2d(attr0, attr1,
-//			"nd::linalg::matmul(...), ");
-//
-//	nd::matrix<T1, true> mat0 = m0.set_new_coords(attr0);
-//	nd::matrix<T2, true> mat1 = m1.set_new_coords(attr1);
-//}
+template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
+nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m0,
+		const nd::matrix<T2, rf_h1> &m1) {
 
-//template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
-//nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m1,
-//		const nd::matrix<T2, rf_h1> &m2) {
-//
-//
-//}
+	coords attr0 = m0._m_coords();
+	coords attr1 = m1._m_coords();
+
+	attr0.own_data = false;
+	attr1.own_data = false;
+
+	coords out_attr = nd::align_dim_2d(attr0, attr1,
+			"nd::linalg::matmul(...), ");
+
+	nd::matrix<T1> mat0 = m0.set_new_coords(attr0);
+	nd::matrix<T2> mat1 = m1.set_new_coords(attr1);
+
+	nd::matrix<RT> result(out_attr);
+
+	T1 *d0 = mat0._m_begin();
+	T2 *d1 = mat1._m_begin();
+
+	RT *res = result._m_begin();
+
+	_m_ops::mul_reduce_sum(res, d0, d1, out_attr, mat0._m_coords(),
+			mat1._m_coords(), 1);
+
+	return result;
+}
+
+template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
+nd::matrix<RT> nd::linalg::tensordot(const nd::matrix<T1, rf_h0> &m0,
+		const nd::matrix<T2, rf_h1> &m1, vec1d<shape_t> axes) {
+
+	coords attr0 = m0._m_coords();
+	coords attr1 = m1._m_coords();
+
+	attr0.own_data = false;
+	attr1.own_data = false;
+
+	coords out_attr = nd::align_dim(attr0, attr1, axes,
+			"nd::linalg::tensordot(...), ");
+
+	nd::matrix<T1> mat0 = m0.set_new_coords(attr0);
+	nd::matrix<T2> mat1 = m1.set_new_coords(attr1);
+
+	nd::matrix<RT> result(out_attr);
+
+	T1 *d0 = mat0._m_begin();
+	T2 *d1 = mat1._m_begin();
+
+	RT *res = result._m_begin();
+
+	// axes[0].size() == axes[1].size()
+	max_size_t naxes = axes[0].size();
+
+	_m_ops::mul_reduce_sum(res, d0, d1, out_attr, mat0._m_coords(),
+			mat1._m_coords(), naxes);
+
+	return result;
+}
+
+template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
+nd::matrix<RT> nd::linalg::inner(const nd::matrix<T1, rf_h0> &m0,
+		const nd::matrix<T2, rf_h1> &m1) {
+
+	max_size_t ndim0 = m0._m_coords().ndim;
+	max_size_t ndim1 = m1._m_coords().ndim;
+
+	if (ndim0 == 1 && ndim1 == 1) {
+
+		throw nd::exception("...");
+
+		// vector inner product ... | mul_reduce_sum(...)
+	}
+
+	else if (ndim0 == 0 || ndim1 == 0) {
+
+		throw nd::exception("...");
+
+		// multiply ... | m0 * m1
+	}
+
+	else {
+
+		return nd::linalg::tensordot<RT>(m0, m1,
+				{ { ndim0 - 1 }, { ndim1 - 1 } });
+	}
+}
+
+template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
+nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m0,
+		const nd::matrix<T2, rf_h1> &m1) {
+
+	max_size_t ndim0 = m0._m_coords().ndim;
+	max_size_t ndim1 = m1._m_coords().ndim;
+
+	if (ndim0 == 1 && ndim1 == 1) {
+
+		throw nd::exception("...");
+
+		// vector inner product ... | mul_reduce_sum(...)
+	}
+
+	else if (ndim0 == 2 && ndim1 == 2) {
+
+		return nd::linalg::matmul<RT>(m0, m1);
+	}
+
+	else if (ndim0 == 0 || ndim1 == 0) {
+
+		throw nd::exception("...");
+
+		// multiply ... | m0 * m1
+	}
+
+	else {
+
+		return nd::linalg::tensordot<RT>(m0, m1,
+				{ { ndim0 - 1 }, { ndim1 - 2 } });
+	}
+}
 
 template<typename T, bool rf_h>
 nd::matrix<T> nd::linalg::transpose(const nd::matrix<T, rf_h> &mat,
@@ -114,7 +212,7 @@ nd::matrix<T> nd::linalg::transpose(const nd::matrix<T, rf_h> &mat,
 template<typename T, bool rf_h>
 void nd::linalg::inplace::transpose(nd::matrix<T, rf_h> &mat, shape_t axes) {
 
-	// might be optional later
+// might be optional later
 	if (!mat.own_data()) {
 		throw nd::exception("nd::matrix, mat.own_data() == false");
 	}

@@ -275,6 +275,62 @@ void write_vec(RT *res, T *d, coords attr, std::function<RT(T)> func) {
 	nd::iterator::free_iterator(iter);
 }
 
+/* [6] - lhs = rhs | res = sum(d0[i0:i1] * d1[j0:j1])
+ *
+ * 		ex. use-case -> nd::linalg::matmul(...)
+ */
+template<typename RT, typename T1, typename T2>
+void mul_reduce_sum(RT *res, T1 *d0, T2 *d1, coords out_attr, coords attr0,
+		coords attr1, max_size_t reduce_ndim) {
+
+	nd::iterator::PairwiseSequential pseqIter(attr0, attr1);
+
+	coords aligned_attr = pseqIter.aligned_coords(2);
+
+	max_size_t aligned_ndim = aligned_attr.ndim;
+
+	if (aligned_ndim < reduce_ndim) {
+
+		throw nd::exception("...");
+	}
+
+	big_size_t n_chunk = aligned_attr.shape.multiply(0,
+			aligned_ndim - reduce_ndim);
+
+	big_size_t chunk_size = aligned_attr.shape.multiply(
+			aligned_ndim - reduce_ndim, aligned_ndim);
+
+	big_size_t aux_size = nd::mem::clip_dim(chunk_size);
+
+	vec1d<RT> elems(aux_size, 0);
+
+	big_size_t ij;
+	big_size_t vi;
+
+	for (big_size_t i = 0; i < n_chunk; i++) {
+
+		ij = 0;
+		vi = 0;
+
+		elems.fill(aux_size, 0);
+
+		do {
+
+			elems[vi++] += (d0[pseqIter.index(0)] * d1[pseqIter.index(1)]);
+
+			if (vi >= aux_size) {
+				vi = 0;
+			}
+
+			ij++;
+
+		} while (pseqIter.next() && (ij < chunk_size));
+
+		res[i] = algorithm::sum<RT>(0, aux_size, elems.ref(0));
+	}
+
+}
+
 }
 
 #endif /* SRC_MULTIDIM_UFUNC_HPP */

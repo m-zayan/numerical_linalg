@@ -130,6 +130,8 @@ public:
 
 	matrix<T, false> set_new_coords(const coords &attr) const;
 
+	matrix<T, false> op_view_2d() const;
+
 	void _m_reshape(shape_t shape);
 	void _m_clear_iter_type();
 

@@ -76,6 +76,23 @@
 //
 //}
 //
+//void test_4() {
+//
+//	shape_t shape = { 3, 2, 2 };
+//
+//	coords attr(shape);
+//
+//	nd::iterator::Sequential seqIter(attr);
+//
+//	do {
+//
+//		std::cout << seqIter.indices() << " : " << seqIter.index() << " | " << seqIter.iaxis() << ln;
+//
+//	} while (seqIter.next());
+//
+//}
+//
+//
 //int main() {
-//	test_3();
+//	test_4();
 //}

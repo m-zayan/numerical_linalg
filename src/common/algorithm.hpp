@@ -55,6 +55,8 @@ std::vector<RT> update_variance(RT sum0, RT sum1, RT var0, RT var1, Size size0,
 template<typename T>
 T clip(T current_value, T min_value, T max_value);
 
+template<typename T>
+T sign(T value);
 }
 
 #endif /* SRC_ALGORITHM_HPP */

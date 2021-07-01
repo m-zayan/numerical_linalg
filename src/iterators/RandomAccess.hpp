@@ -40,6 +40,8 @@ public:
 	shape_t& indices_at(big_size_t index_1d);
 
 	big_size_t nd_index_at(shape_t &indices);
+	big_size_t nd_index_at(shape_t &&indices);
+
 	big_size_t index_at(big_size_t index_1d);
 
 	big_size_t reversed_index_at(big_size_t index_1d, coords &prev_attr,

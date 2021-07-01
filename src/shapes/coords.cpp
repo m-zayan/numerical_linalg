@@ -268,7 +268,8 @@ coords coords::reduce(max_size_t axis, bool keepdims) const {
 	return new_attr;
 }
 
-coords coords::reduce_ndim(max_size_t begin, max_size_t end) const {
+coords coords::reduce_ndim(max_size_t begin, max_size_t end,
+		bool own_data) const {
 
 	if (begin >= end) {
 		throw nd::exception("coords::reduce_ndim(...), begin >= end");
@@ -277,13 +278,18 @@ coords coords::reduce_ndim(max_size_t begin, max_size_t end) const {
 	max_size_t out_ndim = end - begin + 1;
 
 	if (this->ndim < out_ndim) {
-
 		throw nd::exception("coords::reduce_ndim(...), out_dim - Out Of Range");
 	}
 
 	if (this->ndim <= 2) {
+		throw nd::exception("coords::reduce_ndim(...), this->ndim <= 0");
+	}
 
-		throw nd::exception("coords::reduce_all(...), this->ndim <= 0");
+	shape_t axes = this->axes;
+
+	if (!axes.is_sorted(begin, end)) {
+		throw nd::exception("coords::reduce_ndim(...),\n\t"
+				"axes.is_sorted(begin, end) <--> !require_no_iterator(*this)");
 	}
 
 	shape_t in_shape = this->shape;
@@ -291,7 +297,7 @@ coords coords::reduce_ndim(max_size_t begin, max_size_t end) const {
 	shape_t out_shape = in_shape.reduce_multiply(begin, end).as_std_vec<
 			max_size_t>();
 
-	coords out_attr = coords(out_shape);
+	coords out_attr = coords(out_shape, own_data, this->iter_type);
 
 	return out_attr;
 }
@@ -588,6 +594,9 @@ coords nd::align_dim(coords &attr0, coords &attr1, vec1d<shape_t> axes,
 	shape_t axes0 = attr0.axes;
 	shape_t axes1 = attr1.axes;
 
+	// axes[0].size() == axes[1].size()
+	max_size_t naxes = axes[0].size();
+
 	if (!(ndim0 >= 2 && ndim1 >= 2)) {
 
 		throw nd::exception(
@@ -595,7 +604,7 @@ coords nd::align_dim(coords &attr0, coords &attr1, vec1d<shape_t> axes,
 						+ "Input dimension has to be greater than or equal 2, ndim >= 2");
 	}
 
-	for (max_size_t i = 0; i < axes_shape[0]; i++) {
+	for (max_size_t i = 0; i < naxes; i++) {
 
 		if (axes[0][i] >= ndim0 || axes[1][i] >= ndim1) {
 			throw nd::exception(signature + "Dimension Out of Range");
