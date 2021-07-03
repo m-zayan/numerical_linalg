@@ -33,28 +33,28 @@ void test_api::reorder_copy() {
 
 	std::cout << "\n ======================= \n";
 
-//	nd::matrix<int> res0 = nd::stack<int>( { mat0[0], mat1 });
-//
-//	nd::out::print_matrix(res0);
-//
-//	std::cout << "\n ======================= \n";
-//
-//	std::cout << "\n own_data : " << mat1.permute( { 1, 0 }).own_data() << ln;
-//
-//	std::cout << "\n ----------------------- \n";
-//
-//	nd::matrix<int> res1 = nd::stack<int>(
-//			{ mat0[0], mat1.permute( { 1, 0 }) });
-//
-//	nd::out::print_matrix(res1);
-//
-//	std::cout << "\n ======================= \n";
+	nd::matrix<int> res0 = nd::stack<int>( { mat0[0], mat1 });
 
-//	nd::matrix<double> res2 = nd::linalg::matmul<double>(mat0, mat1.permute( {
-//			1, 0 })) + 0.5;
-//
-//	nd::out::print_matrix(res2);
-//
-//	std::cout << "\n ======================= \n";
+	nd::out::print_matrix(res0);
+
+	std::cout << "\n ======================= \n";
+
+	std::cout << "\n own_data : " << mat1.permute( { 1, 0 }).own_data() << ln;
+
+	std::cout << "\n ----------------------- \n";
+
+	nd::matrix<int> res1 = nd::stack<int>(
+			{ mat0[0], mat1.permute( { 1, 0 }) });
+
+	nd::out::print_matrix(res1);
+
+	std::cout << "\n ======================= \n";
+
+	nd::matrix<double> res2 = nd::linalg::matmul<double>(mat0, mat1.permute( {
+			1, 0 })) + 0.5;
+
+	nd::out::print_matrix(res2);
+
+	std::cout << "\n ======================= \n";
 
 }

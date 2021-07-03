@@ -9,9 +9,13 @@
 /*
  * mat.shape() ---> (reduced_dims, nrows, ncols)
  * column_index ---> pivot
+ *
+ * {1: valid-step, -1: invalid-step}
+ *
+ * 		 [invalid-step <--> singular-matrix-indicator]
  */
 template<typename T, bool ref_h>
-void nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
+flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
 		nd::iterator::RandomAccess &rndIter, max_size_t column_index,
 		bool scale) {
 
@@ -77,7 +81,12 @@ void nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
 
 		max_size_t max_index = mx.second;
 
-		if (max_index != column_index) {
+		// case: zero | invalid-step
+		if (max_index == invalid_idx) {
+			return -1;
+		}
+
+		else if (max_index != column_index) {
 
 			big_size_t idx0, idx1;
 
@@ -109,8 +118,15 @@ void nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
 
 			T scale_inv;
 
+			if (d[index] == 0) {
+
+				// Debugging ... | must have been executed in case-zero
+				throw nd::exception(
+						"nd::linalg::_h::partial_pivoting_step(...), has been failed");
+			}
+
 			// case: overflow
-			if (std::abs(d[index]) < EPS) {
+			else if (std::abs(d[index]) < EPS) {
 
 				scale_inv = IEPS * algorithm::sign(d[index]);
 			}
@@ -133,17 +149,30 @@ void nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
 		}
 
 	}
+
+	// valid-step
+	return 1;
 }
 
 /*
  * mat.shape() ---> (reduced_dims, nrows, ncols)
+ *
+ * {1: valid-step , 0: last-pivot, -1: invalid-step}
+ *
+ * 		[invalid-step <--> singular-matrix-indicator]
  */
 
 template<typename T, bool ref_h>
-void nd::linalg::_h::forward_substitution_step(nd::matrix<T, ref_h> &mat,
+flag8_t nd::linalg::_h::forward_substitution_step(nd::matrix<T, ref_h> &mat,
 		nd::iterator::RandomAccess &rndIter, max_size_t column_index) {
 
-	nd::linalg::_h::partial_pivoting_step(mat, rndIter, column_index, true);
+	flag8_t is_valid = nd::linalg::_h::partial_pivoting_step(mat, rndIter,
+			column_index, true);
+
+	// case: invalid-step
+	if (is_valid == -1) {
+		return -1;
+	}
 
 	max_size_t ndim = mat.ndim();
 
@@ -151,8 +180,9 @@ void nd::linalg::_h::forward_substitution_step(nd::matrix<T, ref_h> &mat,
 	max_size_t nrows = mat.shape()[1];
 	max_size_t ncols = mat.shape()[2];
 
+	// case: last-pivot
 	if (column_index + 1 == nrows) {
-		return;
+		return 0;
 	}
 
 	T *d = mat._m_begin();
@@ -191,5 +221,8 @@ void nd::linalg::_h::forward_substitution_step(nd::matrix<T, ref_h> &mat,
 			}
 		}
 	}
+
+	// case: valid-step
+	return 1;
 }
 

@@ -36,6 +36,11 @@ max_size_t nd::_matrix<T, ref_holder>::ndim() const {
 template<typename T, bool ref_holder>
 max_size_t nd::_matrix<T, ref_holder>::step_size() const {
 
+	// scalar-like nd::matrix<T, ...>
+	if (this->ndim() == 0) {
+		return 0;
+	}
+
 	return this->shape()[this->ndim() - 1];
 }
 

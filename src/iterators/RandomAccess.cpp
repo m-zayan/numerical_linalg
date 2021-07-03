@@ -34,12 +34,17 @@ shape_t& nd::iterator::RandomAccess::indices_at(big_size_t index_1d) {
 big_size_t nd::iterator::RandomAccess::nd_index_at(shape_t &indices) {
 
 	if (indices.size() != this->ndim()) {
-		throw nd::exception("dimensions -> indices, doesn't match");
+		throw nd::exception("dimensions <--> indices, doesn't match");
 	}
 
 	big_size_t index = 0;
 
 	for (max_size_t i = 0; i < this->ndim(); i++) {
+
+		if (indices[i] >= this->shape()[i]) {
+
+			throw nd::exception("dimensions <--> indices, out of range");
+		}
 
 		index += (this->strides()[i] * indices[i]);
 	}
@@ -56,6 +61,11 @@ big_size_t nd::iterator::RandomAccess::nd_index_at(shape_t &&indices) {
 	big_size_t index = 0;
 
 	for (max_size_t i = 0; i < this->ndim(); i++) {
+
+		if (indices[i] >= this->shape()[i]) {
+
+			throw nd::exception("dimensions <--> indices, out of range");
+		}
 
 		index += (this->strides()[i] * indices[i]);
 	}

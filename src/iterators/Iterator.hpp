@@ -18,6 +18,8 @@ protected:
 	big_size_t index_1d;
 	big_size_t size;
 
+	IteratorType iter_type;
+
 	bool locked;
 
 	void lock();

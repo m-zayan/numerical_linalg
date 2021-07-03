@@ -75,6 +75,8 @@ nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m0,
 	_m_ops::mul_reduce_sum(res, d0, d1, out_attr, mat0._m_coords(),
 			mat1._m_coords(), 1);
 
+	result._m_clear_iter_type();
+
 	return result;
 }
 
@@ -107,6 +109,8 @@ nd::matrix<RT> nd::linalg::tensordot(const nd::matrix<T1, rf_h0> &m0,
 	_m_ops::mul_reduce_sum(res, d0, d1, out_attr, mat0._m_coords(),
 			mat1._m_coords(), naxes);
 
+	result._m_clear_iter_type();
+
 	return result;
 }
 
@@ -117,18 +121,23 @@ nd::matrix<RT> nd::linalg::inner(const nd::matrix<T1, rf_h0> &m0,
 	max_size_t ndim0 = m0._m_coords().ndim;
 	max_size_t ndim1 = m1._m_coords().ndim;
 
-	if (ndim0 == 1 && ndim1 == 1) {
+	// multiply
+	if (ndim0 == 0 || ndim1 == 0) {
 
-		throw nd::exception("...");
+		nd::matrix<T1, false> tmp0 = m0;
+		nd::matrix<T1, false> tmp1 = m1;
 
-		// vector inner product ... | mul_reduce_sum(...)
+		return (tmp0 * tmp1);
+
 	}
 
-	else if (ndim0 == 0 || ndim1 == 0) {
+	// vector inner product
+	else if (ndim0 == 1 && ndim1 == 1) {
 
-		throw nd::exception("...");
+		nd::matrix<T1, false> tmp0 = m0;
+		nd::matrix<T1, false> tmp1 = m1;
 
-		// multiply ... | m0 * m1
+		return nd::numeric::sum<RT>((tmp0 * tmp1), 0, false);
 	}
 
 	else {
@@ -145,23 +154,21 @@ nd::matrix<RT> nd::linalg::dot(const nd::matrix<T1, rf_h0> &m0,
 	max_size_t ndim0 = m0._m_coords().ndim;
 	max_size_t ndim1 = m1._m_coords().ndim;
 
-	if (ndim0 == 1 && ndim1 == 1) {
+	// multiply
+	if (ndim0 == 0 || ndim1 == 0) {
 
-		throw nd::exception("...");
+		return nd::linalg::inner<RT>(m0, m1);
+	}
 
-		// vector inner product ... | mul_reduce_sum(...)
+	// vector inner product
+	else if (ndim0 == 1 && ndim1 == 1) {
+
+		return nd::linalg::inner<RT>(m0, m1);
 	}
 
 	else if (ndim0 == 2 && ndim1 == 2) {
 
 		return nd::linalg::matmul<RT>(m0, m1);
-	}
-
-	else if (ndim0 == 0 || ndim1 == 0) {
-
-		throw nd::exception("...");
-
-		// multiply ... | m0 * m1
 	}
 
 	else {

@@ -37,6 +37,8 @@ protected:
 	template<typename RT, bool ref_h = ref_holder>
 	matrix<RT, ref_h>* _m_dynamic_cast();
 
+public:
+
 	static uflag8_t _m_validate_op(const coords &attr0, const coords &attr1);
 
 	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0, coords attr1);
@@ -44,7 +46,7 @@ protected:
 	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0, coords attr1,
 			T val);
 
-public:
+	// ===========================================================================
 
 	big_size_t size() const;
 
@@ -57,8 +59,11 @@ public:
 
 	bool own_data() const;
 
-	// ===================
+	// ===========================================================================
+
 	matrix<T, false> operator [](max_size_t d_index);
+
+	// ===========================================================================
 
 	// _matrix <---> _matrix
 	template<bool ref_h>
@@ -82,6 +87,8 @@ public:
 	template<bool ref_h>
 	mat_t& operator *=(const matrix<T, ref_h> &mat);
 
+	// ===========================================================================
+
 	// _matrix <---> value
 	matrix<mask_t> operator ==(const T &val);
 
@@ -98,6 +105,8 @@ public:
 
 	mat_t& operator /=(const T &val);
 
+	mat_t& operator =(const T &val);
+
 	void assign(shape_t indices, T val);
 
 	T& at(shape_t indices);
@@ -107,7 +116,10 @@ public:
 	template<typename RT>
 	operator matrix<RT>() const;
 
-	// ===================
+	template<typename RT>
+	explicit operator RT() const;
+
+	// ===========================================================================
 
 	vec1d<T> _m_data() const;
 
@@ -122,7 +134,7 @@ public:
 
 	IteratorType _m_iter_type() const;
 
-	// ===================
+	// ===========================================================================
 
 	matrix<T, false> permute(shape_t axes) const;
 
@@ -132,8 +144,12 @@ public:
 
 	matrix<T, false> op_view_2d() const;
 
+	// ===========================================================================
+
 	void _m_reshape(shape_t shape);
 	void _m_clear_iter_type();
+
+	// ===========================================================================
 
 	virtual ~_matrix();
 
@@ -149,10 +165,13 @@ class matrix<T, true> : public _matrix<T, true> {
 
 public:
 
+	using _matrix<T, true>::operator=;
+
 	matrix() = delete;
 
 	matrix(shape_t shape);
 	matrix(shape_t shape, T val);
+
 	matrix(const coords &attr, T val);
 	matrix(const coords &attr);
 
@@ -168,6 +187,8 @@ template<typename T>
 class matrix<T, false> : public _matrix<T, false> {
 
 public:
+
+	using _matrix<T, false>::operator=;
 
 	matrix() = delete;
 

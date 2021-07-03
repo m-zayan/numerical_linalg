@@ -46,6 +46,12 @@ std::function<void(RT&, T1, T2)> bool_equal = [](RT &v0, T1 v1, T2 v2) {
 	v0 = (v1 == v2);
 };
 
+template<typename T1, typename T2>
+std::function<void(T1&, T2)> istatic_cast = [](T1 &v0, T2 v1) {
+
+	v0 = static_cast<T1>(v1);
+};
+
 }
 
 // ========================= nd::numeric::_h =======================

@@ -75,7 +75,7 @@ public:
 /* =============================== IteratorType =============================== */
 
 enum IteratorType {
-	None, Linear, Random, Pair
+	Undefined, Scalar, None, Linear, Random, Pair
 };
 
 /* =============================== coords ===============================
@@ -108,6 +108,8 @@ public:
 	IteratorType iter_type;
 
 	coords();
+
+	explicit coords(bool own_data);
 
 	coords(shape_t shape);
 
@@ -142,12 +144,14 @@ public:
 
 	coords(const coords &attr);
 	coords(const coords &&attr);
-
 };
 
 // ======================================================================
 
 namespace nd {
+
+coords has_max_ndim(const coords &attr0, const coords &attr1,
+		std::string &&signature = "");
 
 coords align_dim(coords &attr0, coords &attr1, std::string &&signature = "");
 
@@ -240,6 +244,28 @@ shape_t nd::parser::parse_shape(vec1d<T> nested_vec1d, std::string signature) {
 
 // =================================================================================================================
 
+inline bool equal_size(coords &attr0, coords &attr1) {
+
+	return (attr0.size1d == attr1.size1d);
+}
+
+// ------------------------------------------------------
+
+inline bool undefined_iterator(const coords &attr) {
+
+	return (attr.iter_type == IteratorType::Undefined);
+}
+inline bool undefined_iterator(coords &attr0, coords &attr1) {
+
+	return (undefined_iterator(attr0) || undefined_iterator(attr1));
+}
+
+// ------------------------------------------------------
+inline bool is_scalar(const coords &attr) {
+
+	return (attr.iter_type == IteratorType::Scalar);
+}
+
 inline bool require_no_iterator(const coords &attr) {
 
 	return (attr.iter_type == IteratorType::None);
@@ -253,6 +279,94 @@ inline bool require_linear_iterator(const coords &attr) {
 inline bool require_pair_iterator(const coords &attr) {
 
 	return (attr.iter_type == IteratorType::Pair);
+}
+
+// ------------------------------------------------------
+
+inline bool is_valid_for_dynamic_iterator(const coords &attr) {
+
+	return (require_no_iterator(attr) || require_linear_iterator(attr));
+}
+
+// ------------------------------------------------------
+
+inline bool has_no_implicit_bounds(const coords &attr) {
+
+	return is_scalar(attr);
+}
+
+inline bool has_no_implicit_bounds(const coords &attr0, const coords &attr1) {
+
+	return (is_scalar(attr0) && is_scalar(attr1));
+}
+
+// ------------------------------------------------------
+
+inline bool op_not_scalar(const coords &attr0, const coords &attr1) {
+
+	return (!is_scalar(attr0) && !is_scalar(attr1));
+}
+
+inline bool op_any_scalar(const coords &attr0, const coords &attr1) {
+
+	return (is_scalar(attr0) || is_scalar(attr1));
+}
+
+inline bool op_one_scalar(const coords &attr0, const coords &attr1) {
+
+	return (is_scalar(attr0) ^ is_scalar(attr1));
+}
+
+// ------------------------------------------------------
+
+inline void check_coords_definition(coords &attr) {
+
+	if (!is_scalar(attr) && attr.shape.size() == 0) {
+
+		// Debugging
+		throw nd::exception(
+				"coords::coords(...), Invalid construction for a scalar-type\n\t"
+						"this->ndim = 0");
+	}
+}
+
+// ------------------------------------------------------
+
+inline uflag8_t validate_op_bounds(coords &attr0, coords &attr1,
+		std::string &&signature = "", coords *out_attr_ref = nullptr) {
+
+	if (undefined_iterator(attr0, attr1)) {
+
+		throw nd::exception(signature + "coords::iter_type is undefined,\n\t"
+				"validate_op_bounds(...)");
+	}
+
+	else if (has_no_implicit_bounds(attr0, attr1)) {
+
+		if (out_attr_ref == nullptr) {
+
+			return 0;
+		}
+
+		return !is_scalar(*out_attr_ref);
+	}
+
+	else if (op_not_scalar(attr0, attr1) && !equal_size(attr0, attr1)) {
+
+		if (out_attr_ref == nullptr) {
+			throw nd::exception(signature + "size must be same,\n\t"
+					"validate_op_bounds(...)");
+		}
+
+		else if (!require_pair_iterator(*out_attr_ref)) {
+
+			throw nd::exception(signature + "size must be same,\n\t"
+					"out_attr.iter_type is not IteratorType::Pair");
+		}
+	}
+
+	// valid | non-trivial bounds
+	return 1;
 }
 
 #endif /* SRC_SHAPES_COORDS_HPP */

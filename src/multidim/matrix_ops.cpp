@@ -6,6 +6,19 @@
 
 #include "./matrix.hpp"
 
+// nd::matrix<T> = val
+template<typename T, bool ref_holder>
+nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator =(
+		const T &val) {
+
+	T *d = this->_m_begin();
+
+	_m_ops::contiguous_write_vec_val(d, val, this->attr,
+			_v_ops::istatic_cast<T, T>);
+
+	return *this->_m_dynamic_cast<T>();
+}
+
 // mask
 template<typename T, bool ref_holder>
 nd::matrix<mask_t> nd::_matrix<T, ref_holder>::operator ==(const T &val) {
@@ -72,7 +85,7 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator +(
 	return result;
 }
 
-// nd::matrix<T> -= nd::matrix<T>
+// ### nd::matrix<T> -= nd::matrix<T> | must be modified <--> broadcastable
 template<typename T, bool ref_holder>
 template<bool ref_h>
 nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator +=(
@@ -117,7 +130,7 @@ nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator +=(
 
 	T *d = this->_m_begin();
 
-	_m_ops::write_val_vec<T, T, T>(d, val, this->attr, _v_ops::add<T, T, T>);
+	_m_ops::write_val_vec<T, T>(d, val, this->attr, _v_ops::add<T, T, T>);
 
 	return *this->_m_dynamic_cast<T>();
 }
@@ -151,7 +164,7 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator -(
 	return result;
 }
 
-// nd::matrix<T> -= nd::matrix<T>
+// ### nd::matrix<T> -= nd::matrix<T> | must be modified <--> broadcastable
 template<typename T, bool ref_holder>
 template<bool ref_h>
 nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator -=(
@@ -230,7 +243,7 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator *(
 	return result;
 }
 
-// nd::matrix<T> *= nd::matrix<T>
+// ### nd::matrix<T> *= nd::matrix<T> | must be modified <--> broadcastable
 template<typename T, bool ref_holder>
 template<bool ref_h>
 nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator *=(
@@ -312,16 +325,27 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::operator [](
 
 	max_size_t step = this->strides()[0];
 
-	if (d_index >= this->shape()[0]) {
+	if (this->ndim() == 0) {
+
+		throw nd::exception("nd::matrix<T> - N-Dim-Index Out Of Range");
+	}
+
+	else if (d_index >= this->shape()[0]) {
 
 		throw nd::exception("nd::matrix<T> - Dim-Index Out Of Range");
-
 	}
 
 	// case: scalar-like nd::matrix<T>
-	else if (this->size() == this->step_size()) {
+	else if (this->ndim() == 1) {
 
-		throw nd::exception("scalar-like nd::matrix<T>, is not supported yet");
+		coords new_attr(false);
+
+		big_size_t c_begin = this->c_begin + (d_index * step);
+		big_size_t c_end = this->c_begin + (d_index + 1) * step;
+
+		nd::matrix<T, false> mat_chunk(new_attr, this->data, c_begin, c_end);
+
+		return mat_chunk;
 	}
 
 	else {
@@ -444,6 +468,20 @@ nd::_matrix<T, ref_holder>::operator nd::matrix<RT>() const {
 	return result;
 }
 
+template<typename T, bool ref_holder>
+template<typename RT>
+nd::_matrix<T, ref_holder>::operator RT() const {
+
+	if (!is_scalar(this->attr)) {
+
+		throw nd::exception("invalid-cast, nd::matrix<T, ...>::ndim() > 0");
+	}
+
+	T *d = (*this->data.get()).ref(this->c_begin);
+
+	return static_cast<RT>(d[0]);
+}
+
 template<typename RT, typename T, bool rf_h>
 nd::matrix<RT> nd::apply(const nd::matrix<T, rf_h> &mat,
 		std::function<RT(T)> func) {
@@ -455,7 +493,7 @@ nd::matrix<RT> nd::apply(const nd::matrix<T, rf_h> &mat,
 	T *d = tmp._m_begin();
 	RT *res = result._m_begin();
 
-	_m_ops::write_vec<RT, T>(res, d, tmp._m_coords(), func);
+	_m_ops::write_vec<RT, T>(res, d, tmp._m_coords(), result._m_coords(), func);
 
 	return result;
 }

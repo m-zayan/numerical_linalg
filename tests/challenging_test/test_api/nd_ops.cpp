@@ -33,4 +33,3 @@ void test_api::nd_ops() {
 	std::cout << "end\n";
 
 }
-

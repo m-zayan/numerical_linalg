@@ -32,6 +32,7 @@ void nd_broadcasting();
 void ops_nd_matrix();
 void linalg_preprocessing();
 void linalg_lu();
+void scalar_like_nd();
 
 }
 

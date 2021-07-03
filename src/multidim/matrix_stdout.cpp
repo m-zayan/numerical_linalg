@@ -52,6 +52,11 @@ void print_matrix(const matrix<T, ref_holder> &mat) {
 	max_size_t ndim = tmp.ndim();
 	big_size_t size = tmp.size();
 
+	if (ndim == 0) {
+		std::cout << data[0] << '\n';
+		return;
+	}
+
 	shape_t strides = tmp.strides();
 
 	if (ndim > 1) {

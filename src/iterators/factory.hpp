@@ -17,7 +17,7 @@ inline Iterator* init_iterator(const coords &attr) {
 
 	Iterator *iter;
 
-	if (require_no_iterator(attr)) {
+	if (require_no_iterator(attr) || is_scalar(attr)) {
 
 		Iterator *trivialIter = new Iterator(attr);
 
@@ -33,7 +33,9 @@ inline Iterator* init_iterator(const coords &attr) {
 	}
 
 	else {
-		throw nd::exception("...");
+
+		throw nd::exception(
+				"nd::iterator::init_iterator(...), Invalid Iterator Type");
 	}
 
 	return iter;

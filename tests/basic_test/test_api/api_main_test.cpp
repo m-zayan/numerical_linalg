@@ -37,12 +37,15 @@ int main() {
 //	test_api::ops_nd_matrix();
 
 // [10]
-	test_api::linalg_preprocessing();
+//	test_api::linalg_preprocessing();
 
 // [11]
 //	test_api::linalg_lu();
 
 // [12]
 //	test_api::linalg_tensordot();
+
+// [13]
+	test_api::scalar_like_nd();
 
 }

@@ -8,18 +8,23 @@
 
 // locked -> true
 nd::iterator::Iterator::Iterator() :
-		index_1d(0), size(0), locked(false) {
+		index_1d(0), size(0), iter_type(IteratorType::Undefined), locked(false) {
 
 }
 
 nd::iterator::Iterator::Iterator(coords attr) :
-		index_1d(0), size(attr.size1d), locked(false) {
+		index_1d(0), size(attr.size1d), iter_type(attr.iter_type), locked(false) {
 
 }
 
 bool nd::iterator::Iterator::next() {
 
-	if (this->isLocked()) {
+	if (this->iter_type == IteratorType::Scalar) {
+
+		return true;
+	}
+
+	else if (this->isLocked()) {
 
 		throw nd::exception("The iterator was locked, if you want to reuse it, "
 				"consider using Iterator::reset(), method.");

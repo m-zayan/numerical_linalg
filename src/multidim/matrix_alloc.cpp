@@ -37,9 +37,17 @@ uflag8_t nd::_matrix<T, ref_holder>::_m_validate_op(const coords &attr0,
 
 	}
 
-	else if (valid == 1) {
+	else if (valid == 1 && op_not_scalar(attr0, attr1)) {
 
 		return 1;
+	}
+
+	else if (has_no_implicit_bounds(attr0, attr1)) {
+		return 2;
+	}
+
+	else if (op_any_scalar(attr0, attr1)) {
+		return 3;
 	}
 
 	// case: valid = 2, (i.e. broadcastable)
@@ -58,7 +66,7 @@ uflag8_t nd::_matrix<T, ref_holder>::_m_validate_op(const coords &attr0,
 	}
 
 	else {
-		return 2;
+		return 4;
 	}
 }
 
@@ -89,6 +97,16 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::_m_alloc_if_broadcastable(
 		new_attr = coords(attr0.shape);
 	}
 
+	else if (op_state == 2) {
+
+		new_attr = coords(false);
+	}
+
+	else if (op_state == 3) {
+
+		new_attr = nd::has_max_ndim(attr0, attr1);
+	}
+
 	else {
 		new_attr = nd::align_dim(attr0, attr1);
 	}
@@ -111,6 +129,16 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::_m_alloc_if_broadcastable(
 
 		// attr0.shape == attr1.shape
 		new_attr = coords(attr0.shape);
+	}
+
+	else if (op_state == 2) {
+
+		new_attr = coords(false);
+	}
+
+	else if (op_state == 3) {
+
+		new_attr = nd::has_max_ndim(attr0, attr1);
 	}
 
 	else {
@@ -188,7 +216,15 @@ nd::matrix<T, true>::matrix(const nd::matrix<T, false> &mat) {
 
 	nd::matrix<T, false> temp = mat;
 
-	this->attr = coords(temp.shape());
+	if (!is_scalar(temp._m_coords())) {
+		this->attr = coords(temp.shape());
+	}
+
+	// case: scalar-like nd::matrix<T, ...>
+	else {
+		this->attr = coords(false);
+	}
+
 	this->data = allocator::init_data<T>(this->size());
 
 	this->c_begin = 0;

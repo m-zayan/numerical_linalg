@@ -18,7 +18,13 @@ bounded_t<uflag8_t> nd::state::BroadcastingLevel( { 0, 1, 2 },
 
 coords::coords() :
 		shape( { }), ndim(0), size1d(0), strides( { }), axes( { }), order('C'), own_data(
-				1), iter_type(IteratorType::None) {
+				1), iter_type(IteratorType::Undefined) {
+
+}
+
+coords::coords(bool own_data) :
+		shape( { }), ndim(0), size1d(1), strides( { }), axes( { }), order('C'), own_data(
+				own_data), iter_type(IteratorType::Scalar) {
 
 }
 
@@ -27,7 +33,16 @@ coords::coords(shape_t shape) :
 				coords::get_strides(shape)), axes( { }), order('C'), own_data(
 				1), iter_type(IteratorType::None) {
 
-	this->axes.range(0, shape.size(), 1);
+	if (shape.size() == 0) {
+
+		(*this) = coords(true);
+	}
+
+	else {
+
+		this->axes.range(0, shape.size(), 1);
+	}
+
 }
 
 coords::coords(shape_t shape, char order) :
@@ -41,6 +56,8 @@ coords::coords(shape_t shape, bool own_data, IteratorType iter_type) :
 
 	this->own_data = own_data;
 	this->iter_type = iter_type;
+
+	check_coords_definition(*this);
 }
 
 coords::coords(shape_t shape, shape_t strides, bool own_data,
@@ -55,9 +72,14 @@ coords::coords(shape_t shape, shape_t strides, bool own_data,
 	this->order = 'C';
 	this->own_data = own_data;
 
-	this->axes.range(0, shape.size(), 1);
+	if (this->ndim != 0) {
+
+		this->axes.range(0, shape.size(), 1);
+	}
 
 	this->iter_type = iter_type;
+
+	check_coords_definition(*this);
 }
 
 coords::coords(shape_t shape, shape_t axes, shape_t strides, bool own_data,
@@ -134,7 +156,7 @@ shape_t coords::get_strides(shape_t &shape) {
 		strides.push_back(shape[ndim - 1]);
 		strides.push_back(1);
 
-	} else {
+	} else if (ndim > 0) {
 
 		strides.push_back(1);
 	}
@@ -145,6 +167,20 @@ shape_t coords::get_strides(shape_t &shape) {
 void coords::check_strides(shape_t &shape, shape_t &strides) {
 
 	max_size_t ndim = shape.size();
+
+	if (ndim != strides.size()) {
+
+		// Debugging
+		throw nd::exception("Invalid call for, coords::check_strides(...)\n\t"
+				"shape.size() != strides.size()");
+	}
+
+	if (ndim == 0) {
+
+		// Debugging
+		throw nd::exception("Invalid call for, coords::check_strides(...)\n\t"
+				"shape.size() = 0");
+	}
 
 	for (max_size_t i = 0; i < ndim - 1; i++) {
 
@@ -393,14 +429,18 @@ std::ostream& operator <<(std::ostream &os, shape_t shape) {
 
 	os << '(';
 
-	for (max_size_t i = 0; i < shape.size() - 1; i++) {
-		os << shape[i] << ',';
-	}
+	if (shape.size() > 0) {
 
-	os << shape[shape.size() - 1];
+		for (max_size_t i = 0; i < shape.size() - 1; i++) {
+			os << shape[i] << ',';
+		}
 
-	if (shape.size() == 1) {
-		os << ',';
+		os << shape[shape.size() - 1];
+
+		if (shape.size() == 1) {
+			os << ',';
+		}
+
 	}
 
 	os << ')';
@@ -531,6 +571,25 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 }
 
 // ============================================= nd =============================================
+
+coords nd::has_max_ndim(const coords &attr0, const coords &attr1,
+		std::string &&signature) {
+
+	if (attr0.ndim == attr1.ndim) {
+
+		throw nd::exception(
+				"Invalid nd::has_max_ndim(...), attr0.ndim == attr1.ndim");
+	}
+
+	else if (attr0.ndim > attr1.ndim) {
+
+		return attr0;
+	}
+
+	else {
+		return attr1;
+	}
+}
 
 // used for broadcasting [attr0 & attr1 will be modified]
 coords nd::align_dim(coords &attr0, coords &attr1, std::string &&signature) {

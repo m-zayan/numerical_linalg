@@ -231,8 +231,12 @@ T algorithm::clip(T current_value, T min_value, T max_value) {
 template<typename T>
 T algorithm::sign(T value) {
 
-	if (value >= 0) {
+	if (value > 0) {
 		return 1;
+	}
+
+	else if (value == 0) {
+		return 0;
 	}
 
 	return -1;

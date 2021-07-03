@@ -26,12 +26,15 @@ template<typename T1, typename T2>
 void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 		std::function<void(T1&, T1, T2)> func) {
 
-	big_size_t size0 = attr0.size1d;
-	big_size_t size1 = attr1.size1d;
+	uflag8_t state = validate_op_bounds(attr0, attr1,
+			"_m_ops::write_vec_vec(...), ");
 
-	if (size0 != size1) {
-		throw nd::exception("_m_ops::write_vec_vec(...), size must be same,\n\t"
-				"attr0.size1d == attr1.size1d");
+	// (attr0 &  attr1) <--> scalar-like nd::matrix<T, ...>
+	if (state == 0) {
+
+		func(*d0, *d0, *d1);
+
+		return;
 	}
 
 	// ==================================================================
@@ -60,6 +63,14 @@ template<typename T1, typename T2>
 void write_val_vec(T1 *d, T2 val, coords attr,
 		std::function<void(T1&, T1, T2)> func) {
 
+	// scalar-like nd::matrix<T, ...>
+	if (has_no_implicit_bounds(attr)) {
+
+		func(*d, *d, val);
+
+		return;
+	}
+
 	// [0]
 	nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
 
@@ -82,37 +93,34 @@ void write_val_vec(T1 *d, T2 val, coords attr,
 template<typename RT, typename T>
 void copy(RT *res, T *d, coords attr, coords out_attr) {
 
-	big_size_t size = attr.size1d;
-	big_size_t out_size = out_attr.size1d;
+	uflag8_t state = validate_op_bounds(attr, out_attr, "_m_ops::copy(...), ");
 
-	if (size != out_size) {
-		throw nd::exception("_m_ops::copy(...), size must be same,\n\t"
-				"attr.size1d  != out_attr.size1d");
-	}
+	// (attr &  out_attr) <--> scalar-like nd::matrix<T, ...>
+	if (state == 0) {
 
-	if (require_linear_iterator(out_attr)) {
+		res[0] = static_cast<RT>(d[0]);
 
-		throw nd::exception("Invalid call for, _m_ops::copy(...),\n\t"
-				"require_linear_iterator(...)");
+		return;
 	}
 
 	// ==================================================================
 
-	if (require_no_iterator(out_attr)) {
+	if (is_valid_for_dynamic_iterator(out_attr)) {
 
 		// [0]
 		nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
-
-		big_size_t i = 0;
+		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
+				out_attr);
 
 		do {
 
-			res[i++] = static_cast<RT>(d[iter->index()]);
+			res[out_iter->index()] = static_cast<RT>(d[iter->index()]);
 
-		} while (iter->next());
+		} while (out_iter->next() && iter->next());
 
 		// [1]
 		nd::iterator::free_iterator(iter);
+		nd::iterator::free_iterator(out_iter);
 
 	}
 
@@ -137,40 +145,38 @@ template<typename RT, typename T1, typename T2>
 void write_vec_val_vec(RT *res, T1 *d, T2 val, coords attr, coords out_attr,
 		std::function<void(RT&, T1, T2)> func) {
 
-	big_size_t size = attr.size1d;
-	big_size_t out_size = out_attr.size1d;
+	uflag8_t state = validate_op_bounds(attr, out_attr,
+			"_m_ops::write_vec_val_vec(...), ");
 
-	if (size != out_size) {
-		throw nd::exception(
-				"_m_ops::write_vec_val_vec(...), size must be same,\n\t"
-						"attr.size1d  != out_attr.size1d");
-	}
+	// (attr &  out_attr) <--> scalar-like nd::matrix<T, ...>
+	if (state == 0) {
 
-	if (require_linear_iterator(out_attr)) {
-		throw nd::exception(
-				"Invalid call for, _m_ops::write_vec_val_vec(...),\n\t"
-						"require_linear_iterator(...)");
+		func(*res, *d, val);
+
+		return;
 	}
 
 	// ==================================================================
 
-	if (require_no_iterator(out_attr)) {
+	if (is_valid_for_dynamic_iterator(out_attr)) {
 
 		// [0]
 		nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
-
-		big_size_t i = 0;
+		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
+				out_attr);
 
 		do {
 
 			T1 *v = d + iter->index();
+			RT *r = res + out_iter->index();
 
-			func(res[i++], *v, val);
+			func(*r, *v, val);
 
-		} while (iter->next());
+		} while (out_iter->next() && iter->next());
 
 		// [1]
 		nd::iterator::free_iterator(iter);
+		nd::iterator::free_iterator(out_iter);
 
 	}
 
@@ -197,48 +203,44 @@ template<typename RT, typename T1, typename T2>
 void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 		coords out_attr, std::function<void(RT&, T1, T2)> func) {
 
-	big_size_t size0 = attr0.size1d;
-	big_size_t size1 = attr1.size1d;
+	uflag8_t state = validate_op_bounds(attr0, attr1,
+			"_m_ops::write_vec_vec_vec(...), ", &out_attr);
 
-	big_size_t out_size = out_attr.size1d;
+	// (attr1 &  attr0 & out_attr) <--> scalar-like nd::matrix<T, ...>
+	if (state == 0) {
 
-	if (require_linear_iterator(out_attr)) {
-		throw nd::exception(
-				"Invalid call for, _m_ops::write_vec_vec_vec(...),\n\t"
-						"LHS: coords::iter_type - require_linear_iterator(...)");
-	}
+		func(*res, *d0, *d1);
 
-	if (require_no_iterator(out_attr)
-			&& (size0 != size1 || out_size != size0)) {
-
-		throw nd::exception("_m_ops::write_vec_vec(...), size must be same,\n\t"
-				"attr0.size1d == attr1.size1d,\n\t"
-				"out_attr.iter_type - require_no_iterator(...)");
+		return;
 	}
 
 	// ==================================================================
 
 	// case: 0  (i.e. no broadcast)
-	if (require_no_iterator(out_attr)) {
+	if (is_valid_for_dynamic_iterator(out_attr)) {
 
 		// [0]
 		nd::iterator::Iterator *iter0 = nd::iterator::init_iterator(attr0);
 		nd::iterator::Iterator *iter1 = nd::iterator::init_iterator(attr1);
-
-		big_size_t i = 0;
+		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
+				out_attr);
 
 		do {
 
 			T1 *v0 = d0 + iter0->index();
 			T2 *v1 = d1 + iter1->index();
 
-			func(res[i++], *v0, *v1);
+			RT *r = res + out_iter->index();
 
-		} while (iter0->next() && iter1->next());
+			func(*r, *v0, *v1);
+
+		} while (out_iter->next() && iter0->next() && iter1->next());
 
 		// [1]
 		nd::iterator::free_iterator(iter0);
 		nd::iterator::free_iterator(iter1);
+		nd::iterator::free_iterator(out_iter);
+
 	}
 
 	else {
@@ -257,22 +259,57 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 }
 
 // [5] - lhs = rhs | res = func(d0)
+/* [2] - lhs = rhs | res = d | use-case -> type-casting
+ *
+ * broadcastable (i.e. repeat)
+ */
 template<typename RT, typename T>
-void write_vec(RT *res, T *d, coords attr, std::function<RT(T)> func) {
+void write_vec(RT *res, T *d, coords attr, coords out_attr,
+		std::function<RT(T)> func) {
 
-	// [0]
-	nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
+	uflag8_t state = validate_op_bounds(attr, out_attr,
+			"_m_ops::write_vec(...), ");
 
-	big_size_t i = 0;
+	// (attr &  out_attr) <--> scalar-like nd::matrix<T, ...>
+	if (state == 0) {
 
-	do {
+		res[0] = func(d[0]);
 
-		res[i++] = func(d[iter->index()]);
+		return;
+	}
 
-	} while (iter->next());
+	// ==================================================================
 
-	// [1]
-	nd::iterator::free_iterator(iter);
+	if (is_valid_for_dynamic_iterator(out_attr)) {
+
+		// [0]
+		nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
+		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
+				out_attr);
+
+		do {
+
+			res[out_iter->index()] = func(d[iter->index()]);
+
+		} while (out_iter->next() && iter->next());
+
+		// [1]
+		nd::iterator::free_iterator(iter);
+		nd::iterator::free_iterator(out_iter);
+
+	}
+
+	else {
+
+		nd::iterator::PairwiseSequential pseqIter(attr, out_attr);
+
+		do {
+
+			res[pseqIter.index(2)] = static_cast<RT>(d[pseqIter.index(0)]);
+
+		} while (pseqIter.next());
+	}
+
 }
 
 /* [6] - lhs = rhs | res = sum(d0[i0:i1] * d1[j0:j1])
@@ -291,7 +328,8 @@ void mul_reduce_sum(RT *res, T1 *d0, T2 *d1, coords out_attr, coords attr0,
 
 	if (aligned_ndim < reduce_ndim) {
 
-		throw nd::exception("...");
+		throw nd::exception(
+				"_m_ops::mul_reduce_sum(...), aligned_ndim < reduce_ndim");
 	}
 
 	big_size_t n_chunk = aligned_attr.shape.multiply(0,
@@ -327,6 +365,21 @@ void mul_reduce_sum(RT *res, T1 *d0, T2 *d1, coords out_attr, coords attr0,
 		} while (pseqIter.next() && (ij < chunk_size));
 
 		res[i] = algorithm::sum<RT>(0, aux_size, elems.ref(0));
+	}
+
+}
+
+// ==========================================================================================
+
+template<typename T1, typename T2>
+void contiguous_write_vec_val(T1 *d, T2 val, coords attr,
+		std::function<void(T1&, T2)> func) {
+
+	big_size_t size = attr.size1d;
+
+	for (big_size_t i = 0; i < size; i++) {
+
+		func(d[i], val);
 	}
 
 }

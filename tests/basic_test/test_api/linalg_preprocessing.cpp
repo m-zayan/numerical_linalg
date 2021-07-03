@@ -21,10 +21,26 @@ void test_api::linalg_preprocessing() {
 
 	nd::iterator::RandomAccess rndIter(attr);
 
-	nd::linalg::_h::forward_substitution_step(tmp, rndIter, 0);
-	nd::linalg::_h::forward_substitution_step(tmp, rndIter, 1);
+	flag8_t state = nd::linalg::_h::forward_substitution_step(tmp, rndIter, 0);
+
+	state = nd::linalg::_h::forward_substitution_step(tmp, rndIter, 1);
 
 	nd::out::print_matrix(mat);
 
+	std::cout << "\n===============================\n";
+
+	std::cout << "state [0]: " << static_cast<min_t>(state) << ln;
+
+	std::cout << "\n--------------------\n";
+
+	mat.assign( { 1, 1, 1 }, 0);
+
+	nd::out::print_matrix(mat);
+
+	state = nd::linalg::_h::forward_substitution_step(tmp, rndIter, 1);
+
+	std::cout << "\n--------------------\n";
+
+	std::cout << "state [1]: " << static_cast<min_t>(state) << ln;
 }
 
