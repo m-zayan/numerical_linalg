@@ -72,7 +72,7 @@ public:
 	// used for tree traversing [top-down | leaf-cache]
 	max_size_t tleaf;
 
-	// used for tree traversing [top-down | leaf-cache]
+	// used for tree traversing [bottom-down | leaf-cache]
 	max_size_t bleaf;
 
 	CIterator() = delete;
