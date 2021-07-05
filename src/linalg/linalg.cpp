@@ -236,7 +236,7 @@ void nd::linalg::inplace::transpose(nd::matrix<T, rf_h> &mat, shape_t axes) {
 	nd::iterator::RandomAccess rndIter(new_attr);
 	nd::iterator::RandomAccess prev_rndIter(attr);
 
-	shape_t reordered_strides = coords(new_attr.shape).strides;
+	strides_t reordered_strides = coords(new_attr.shape).strides;
 
 	bool is_root;
 

@@ -19,7 +19,7 @@ nd::iterator::PairwiseSequential::PairwiseSequential(coords attr0,
 	this->axis = this->dim_bounds - 1;
 	this->mov_axis = this->dim_bounds - 1;
 
-	this->bounds.fill(3, vec1d<big_size_t>(this->dim_bounds));
+	this->bounds.fill(3, strides_t(this->dim_bounds));
 
 	for (max_size_t i = 0; i < 3; i++) {
 

@@ -72,6 +72,9 @@ public:
 
 };
 
+// =============================== strides_t ===============================
+using strides_t = vec1d<big_size_t>;
+
 /* =============================== IteratorType =============================== */
 
 enum IteratorType {
@@ -85,13 +88,6 @@ enum IteratorType {
 
 class coords {
 
-private:
-
-	static big_size_t get_size1d(shape_t &shape);
-	static shape_t get_strides(shape_t &shape);
-
-	static void check_strides(shape_t &shape, shape_t &strides);
-
 public:
 
 	shape_t shape;
@@ -99,7 +95,7 @@ public:
 
 	big_size_t size1d; // shape.multiply(0, n)
 
-	shape_t strides;
+	strides_t strides;
 	shape_t axes;
 
 	char order; // C-style, F-style, default : 'C'
@@ -117,10 +113,10 @@ public:
 
 	coords(shape_t shape, bool own_data, IteratorType iter_type);
 
-	coords(shape_t shape, shape_t strides, bool own_data,
+	coords(shape_t shape, strides_t strides, bool own_data,
 			IteratorType iter_type);
 
-	coords(shape_t shape, shape_t axes, shape_t strides, bool own_data,
+	coords(shape_t shape, shape_t axes, strides_t strides, bool own_data,
 			IteratorType iter_type);
 
 	coords& operator =(const coords &attr);
@@ -162,84 +158,72 @@ coords align_dim_2d(coords &attr0, coords &attr1, std::string &&signature = "");
 
 }
 
-// ============================================= nd::parser::_h =============================================
+inline big_size_t get_size1d(shape_t &shape, max_size_t begin, max_size_t end) {
 
-namespace nd::parser::_h {
-
-template<typename T>
-void parse_shape(T &scalar, shape_t &out_shape,
-		std::unordered_map<max_size_t, max_size_t> &depth_mp, max_size_t depth,
-		std::string signature);
-
-template<typename T>
-void parse_shape(vec1d<T> &nested_vec1d, shape_t &out_shape,
-		std::unordered_map<max_size_t, max_size_t> &depth_mp, max_size_t depth,
-		std::string signature);
-
+	return shape.multiply<big_size_t>(begin, end);
 }
 
-// =============================================   nd::parser   =============================================
+inline big_size_t get_size1d(shape_t &shape) {
 
-namespace nd::parser {
-
-template<typename T>
-shape_t parse_shape(vec1d<T> nested_vec1d, std::string signature = "");
-
+	return shape.multiply<big_size_t>(0, shape.size());
 }
 
-// =================================================================================================================
+inline strides_t get_strides(shape_t &shape) {
 
-template<typename T>
-void nd::parser::_h::parse_shape(T &scalar, shape_t &out_shape,
-		std::unordered_map<max_size_t, max_size_t> &depth_mp, max_size_t depth,
-		std::string signature) {
+	strides_t strides;
 
-	return;
+	max_size_t ndim = shape.size();
+
+	if (ndim > 1) {
+
+		strides.reserve(shape.size());
+
+		for (max_size_t i = 1; i < ndim - 1; i++) {
+
+			max_size_t begin = i;
+			max_size_t end = ndim - 1;
+
+			strides.push_back(get_size1d(shape, begin, end) * shape[ndim - 1]);
+		}
+
+		strides.push_back(shape[ndim - 1]);
+		strides.push_back(1);
+
+	} else if (ndim > 0) {
+
+		strides.push_back(1);
+	}
+
+	return strides;
 }
 
-template<typename T>
-void nd::parser::_h::parse_shape(vec1d<T> &nested_vec1d, shape_t &out_shape,
-		std::unordered_map<max_size_t, max_size_t> &depth_mp, max_size_t depth,
-		std::string signature) {
+inline void check_strides(shape_t &shape, strides_t &strides) {
 
-	max_size_t size = nested_vec1d.size();
+	max_size_t ndim = shape.size();
 
-	if (depth_mp.find(depth) != depth_mp.end()) {
+	if (ndim != strides.size()) {
 
-		if (size != depth_mp[depth]) {
+		// Debugging
+		throw nd::exception("Invalid call for, coords::check_strides(...)\n\t"
+				"shape.size() != strides.size()");
+	}
 
-			throw nd::exception(signature + "Inconsistent Dimensions, "
-					"dim = " + to_string(depth));
+	if (ndim == 0) {
+
+		// Debugging
+		throw nd::exception("Invalid call for, coords::check_strides(...)\n\t"
+				"shape.size() = 0");
+	}
+
+	for (max_size_t i = 0; i < ndim - 1; i++) {
+
+		if (strides[i] % shape[i] != 0
+				|| (strides[i] / shape[i]) != strides[i + 1]) {
+
+			nd::exception("Invalid coords(shape, strides), shape, "
+					"doesn't match with the given strides");
 		}
 	}
-
-	else {
-
-		depth_mp[depth] = size;
-
-		out_shape.emplace_back(size);
-
-	}
-
-	for (max_size_t i = 0; i < size; i++) {
-
-		nd::parser::_h::parse_shape(nested_vec1d[i], out_shape, depth_mp,
-				depth + 1, signature);
-	}
-
-}
-
-template<typename T>
-shape_t nd::parser::parse_shape(vec1d<T> nested_vec1d, std::string signature) {
-
-	std::unordered_map<max_size_t, max_size_t> depth_mp;
-
-	shape_t out_shape;
-
-	nd::parser::_h::parse_shape(nested_vec1d, out_shape, depth_mp, 0,
-			signature);
-
-	return out_shape;
 }
 
 // =================================================================================================================
@@ -367,6 +351,86 @@ inline uflag8_t validate_op_bounds(coords &attr0, coords &attr1,
 
 	// valid | non-trivial bounds
 	return 1;
+}
+
+// ============================================= nd::parser::_h =============================================
+
+namespace nd::parser::_h {
+
+template<typename T>
+void parse_shape(T &scalar, shape_t &out_shape,
+		std::unordered_map<max_size_t, max_size_t> &depth_mp, max_size_t depth,
+		std::string signature);
+
+template<typename T>
+void parse_shape(vec1d<T> &nested_vec1d, shape_t &out_shape,
+		std::unordered_map<max_size_t, max_size_t> &depth_mp, max_size_t depth,
+		std::string signature);
+
+}
+
+// =============================================   nd::parser   =============================================
+
+namespace nd::parser {
+
+template<typename T>
+shape_t parse_shape(vec1d<T> nested_vec1d, std::string signature = "");
+
+}
+
+// =================================================================================================================
+
+template<typename T>
+void nd::parser::_h::parse_shape(T &scalar, shape_t &out_shape,
+		std::unordered_map<max_size_t, max_size_t> &depth_mp, max_size_t depth,
+		std::string signature) {
+
+	return;
+}
+
+template<typename T>
+void nd::parser::_h::parse_shape(vec1d<T> &nested_vec1d, shape_t &out_shape,
+		std::unordered_map<max_size_t, max_size_t> &depth_mp, max_size_t depth,
+		std::string signature) {
+
+	max_size_t size = nested_vec1d.size();
+
+	if (depth_mp.find(depth) != depth_mp.end()) {
+
+		if (size != depth_mp[depth]) {
+
+			throw nd::exception(signature + "Inconsistent Dimensions, "
+					"dim = " + to_string(depth));
+		}
+	}
+
+	else {
+
+		depth_mp[depth] = size;
+
+		out_shape.emplace_back(size);
+
+	}
+
+	for (max_size_t i = 0; i < size; i++) {
+
+		nd::parser::_h::parse_shape(nested_vec1d[i], out_shape, depth_mp,
+				depth + 1, signature);
+	}
+
+}
+
+template<typename T>
+shape_t nd::parser::parse_shape(vec1d<T> nested_vec1d, std::string signature) {
+
+	std::unordered_map<max_size_t, max_size_t> depth_mp;
+
+	shape_t out_shape;
+
+	nd::parser::_h::parse_shape(nested_vec1d, out_shape, depth_mp, 0,
+			signature);
+
+	return out_shape;
 }
 
 #endif /* SRC_SHAPES_COORDS_HPP */

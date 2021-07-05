@@ -101,7 +101,7 @@ big_size_t nd::iterator::RandomAccess::index_at(big_size_t index_1d) {
 // reversed index
 big_size_t nd::iterator::RandomAccess::reversed_index_at(big_size_t index_1d,
 		coords &prev_attr, nd::iterator::RandomAccess &prev_rndIter,
-		shape_t &reordered_strides) {
+		strides_t &reordered_strides) {
 
 	if (index_1d >= this->size()) {
 		throw nd::exception("index_1d, out of range");
@@ -121,7 +121,7 @@ big_size_t nd::iterator::RandomAccess::reversed_index_at(big_size_t index_1d,
 
 bool nd::iterator::RandomAccess::is_cycle_root(big_size_t index_1d,
 		coords &prev_attr, nd::iterator::RandomAccess &prev_rndIter,
-		shape_t &reordered_strides) {
+		strides_t &reordered_strides) {
 
 	big_size_t size = this->size();
 
@@ -170,7 +170,7 @@ shape_t& nd::iterator::RandomAccess::axes() {
 	return this->attr.axes;
 }
 
-shape_t& nd::iterator::RandomAccess::strides() {
+strides_t& nd::iterator::RandomAccess::strides() {
 
 	return this->attr.strides;
 }

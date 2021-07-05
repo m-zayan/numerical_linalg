@@ -57,7 +57,7 @@ void print_matrix(const matrix<T, ref_holder> &mat) {
 		return;
 	}
 
-	shape_t strides = tmp.strides();
+	strides_t strides = tmp.strides();
 
 	if (ndim > 1) {
 		std::cout << "[";

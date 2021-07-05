@@ -23,7 +23,7 @@ private:
 	max_size_t axis;
 	max_size_t mov_axis;
 
-	vec1d<vec1d<big_size_t>> bounds;
+	vec1d<strides_t> bounds;
 
 	// indices
 	vec1d<shape_t> current;

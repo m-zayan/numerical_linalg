@@ -129,6 +129,12 @@ const_iterator<T> vec1d<T>::end() {
 }
 
 template<typename T>
+void vec1d<T>::fill(T val) {
+
+	std::fill(this->values.begin(), this->values.end(), val);
+}
+
+template<typename T>
 void vec1d<T>::fill(big_size_t size, T val) {
 
 	this->values.resize(size);
@@ -639,14 +645,15 @@ T vec1d<T>::max(big_size_t begin, big_size_t end) {
 }
 
 template<typename T>
-T vec1d<T>::sum(big_size_t begin, big_size_t end) {
+template<typename RT>
+RT vec1d<T>::sum(big_size_t begin, big_size_t end) {
 
 	if (begin > end || end > this->size()) {
 
 		throw std::logic_error("Invalid Range, vec1d<T>::sum(...)");
 	}
 
-	T sum = 0;
+	RT sum = 0;
 
 	for (big_size_t i = begin; i < end; i++) {
 
@@ -657,14 +664,15 @@ T vec1d<T>::sum(big_size_t begin, big_size_t end) {
 }
 
 template<typename T>
-T vec1d<T>::multiply(big_size_t begin, big_size_t end) {
+template<typename RT>
+RT vec1d<T>::multiply(big_size_t begin, big_size_t end) {
 
 	if (begin > end || end > this->size()) {
 
 		throw std::logic_error("Invalid Range, vec1d<T>::multiply(...)");
 	}
 
-	T result = 1;
+	RT result = 1;
 
 	for (big_size_t i = begin; i < end; i++) {
 		result *= this->operator [](i);

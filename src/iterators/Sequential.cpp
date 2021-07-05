@@ -33,7 +33,7 @@ shape_t& nd::iterator::Sequential::shape() {
 	return this->attr.shape;
 }
 
-shape_t& nd::iterator::Sequential::strides() {
+strides_t& nd::iterator::Sequential::strides() {
 
 	return this->attr.strides;
 }

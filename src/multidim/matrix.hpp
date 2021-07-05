@@ -51,7 +51,7 @@ public:
 	big_size_t size() const;
 
 	shape_t shape() const;
-	shape_t strides() const;
+	strides_t strides() const;
 
 	max_size_t ndim() const;
 

@@ -22,7 +22,7 @@ shape_t nd::_matrix<T, ref_holder>::shape() const {
 }
 
 template<typename T, bool ref_holder>
-shape_t nd::_matrix<T, ref_holder>::strides() const {
+strides_t nd::_matrix<T, ref_holder>::strides() const {
 
 	return this->attr.strides;
 }
