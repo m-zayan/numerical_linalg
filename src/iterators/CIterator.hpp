@@ -67,13 +67,13 @@ public:
 	max_size_t troot;
 
 	// used for tree traversing [bottom-up]
-	max_size_t broot;
+	max_size_t bleft;
 
 	// used for tree traversing [top-down | leaf-cache]
 	max_size_t tleaf;
 
 	// used for tree traversing [bottom-down | leaf-cache]
-	max_size_t bleaf;
+	max_size_t bright;
 
 	CIterator() = delete;
 
@@ -110,8 +110,7 @@ public:
 
 	void _it_init_leaf();
 
-	void _it_init_state_rstep();
-	void _it_init_state_lstep();
+	void _it_init_state_step(uflag8_t ttype);
 
 	void _it_init_state();
 	// ------------------------------------------------------------
@@ -160,7 +159,7 @@ CIterator::CIterator(vec1d<coords*> &&attr_refs) {
 
 	max_size_t nin_nodes = attr_refs.size();
 	max_size_t nout_nodes = nin_nodes - 1;
-	max_size_t optree_size = (nin_nodes << 1) - 1;
+	max_size_t optree_size = nin_nodes + nout_nodes;
 
 	this->attr_refs = attr_refs;
 
@@ -168,8 +167,8 @@ CIterator::CIterator(vec1d<coords*> &&attr_refs) {
 	this->aligned_coords = vec1d<coords>(optree_size);
 
 	// --------------- [1] ---------------
-	this->axis = vec1d<max_size_t>(nout_nodes);
-	this->mov_axis = vec1d<max_size_t>(nout_nodes);
+	this->axis = vec1d<max_size_t>(optree_size);
+	this->mov_axis = vec1d<max_size_t>(optree_size);
 
 	// --------------- [2] ---------------
 	this->bounds = vec1d<strides_t>(optree_size);
@@ -198,10 +197,10 @@ CIterator::CIterator(vec1d<coords*> &&attr_refs) {
 	this->troot = optree_size - 1;
 
 	// most left node | leaf
-	this->broot = 0;
+	this->bleft = 0;
 
-	this->tleaf = this->optree_rchild(this->troot);
-	this->bleaf = 0;
+	this->tleaf = optree_size - 1;
+	this->bright = 1;
 
 	/* set-default-alignment */
 	// ... [here]
@@ -212,10 +211,10 @@ CIterator::CIterator(vec1d<coords*> &&attr_refs) {
 inline void CIterator::_it_reset_optree_baseindex() {
 
 	this->troot = optree_size - 1;
-	this->broot = 0;
+	this->bleft = 0;
 
-	this->tleaf = this->optree_rchild(this->troot);
-	this->bleaf = 0;
+	this->tleaf = optree_size - 1;
+	this->bright = 1;
 }
 
 inline bool CIterator::is_optree_root(max_size_t i) {
@@ -289,12 +288,16 @@ inline max_size_t CIterator::optree_rchild(max_size_t i) {
 inline void CIterator::_it_optree_next() {
 
 	// [top-down]
-	this->troot = this->optree_lchild(this->troot);
 	this->tleaf = this->optree_rchild(this->troot);
+	this->troot = this->optree_lchild(this->troot);
 
 	// [bottom-up]
-	this->broot = this->optree_parent(this->broot);
-	this->bleaf = this->optree_rchild(this->broot);
+	this->bleft = this->optree_parent(this->bleft);
+	this->bright = this->optree_parent(this->bleft);
+
+	if (!is_optree_root(this->bleft)) {
+		this->bright = this->optree_rchild(this->bright);
+	}
 }
 
 inline max_size_t CIterator::optree_index(uflag8_t ttype) {
@@ -308,11 +311,11 @@ inline max_size_t CIterator::optree_index(uflag8_t ttype) {
 	}
 
 	else if (ttype == 2) {
-		return this->broot;
+		return this->bleft;
 	}
 
 	else {
-		return this->bleaf;
+		return this->bright;
 	}
 }
 
@@ -399,40 +402,22 @@ inline void CIterator::_it_init_leaf() {
 
 }
 
-// [bottom-up root-step]
-inline void CIterator::_it_init_state_rstep() {
+// [bottom-up init-step]
+inline void CIterator::_it_init_state_step(uflag8_t ttype) {
 
-	max_size_t ndim = this->ith_ndim(2);
+	max_size_t ndim = this->ith_ndim(ttype);
 
-	this->imov_axis(2) = ndim - 1;
-	this->iaxis(2) = ndim - 1;
+	this->imov_axis(ttype) = ndim - 1;
+	this->iaxis(ttype) = ndim - 1;
 
-	this->ibound(2) = strides_t(ndim);
-	this->icurrent(2) = shape_t(ndim, 0);
-	this->iindex1d(2) = 0;
-
-	for (max_size_t j = 0; j < ndim; j++) {
-
-		this->ijbound(2, j) = (this->ijshape(2, j) - 1) * this->ijstride(2, j);
-	}
-
-}
-
-// [bottom-up leaf-step]
-inline void CIterator::_it_init_state_lstep() {
-
-	max_size_t ndim = this->ith_ndim(3);
-
-	this->imov_axis(3) = ndim - 1;
-	this->iaxis(3) = ndim - 1;
-
-	this->ibound(3) = strides_t(ndim);
-	this->icurrent(3) = shape_t(ndim, 0);
-	this->iindex1d(3) = 0;
+	this->ibound(ttype) = strides_t(ndim);
+	this->icurrent(ttype) = shape_t(ndim, 0);
+	this->iindex1d(ttype) = 0;
 
 	for (max_size_t j = 0; j < ndim; j++) {
 
-		this->ijbound(3, j) = (this->ijshape(3, j) - 1) * this->ijstride(3, j);
+		this->ijbound(ttype, j) = (this->ijshape(ttype, j) - 1)
+				* this->ijstride(ttype, j);
 	}
 
 }
@@ -440,17 +425,16 @@ inline void CIterator::_it_init_state_lstep() {
 // [bottom-up init]
 inline void CIterator::_it_init_state() {
 
-	this->_it_init_state_rstep();
+	for (max_size_t i = 0; i < this->optree_depth - 1; i++) {
 
-	this->_it_optree_next();
-
-	for (max_size_t i = 1; i < this->optree_depth - 1; i++) {
-
-		this->_it_init_state_rstep();
-		this->_it_init_state_lstep();
+		this->_it_init_state_step(2);
+		this->_it_init_state_step(3);
 
 		this->_it_optree_next();
 	}
+
+	// root-node
+	this->_it_init_state_step(2);
 
 	// reset op-tree index
 	this->_it_reset_optree_baseindex();

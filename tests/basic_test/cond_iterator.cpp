@@ -14,8 +14,9 @@ int main() {
 	coords attr1( { 3, 2, 4 }, true, IteratorType::None);
 	coords attr2( { 6, 3, 4, 2 }, true, IteratorType::None);
 	coords attr3( { 1000000, 6, 3, 2, 3 }, true, IteratorType::None);
+	coords attr4( { 3, 3 }, true, IteratorType::None);
 
-	CIterator iter( { &attr0, &attr1, &attr2, &attr3 });
+	CIterator iter( { &attr0, &attr1, &attr2, &attr3, &attr4 });
 
 	iter.op_2d_alignment("init-test, ");
 

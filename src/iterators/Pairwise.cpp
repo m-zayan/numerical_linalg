@@ -36,16 +36,14 @@ shape_t& nd::iterator::Pairwise::indices_at(big_size_t index_1d,
 
 	shape_t *current = &(this->iter_of(2).indices_at(index_1d));
 
-	max_size_t axis;
 	max_size_t dim_size;
 
-// clip indices
+	// clip indices
 	for (max_size_t i = 0; i < ndim; i++) {
 
-		axis = this->attr_list[pair_index].axes[i];
 		dim_size = this->attr_list[pair_index].shape[i];
 
-		this->clipped_indices()[i] = (*current)[axis];
+		this->clipped_indices()[i] = (*current)[i];
 
 		if (dim_size == 1) {
 

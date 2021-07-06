@@ -9,6 +9,15 @@
 //int main() {
 //
 //	// [0]
-//	test_api::nd_ops();
+////	test_api::nd_ops();
+//
+//	// [1]
+////	test_api::nd_seq_iter();
+//
+//	// [2]
+////	test_api::nd_rnd_iter();
+//
+//	// [3]
+////	test_api::nd_citer();
 //
 //}
