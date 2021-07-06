@@ -253,7 +253,7 @@ inline max_size_t CIterator::optree_parent(max_size_t i) {
 
 	else {
 
-		return this->nin_nodes + 1;
+		return i + 1;
 	}
 
 }
@@ -265,8 +265,12 @@ inline max_size_t CIterator::optree_lchild(max_size_t i) {
 		return i;
 	}
 
+	else if (i == this->nin_nodes) {
+		return 0;
+	}
+
 	else {
-		return this->nin_nodes - i + 1;
+		return i - 1;
 	}
 }
 
@@ -278,7 +282,7 @@ inline max_size_t CIterator::optree_rchild(max_size_t i) {
 	}
 
 	else {
-		return this->nin_nodes - 1;
+		return i - this->nin_nodes + 1;
 	}
 }
 
@@ -291,7 +295,6 @@ inline void CIterator::_it_optree_next() {
 	// [bottom-up]
 	this->broot = this->optree_parent(this->broot);
 	this->bleaf = this->optree_rchild(this->broot);
-
 }
 
 inline max_size_t CIterator::optree_index(uflag8_t ttype) {
@@ -441,7 +444,7 @@ inline void CIterator::_it_init_state() {
 
 	this->_it_optree_next();
 
-	for (max_size_t i = 1; i < this->optree_depth; i++) {
+	for (max_size_t i = 1; i < this->optree_depth - 1; i++) {
 
 		this->_it_init_state_rstep();
 		this->_it_init_state_lstep();
