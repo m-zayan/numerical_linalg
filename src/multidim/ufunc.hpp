@@ -40,8 +40,8 @@ void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 	// ==================================================================
 
 	// [0]
-	nd::iterator::Iterator *iter0 = nd::iterator::init_iterator(attr0);
-	nd::iterator::Iterator *iter1 = nd::iterator::init_iterator(attr1);
+	nd::deprecated::iterator::Iterator *iter0 = nd::deprecated::iterator::init_iterator(attr0);
+	nd::deprecated::iterator::Iterator *iter1 = nd::deprecated::iterator::init_iterator(attr1);
 
 	do {
 
@@ -53,8 +53,8 @@ void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 	} while (iter0->next() && iter1->next());
 
 	// [1]
-	nd::iterator::free_iterator(iter0);
-	nd::iterator::free_iterator(iter1);
+	nd::deprecated::iterator::free_iterator(iter0);
+	nd::deprecated::iterator::free_iterator(iter1);
 
 }
 
@@ -72,7 +72,7 @@ void write_val_vec(T1 *d, T2 val, coords attr,
 	}
 
 	// [0]
-	nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
+	nd::deprecated::iterator::Iterator *iter = nd::deprecated::iterator::init_iterator(attr);
 
 	do {
 
@@ -83,7 +83,7 @@ void write_val_vec(T1 *d, T2 val, coords attr,
 	} while (iter->next());
 
 	// [1]
-	nd::iterator::free_iterator(iter);
+	nd::deprecated::iterator::free_iterator(iter);
 }
 
 /* [2] - lhs = rhs | res = d | use-case -> type-casting
@@ -108,8 +108,8 @@ void copy(RT *res, T *d, coords attr, coords out_attr) {
 	if (is_valid_for_dynamic_iterator(out_attr)) {
 
 		// [0]
-		nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
-		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
+		nd::deprecated::iterator::Iterator *iter = nd::deprecated::iterator::init_iterator(attr);
+		nd::deprecated::iterator::Iterator *out_iter = nd::deprecated::iterator::init_iterator(
 				out_attr);
 
 		do {
@@ -119,14 +119,14 @@ void copy(RT *res, T *d, coords attr, coords out_attr) {
 		} while (out_iter->next() && iter->next());
 
 		// [1]
-		nd::iterator::free_iterator(iter);
-		nd::iterator::free_iterator(out_iter);
+		nd::deprecated::iterator::free_iterator(iter);
+		nd::deprecated::iterator::free_iterator(out_iter);
 
 	}
 
 	else {
 
-		nd::iterator::PairwiseSequential pseqIter(attr, out_attr);
+		nd::deprecated::iterator::PairwiseSequential pseqIter(attr, out_attr);
 
 		do {
 
@@ -161,8 +161,8 @@ void write_vec_val_vec(RT *res, T1 *d, T2 val, coords attr, coords out_attr,
 	if (is_valid_for_dynamic_iterator(out_attr)) {
 
 		// [0]
-		nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
-		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
+		nd::deprecated::iterator::Iterator *iter = nd::deprecated::iterator::init_iterator(attr);
+		nd::deprecated::iterator::Iterator *out_iter = nd::deprecated::iterator::init_iterator(
 				out_attr);
 
 		do {
@@ -175,14 +175,14 @@ void write_vec_val_vec(RT *res, T1 *d, T2 val, coords attr, coords out_attr,
 		} while (out_iter->next() && iter->next());
 
 		// [1]
-		nd::iterator::free_iterator(iter);
-		nd::iterator::free_iterator(out_iter);
+		nd::deprecated::iterator::free_iterator(iter);
+		nd::deprecated::iterator::free_iterator(out_iter);
 
 	}
 
 	else {
 
-		nd::iterator::PairwiseSequential pseqIter(attr, out_attr);
+		nd::deprecated::iterator::PairwiseSequential pseqIter(attr, out_attr);
 
 		do {
 
@@ -220,9 +220,9 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 	if (is_valid_for_dynamic_iterator(out_attr)) {
 
 		// [0]
-		nd::iterator::Iterator *iter0 = nd::iterator::init_iterator(attr0);
-		nd::iterator::Iterator *iter1 = nd::iterator::init_iterator(attr1);
-		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
+		nd::deprecated::iterator::Iterator *iter0 = nd::deprecated::iterator::init_iterator(attr0);
+		nd::deprecated::iterator::Iterator *iter1 = nd::deprecated::iterator::init_iterator(attr1);
+		nd::deprecated::iterator::Iterator *out_iter = nd::deprecated::iterator::init_iterator(
 				out_attr);
 
 		do {
@@ -237,15 +237,15 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 		} while (out_iter->next() && iter0->next() && iter1->next());
 
 		// [1]
-		nd::iterator::free_iterator(iter0);
-		nd::iterator::free_iterator(iter1);
-		nd::iterator::free_iterator(out_iter);
+		nd::deprecated::iterator::free_iterator(iter0);
+		nd::deprecated::iterator::free_iterator(iter1);
+		nd::deprecated::iterator::free_iterator(out_iter);
 
 	}
 
 	else {
 
-		nd::iterator::PairwiseSequential pseqIter(attr0, attr1);
+		nd::deprecated::iterator::PairwiseSequential pseqIter(attr0, attr1);
 
 		do {
 
@@ -283,8 +283,8 @@ void write_vec(RT *res, T *d, coords attr, coords out_attr,
 	if (is_valid_for_dynamic_iterator(out_attr)) {
 
 		// [0]
-		nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
-		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
+		nd::deprecated::iterator::Iterator *iter = nd::deprecated::iterator::init_iterator(attr);
+		nd::deprecated::iterator::Iterator *out_iter = nd::deprecated::iterator::init_iterator(
 				out_attr);
 
 		do {
@@ -294,14 +294,14 @@ void write_vec(RT *res, T *d, coords attr, coords out_attr,
 		} while (out_iter->next() && iter->next());
 
 		// [1]
-		nd::iterator::free_iterator(iter);
-		nd::iterator::free_iterator(out_iter);
+		nd::deprecated::iterator::free_iterator(iter);
+		nd::deprecated::iterator::free_iterator(out_iter);
 
 	}
 
 	else {
 
-		nd::iterator::PairwiseSequential pseqIter(attr, out_attr);
+		nd::deprecated::iterator::PairwiseSequential pseqIter(attr, out_attr);
 
 		do {
 
@@ -320,7 +320,7 @@ template<typename RT, typename T1, typename T2>
 void mul_reduce_sum(RT *res, T1 *d0, T2 *d1, coords out_attr, coords attr0,
 		coords attr1, max_size_t reduce_ndim) {
 
-	nd::iterator::PairwiseSequential pseqIter(attr0, attr1);
+	nd::deprecated::iterator::PairwiseSequential pseqIter(attr0, attr1);
 
 	coords aligned_attr = pseqIter.aligned_coords(2);
 

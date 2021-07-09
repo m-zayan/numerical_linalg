@@ -6,7 +6,7 @@
 
 #include "Sequential.hpp"
 
-nd::iterator::Sequential::Sequential(coords attr) {
+nd::deprecated::iterator::Sequential::Sequential(coords attr) {
 
 	this->attr = attr;
 
@@ -28,37 +28,37 @@ nd::iterator::Sequential::Sequential(coords attr) {
 	this->locked = false;
 }
 
-shape_t& nd::iterator::Sequential::shape() {
+shape_t& nd::deprecated::iterator::Sequential::shape() {
 
 	return this->attr.shape;
 }
 
-strides_t& nd::iterator::Sequential::strides() {
+strides_t& nd::deprecated::iterator::Sequential::strides() {
 
 	return this->attr.strides;
 }
 
-max_size_t nd::iterator::Sequential::ndim() {
+max_size_t nd::deprecated::iterator::Sequential::ndim() {
 
 	return this->attr.ndim;
 }
 
-shape_t nd::iterator::Sequential::indices() const {
+shape_t nd::deprecated::iterator::Sequential::indices() const {
 
 	return this->current;
 }
 
-big_size_t nd::iterator::Sequential::index() const {
+big_size_t nd::deprecated::iterator::Sequential::index() const {
 
 	return this->index_1d;
 }
 
-max_size_t nd::iterator::Sequential::iaxis() {
+max_size_t nd::deprecated::iterator::Sequential::iaxis() {
 
 	return this->axis;
 }
 
-bool nd::iterator::Sequential::next() {
+bool nd::deprecated::iterator::Sequential::next() {
 
 	if (this->isLocked()) {
 
@@ -72,7 +72,7 @@ bool nd::iterator::Sequential::next() {
 }
 
 // update step & return a status flag
-flag8_t nd::iterator::Sequential::proceed(big_t i) {
+flag8_t nd::deprecated::iterator::Sequential::proceed(big_t i) {
 
 	// If the current, is upper bound, lock the iterator
 	if (this->mov_axis + i < 0 || this->mov_axis + i >= this->dim_bounds) {
@@ -108,14 +108,14 @@ flag8_t nd::iterator::Sequential::proceed(big_t i) {
 	}
 
 }
-void nd::iterator::Sequential::next_prem() {
+void nd::deprecated::iterator::Sequential::next_prem() {
 
 	flag8_t state = this->proceed(0);
 
 	state = this->update_state(state);
 }
 
-flag8_t nd::iterator::Sequential::update_state(flag8_t state) {
+flag8_t nd::deprecated::iterator::Sequential::update_state(flag8_t state) {
 
 	// range: [lower bound, ...]
 	big_t lbound = -1;
@@ -132,22 +132,22 @@ flag8_t nd::iterator::Sequential::update_state(flag8_t state) {
 	return state;
 }
 
-void nd::iterator::Sequential::lock() {
+void nd::deprecated::iterator::Sequential::lock() {
 
 	this->locked = true;
 }
 
-bool nd::iterator::Sequential::isLocked() {
+bool nd::deprecated::iterator::Sequential::isLocked() {
 
 	return this->locked;
 }
 
-void nd::iterator::Sequential::unlock() {
+void nd::deprecated::iterator::Sequential::unlock() {
 
 	this->locked = false;
 }
 
-void nd::iterator::Sequential::reset() {
+void nd::deprecated::iterator::Sequential::reset() {
 
 	this->current.fill(this->dim_bounds, 0);
 	this->index_1d = 0;
@@ -157,11 +157,11 @@ void nd::iterator::Sequential::reset() {
 	this->locked = false;
 }
 
-void nd::iterator::Sequential::slice(shape_t start, shape_t end) {
+void nd::deprecated::iterator::Sequential::slice(shape_t start, shape_t end) {
 
 	if (start.size() > this->ndim() || end.size() > this->ndim()) {
 
-		throw nd::exception("nd::iterator::Sequential::slice(...), "
+		throw nd::exception("nd::deprecated::iterator::Sequential::slice(...), "
 				"Dimensions Out of Range");
 	}
 
@@ -172,7 +172,7 @@ void nd::iterator::Sequential::slice(shape_t start, shape_t end) {
 	if (valid_s != 2 || valid_e != 2 || valid_order == 0) {
 
 		throw nd::exception("Invalid, "
-				"nd::iterator::Sequential::slice(...)");
+				"nd::deprecated::iterator::Sequential::slice(...)");
 	}
 
 	this->reset();
@@ -193,6 +193,6 @@ void nd::iterator::Sequential::slice(shape_t start, shape_t end) {
 	}
 }
 
-nd::iterator::Sequential::~Sequential() {
+nd::deprecated::iterator::Sequential::~Sequential() {
 }
 

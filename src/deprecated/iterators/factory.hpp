@@ -13,7 +13,7 @@
 
 #include "./CIterator.hpp"
 
-namespace nd::iterator {
+namespace nd::deprecated::iterator {
 
 inline Iterator* init_iterator(const coords &attr) {
 
@@ -37,7 +37,7 @@ inline Iterator* init_iterator(const coords &attr) {
 	else {
 
 		throw nd::exception(
-				"nd::iterator::init_iterator(...), Invalid Iterator Type");
+				"nd::deprecated::iterator::init_iterator(...), Invalid Iterator Type");
 	}
 
 	return iter;

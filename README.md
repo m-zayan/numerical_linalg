@@ -68,7 +68,7 @@ Generated Test Case - TXT - File :test_api/gen_test_cases.txt
 
 shape_t shape = { 4, 3, 2, 2 };
 
-nd::iterator::Sequential seqIter(shape);
+nd::deprecated::iterator::Sequential seqIter(shape);
 
 big_size_t count = 0;
 

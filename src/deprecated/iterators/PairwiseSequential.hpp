@@ -9,7 +9,7 @@
 
 #include "./Iterator.hpp"
 
-namespace nd::iterator {
+namespace nd::deprecated::iterator {
 
 class PairwiseSequential {
 

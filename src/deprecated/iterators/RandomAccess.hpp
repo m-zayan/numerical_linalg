@@ -9,7 +9,7 @@
 
 #include "./Iterator.hpp"
 
-namespace nd::iterator {
+namespace nd::deprecated::iterator {
 class RandomAccess {
 
 private:
@@ -48,7 +48,7 @@ public:
 			RandomAccess &prev_rndIter, strides_t &reordered_strides);
 
 	bool is_cycle_root(big_size_t index_1d, coords &prev_attr,
-			nd::iterator::RandomAccess &prev_rndIter,
+			nd::deprecated::iterator::RandomAccess &prev_rndIter,
 			strides_t &reordered_strides);
 
 	virtual ~RandomAccess();

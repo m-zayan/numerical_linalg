@@ -1,18 +1,18 @@
 /*
- * nd::iterator::RandomAccess.cpp
+ * nd::deprecated::iterator::RandomAccess.cpp
  *
  *	Author: Z. Mohamed
  */
 
 #include "./RandomAccess.hpp"
 
-nd::iterator::RandomAccess::RandomAccess(coords attr) {
+nd::deprecated::iterator::RandomAccess::RandomAccess(coords attr) {
 
 	this->attr = attr;
 	this->indices_cache = shape_t(this->ndim());
 }
 
-shape_t& nd::iterator::RandomAccess::indices_at(big_size_t index_1d) {
+shape_t& nd::deprecated::iterator::RandomAccess::indices_at(big_size_t index_1d) {
 
 	if (index_1d >= this->size()) {
 		throw nd::exception("index_1d, out of range");
@@ -31,7 +31,7 @@ shape_t& nd::iterator::RandomAccess::indices_at(big_size_t index_1d) {
 	return this->indices();
 }
 
-big_size_t nd::iterator::RandomAccess::nd_index_at(shape_t &indices) {
+big_size_t nd::deprecated::iterator::RandomAccess::nd_index_at(shape_t &indices) {
 
 	if (indices.size() != this->ndim()) {
 		throw nd::exception("dimensions <--> indices, doesn't match");
@@ -52,7 +52,7 @@ big_size_t nd::iterator::RandomAccess::nd_index_at(shape_t &indices) {
 	return index;
 }
 
-big_size_t nd::iterator::RandomAccess::nd_index_at(shape_t &&indices) {
+big_size_t nd::deprecated::iterator::RandomAccess::nd_index_at(shape_t &&indices) {
 
 	if (indices.size() != this->ndim()) {
 		throw nd::exception("dimensions -> indices, doesn't match");
@@ -73,7 +73,7 @@ big_size_t nd::iterator::RandomAccess::nd_index_at(shape_t &&indices) {
 	return index;
 }
 
-big_size_t nd::iterator::RandomAccess::index_at(big_size_t index_1d) {
+big_size_t nd::deprecated::iterator::RandomAccess::index_at(big_size_t index_1d) {
 
 	if (index_1d >= this->size()) {
 		throw nd::exception("index_1d, out of range");
@@ -99,8 +99,8 @@ big_size_t nd::iterator::RandomAccess::index_at(big_size_t index_1d) {
 }
 
 // reversed index
-big_size_t nd::iterator::RandomAccess::reversed_index_at(big_size_t index_1d,
-		coords &prev_attr, nd::iterator::RandomAccess &prev_rndIter,
+big_size_t nd::deprecated::iterator::RandomAccess::reversed_index_at(big_size_t index_1d,
+		coords &prev_attr, nd::deprecated::iterator::RandomAccess &prev_rndIter,
 		strides_t &reordered_strides) {
 
 	if (index_1d >= this->size()) {
@@ -119,8 +119,8 @@ big_size_t nd::iterator::RandomAccess::reversed_index_at(big_size_t index_1d,
 	return reindex;
 }
 
-bool nd::iterator::RandomAccess::is_cycle_root(big_size_t index_1d,
-		coords &prev_attr, nd::iterator::RandomAccess &prev_rndIter,
+bool nd::deprecated::iterator::RandomAccess::is_cycle_root(big_size_t index_1d,
+		coords &prev_attr, nd::deprecated::iterator::RandomAccess &prev_rndIter,
 		strides_t &reordered_strides) {
 
 	big_size_t size = this->size();
@@ -149,58 +149,58 @@ bool nd::iterator::RandomAccess::is_cycle_root(big_size_t index_1d,
 		max_iter++;
 		if (max_iter == size) {
 			throw nd::exception(
-					"nd::iterator::RandomAccess::is_cycle_root(...), has been failed");
+					"nd::deprecated::iterator::RandomAccess::is_cycle_root(...), has been failed");
 		}
 	}
 
 	return true;
 }
 
-big_size_t nd::iterator::RandomAccess::size() const {
+big_size_t nd::deprecated::iterator::RandomAccess::size() const {
 	return this->attr.size1d;
 }
 
-shape_t& nd::iterator::RandomAccess::shape() {
+shape_t& nd::deprecated::iterator::RandomAccess::shape() {
 
 	return this->attr.shape;
 }
 
-shape_t& nd::iterator::RandomAccess::axes() {
+shape_t& nd::deprecated::iterator::RandomAccess::axes() {
 
 	return this->attr.axes;
 }
 
-strides_t& nd::iterator::RandomAccess::strides() {
+strides_t& nd::deprecated::iterator::RandomAccess::strides() {
 
 	return this->attr.strides;
 }
 
-shape_t& nd::iterator::RandomAccess::indices() {
+shape_t& nd::deprecated::iterator::RandomAccess::indices() {
 
 	return this->indices_cache;
 }
 
-max_size_t nd::iterator::RandomAccess::ndim() const {
+max_size_t nd::deprecated::iterator::RandomAccess::ndim() const {
 
 	return this->attr.ndim;
 }
 
-char nd::iterator::RandomAccess::order() const {
+char nd::deprecated::iterator::RandomAccess::order() const {
 
 	return this->attr.order;
 }
 
-bool nd::iterator::RandomAccess::own_data() const {
+bool nd::deprecated::iterator::RandomAccess::own_data() const {
 
 	return this->attr.own_data;
 }
 
-IteratorType nd::iterator::RandomAccess::iter_type() const {
+IteratorType nd::deprecated::iterator::RandomAccess::iter_type() const {
 
 	return this->attr.iter_type;
 }
 
-nd::iterator::RandomAccess::~RandomAccess() {
+nd::deprecated::iterator::RandomAccess::~RandomAccess() {
 
 }
 

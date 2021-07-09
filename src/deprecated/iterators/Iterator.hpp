@@ -9,7 +9,7 @@
 
 #include "../../shapes/coords.hpp"
 
-namespace nd::iterator {
+namespace nd::deprecated::iterator {
 
 class Iterator {
 

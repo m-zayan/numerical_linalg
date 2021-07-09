@@ -9,7 +9,7 @@
 
 #include "./RandomAccess.hpp"
 
-namespace nd::iterator {
+namespace nd::deprecated::iterator {
 
 class Pairwise {
 

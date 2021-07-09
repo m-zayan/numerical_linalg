@@ -16,7 +16,7 @@
  */
 template<typename T, bool ref_h>
 flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
-		nd::iterator::RandomAccess &rndIter, max_size_t column_index,
+		nd::deprecated::iterator::RandomAccess &rndIter, max_size_t column_index,
 		bool scale) {
 
 	max_size_t ndim = mat.ndim();
@@ -164,7 +164,7 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
 
 template<typename T, bool ref_h>
 flag8_t nd::linalg::_h::forward_substitution_step(nd::matrix<T, ref_h> &mat,
-		nd::iterator::RandomAccess &rndIter, max_size_t column_index) {
+		nd::deprecated::iterator::RandomAccess &rndIter, max_size_t column_index) {
 
 	flag8_t is_valid = nd::linalg::_h::partial_pivoting_step(mat, rndIter,
 			column_index, true);
