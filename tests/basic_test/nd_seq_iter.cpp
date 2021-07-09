@@ -7,8 +7,8 @@
 //#include <iostream>
 //#include <memory>
 //
-//#include "../../src/iterators/Sequential.hpp"
-//#include "../../src/iterators/RandomAccess.hpp"
+//#include "../../src/deprecated/iterators/Sequential.hpp"
+//#include "../../src/deprecated/iterators/RandomAccess.hpp"
 //
 //#define ln '\n'
 //

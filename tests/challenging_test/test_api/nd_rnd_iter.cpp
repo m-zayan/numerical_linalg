@@ -6,7 +6,7 @@
 
 #include "./test_api.hpp"
 
-#include "../../../src/iterators/Pairwise.hpp"
+#include "../../../src/deprecated/iterators/Pairwise.hpp"
 
 void test_api::nd_rnd_iter() {
 

@@ -4,10 +4,10 @@
  *      Author: Z. Mohamed
  */
 
-#ifndef SRC_ITERATORS_ITERATOR_HPP
-#define SRC_ITERATORS_ITERATOR_HPP
+#ifndef SRC_DEPRECATED_ITERATORS_ITERATOR_HPP
+#define SRC_DEPRECATED_ITERATORS_ITERATOR_HPP
 
-#include "../shapes/coords.hpp"
+#include "../../shapes/coords.hpp"
 
 namespace nd::iterator {
 
@@ -42,4 +42,4 @@ public:
 
 }
 
-#endif /* SRC_ITERATORS_ITERATOR_HPP */
+#endif /* SRC_DEPRECATED_ITERATORS_ITERATOR_HPP */

@@ -10,10 +10,10 @@
 //#include "../iterators/Pairwise.hpp"
 //#include "../iterators/Sequential.hpp"
 
-#include "../iterators/factory.hpp"
-#include "../iterators/PairwiseSequential.hpp"
+#include "../deprecated/iterators/factory.hpp"
+#include "../deprecated/iterators/PairwiseSequential.hpp"
 
-#include "../iterators/RandomAccess.hpp"
+#include "../deprecated/iterators/RandomAccess.hpp"
 
 #include "../wrappers/ops.hpp"
 

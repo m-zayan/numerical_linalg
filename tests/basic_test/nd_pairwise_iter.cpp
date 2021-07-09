@@ -4,7 +4,7 @@
 // *	Author: Z. Mohamed
 // */
 //
-//#include "../../src/iterators/Pairwise.hpp"
+//#include "../../src/deprecated/iterators/Pairwise.hpp"
 //
 //#define ln '\n'
 //

@@ -7,8 +7,6 @@
  *
  * 	Author: Z. Mohamed
  *
- *	- Faster Than Other Iterators
- *
  *  - Extended Pairwise Sequential Iterator.
  *
  *  - Designed to fit all nd::matrix<T, ...> - ops
@@ -22,10 +20,10 @@
  *    				(-mat2 * mat3 / 2 + mat0 + mat1) --> result
  */
 
-#ifndef SRC_ITERATORS_CITERATOR_HPP
-#define SRC_ITERATORS_CITERATOR_HPP
+#ifndef SRC_DEPRECATED_ITERATORS_CITERATOR_HPP
+#define SRC_DEPRECATED_ITERATORS_CITERATOR_HPP
 
-#include "../shapes/coords.hpp"
+#include "../../shapes/coords.hpp"
 
 class CIterator {
 
@@ -611,4 +609,4 @@ inline void CIterator::_it_next() {
 	this->_it_reset_optree_bu_baseindex();
 }
 
-#endif /* SRC_ITERATORS_CITERATOR_HPP */
+#endif /* SRC_DEPRECATED_ITERATORS_CITERATOR_HPP */

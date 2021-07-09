@@ -4,8 +4,8 @@
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_ITERATORS_RandomAccess_HPP
-#define SRC_ITERATORS_RandomAccess_HPP
+#ifndef SRC_DEPRECATED_ITERATORS_RANDOMACESS_HPP
+#define SRC_DEPRECATED_ITERATORS_RANDOMACESS_HPP
 
 #include "./Iterator.hpp"
 
@@ -55,4 +55,4 @@ public:
 };
 }
 
-#endif /* SRC_ITERATORS_RandomAccess_HPP */
+#endif /* SRC_DEPRECATED_ITERATORS_RANDOMACESS_HPP */

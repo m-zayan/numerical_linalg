@@ -6,8 +6,8 @@
  *	N-dimensional iterator to index vec1d
  */
 
-#ifndef SRC_ITERATORS_SEQUENTIAL_HPP
-#define SRC_ITERATORS_SEQUENTIAL_HPP
+#ifndef SRC_DEPRECATED_ITERATORS_SEQUENTIAL_HPP
+#define SRC_DEPRECATED_ITERATORS_SEQUENTIAL_HPP
 
 #include "./Iterator.hpp"
 
@@ -68,4 +68,4 @@ public:
 };
 }
 
-#endif /* SRC_ITERATORS_SEQUENTIAL_HPP */
+#endif /* SRC_DEPRECATED_ITERATORS_SEQUENTIAL_HPP */

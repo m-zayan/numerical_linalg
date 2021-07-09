@@ -4,7 +4,7 @@
 // *      Author: Z. Mohamed
 // */
 //
-//#include "../../src/iterators/CIterator.hpp"
+//#include "../../src/deprecated/iterators/CIterator.hpp"
 //
 //#define ln '\n'
 //

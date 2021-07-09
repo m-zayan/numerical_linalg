@@ -4,8 +4,8 @@
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_ITERATORS_PAIRWISE_HPP
-#define SRC_ITERATORS_PAIRWISE_HPP
+#ifndef SRC_DEPRECATED_ITERATORS_PAIRWISE_HPP
+#define SRC_DEPRECATED_ITERATORS_PAIRWISE_HPP
 
 #include "./RandomAccess.hpp"
 
@@ -40,4 +40,4 @@ public:
 
 }
 
-#endif /* SRC_ITERATORS_PAIRWISE_HPP */
+#endif /* SRC_DEPRECATED_ITERATORS_PAIRWISE_HPP */

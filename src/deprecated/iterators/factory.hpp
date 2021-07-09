@@ -6,8 +6,8 @@
  *      [Iterator Factory]
  */
 
-#ifndef SRC_ITERATORS_FACTORY_HPP
-#define SRC_ITERATORS_FACTORY_HPP
+#ifndef SRC_DEPRECATED_ITERATORS_FACTORY_HPP
+#define SRC_DEPRECATED_ITERATORS_FACTORY_HPP
 
 #include "./Sequential.hpp"
 
@@ -50,4 +50,4 @@ inline void free_iterator(Iterator *iter) {
 
 }
 
-#endif /* SRC_ITERATORS_FACTORY_HPP */
+#endif /* SRC_DEPRECATED_ITERATORS_FACTORY_HPP */
