@@ -81,13 +81,21 @@ struct Iterator {
 		it->index1d++; \
 		ITER1D_MUST_REST(it); \
 	}\
-	else if(it->iter_type != IteratorType::Scalar){ \
-		for (max_size_t i = it->ndim - 1; i > 0; i++) { \
+	else if(it->iter_type != IteratorType::Scalar) { \
+		max_size_t i; \
+		for (i=it->ndim - 1; i > 0; --i) { \
 			if (ITER_IS_VALID_STEP(it, i)) { \
 				ITER_UPDATE_STEP(it, i); \
 				break; \
 			} else { \
 				ITER_CLIP_STEP(it, i); \
+			} \
+		} \
+		if(i == 0){ \
+			if (ITER_IS_VALID_STEP(it, 0)) { \
+				ITER_UPDATE_STEP(it, 0); \
+			} else { \
+				ITER_CLIP_STEP(it, 0); \
 			} \
 		} \
 	} \
