@@ -11,6 +11,8 @@
 
 #include "./Sequential.hpp"
 
+#include "./CIterator.hpp"
+
 namespace nd::iterator {
 
 inline Iterator* init_iterator(const coords &attr) {
