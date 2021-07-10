@@ -28,5 +28,4 @@ void test_api::linalg_matmul() {
 	std::cout << "---------------------\n";
 
 	nd::out::_h::print_vec1d(result._m_begin(), 0, result.size());
-
 }

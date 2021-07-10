@@ -156,7 +156,7 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator -(
 
 	T *d2 = result._m_begin();
 
-	_m_ops::write_vec_vec_vec<T, T, T>(d2, d0, d1, this->attr, mat._m_coords(),
+	_m_ops::write_vec_vec_vec<T, T, T>(d2, d0, d1, attr0, attr1,
 			result._m_coords(), _v_ops::sub<T, T, T>);
 
 	result._m_clear_iter_type();
@@ -235,7 +235,7 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator *(
 
 	T *d2 = result._m_begin();
 
-	_m_ops::write_vec_vec_vec<T, T, T>(d2, d0, d1, this->attr, mat._m_coords(),
+	_m_ops::write_vec_vec_vec<T, T, T>(d2, d0, d1, attr0, attr1,
 			result._m_coords(), _v_ops::mul<T, T, T>);
 
 	result._m_clear_iter_type();
@@ -542,13 +542,13 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 	nd::matrix<RT> result(new_attr.shape);
 
 	// [0]
-	nd::deprecated::iterator::Iterator *iter = nd::deprecated::iterator::init_iterator(tmp_attr);
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(tmp_attr);
 
 	big_size_t out_size = tmp.size() / dim_size;
 
 	max_size_t aux_size = nd::mem::clip_dim(dim_size);
 
-	max_size_t vi, j;
+	max_size_t vi;
 
 	vec1d<T1> elems(aux_size);
 	vec1d<max_size_t> indices(aux_size);
@@ -560,16 +560,14 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 	for (big_size_t i = 0; i < out_size; i++) {
 
-		j = 0;
 		vi = 0;
 		acc = initial_acc;
 
-		do {
+		for (max_size_t j = 0; j < dim_size; j++) {
 
-			elems[vi] = d0[iter->index()];
+			elems[vi] = d0[it->index1d];
 			indices[vi] = j;
 
-			j++;
 			vi++;
 
 			if (vi >= aux_size) {
@@ -577,7 +575,8 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 				func(acc, indices, elems, 0, aux_size);
 			}
 
-		} while (iter->next() && (j < dim_size));
+			ITER_NEXT(it);
+		}
 
 		if (dim_size % aux_size) {
 
@@ -588,7 +587,7 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 	}
 
 	// [1]
-	nd::deprecated::iterator::free_iterator(iter);
+	nd::iterator::free_iterator(it);
 
 	return result;
 }

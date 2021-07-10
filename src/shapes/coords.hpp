@@ -239,6 +239,7 @@ inline bool undefined_iterator(const coords &attr) {
 
 	return (attr.iter_type == IteratorType::Undefined);
 }
+
 inline bool undefined_iterator(coords &attr0, coords &attr1) {
 
 	return (undefined_iterator(attr0) || undefined_iterator(attr1));
@@ -267,10 +268,10 @@ inline bool require_pair_iterator(const coords &attr) {
 
 // ------------------------------------------------------
 
-inline bool is_valid_for_dynamic_iterator(const coords &attr) {
-
-	return (require_no_iterator(attr) || require_linear_iterator(attr));
-}
+//inline bool is_valid_for_dynamic_iterator(const coords &attr) {
+//
+//	return (require_no_iterator(attr) || require_linear_iterator(attr));
+//}
 
 // ------------------------------------------------------
 

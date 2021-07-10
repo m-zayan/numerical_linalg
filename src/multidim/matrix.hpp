@@ -41,9 +41,9 @@ public:
 
 	static uflag8_t _m_validate_op(const coords &attr0, const coords &attr1);
 
-	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0, coords attr1);
+	static nd::matrix<T> _m_alloc_if_broadcastable(coords& attr0, coords& attr1);
 
-	static nd::matrix<T> _m_alloc_if_broadcastable(coords attr0, coords attr1,
+	static nd::matrix<T> _m_alloc_if_broadcastable(coords& attr0, coords& attr1,
 			T val);
 
 	// ===========================================================================
