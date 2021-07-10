@@ -22,7 +22,7 @@ shape_t nd::_matrix<T, ref_holder>::shape() const {
 }
 
 template<typename T, bool ref_holder>
-shape_t nd::_matrix<T, ref_holder>::strides() const {
+strides_t nd::_matrix<T, ref_holder>::strides() const {
 
 	return this->attr.strides;
 }
@@ -101,7 +101,7 @@ T* nd::_matrix<T, ref_holder>::_m_end() {
 template<typename T, bool ref_holder>
 T& nd::_matrix<T, ref_holder>::at(shape_t indices) {
 
-	nd::iterator::RandomAccess rndIter(this->attr);
+	nd::deprecated::iterator::RandomAccess rndIter(this->attr);
 
 	big_size_t index = rndIter.nd_index_at(indices);
 

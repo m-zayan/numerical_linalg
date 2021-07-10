@@ -10,10 +10,8 @@
 //#include "../iterators/Pairwise.hpp"
 //#include "../iterators/Sequential.hpp"
 
+#include "../deprecated/iterators/RandomAccess.hpp"
 #include "../iterators/factory.hpp"
-#include "../iterators/PairwiseSequential.hpp"
-
-#include "../iterators/RandomAccess.hpp"
 
 #include "../wrappers/ops.hpp"
 
@@ -40,21 +38,24 @@ void write_vec_vec(T1 *d0, T2 *d1, coords attr0, coords attr1,
 	// ==================================================================
 
 	// [0]
-	nd::iterator::Iterator *iter0 = nd::iterator::init_iterator(attr0);
-	nd::iterator::Iterator *iter1 = nd::iterator::init_iterator(attr1);
+	nd::iterator::Iterator *it0 = nd::iterator::init_iterator(attr0);
+	nd::iterator::Iterator *it1 = nd::iterator::init_iterator(attr1);
 
-	do {
+	big_size_t niter = std::max(it0->niter, it1->niter);
 
-		T1 *v0 = d0 + iter0->index();
-		T2 *v1 = d1 + iter1->index();
+	for (big_size_t i = 0; i < niter; i++) {
+
+		T1 *v0 = d0 + it0->index1d;
+		T2 *v1 = d1 + it1->index1d;
 
 		func(*v0, *v0, *v1);
 
-	} while (iter0->next() && iter1->next());
+		ITER_PAIRWISE2_NEXT(it0, it1);
+	}
 
 	// [1]
-	nd::iterator::free_iterator(iter0);
-	nd::iterator::free_iterator(iter1);
+	nd::iterator::free_iterator(it0);
+	nd::iterator::free_iterator(it1);
 
 }
 
@@ -72,18 +73,22 @@ void write_val_vec(T1 *d, T2 val, coords attr,
 	}
 
 	// [0]
-	nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(attr);
 
-	do {
+	big_size_t niter = it->niter;
 
-		T1 *v = d + iter->index();
+	for (big_size_t i = 0; i < niter; i++) {
+
+		T1 *v = d + it->index1d;
 
 		func(*v, *v, val);
 
-	} while (iter->next());
+		ITER_NEXT(it);
+
+	}
 
 	// [1]
-	nd::iterator::free_iterator(iter);
+	nd::iterator::free_iterator(it);
 }
 
 /* [2] - lhs = rhs | res = d | use-case -> type-casting
@@ -105,35 +110,22 @@ void copy(RT *res, T *d, coords attr, coords out_attr) {
 
 	// ==================================================================
 
-	if (is_valid_for_dynamic_iterator(out_attr)) {
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(attr);
+	nd::iterator::Iterator *out_it = nd::iterator::init_iterator(out_attr);
 
-		// [0]
-		nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
-		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
-				out_attr);
+	big_size_t niter = std::max(it->niter, out_it->niter);
 
-		do {
+	for (big_size_t i = 0; i < niter; i++) {
 
-			res[out_iter->index()] = static_cast<RT>(d[iter->index()]);
+		res[out_it->index1d] = static_cast<RT>(d[it->index1d]);
 
-		} while (out_iter->next() && iter->next());
-
-		// [1]
-		nd::iterator::free_iterator(iter);
-		nd::iterator::free_iterator(out_iter);
-
+		ITER_PAIRWISE2_NEXT(out_it, it);
 	}
 
-	else {
-
-		nd::iterator::PairwiseSequential pseqIter(attr, out_attr);
-
-		do {
-
-			res[pseqIter.index(2)] = static_cast<RT>(d[pseqIter.index(0)]);
-
-		} while (pseqIter.next());
-	}
+	// [1]
+	nd::iterator::free_iterator(it);
+	nd::iterator::free_iterator(out_it);
 
 }
 
@@ -158,41 +150,25 @@ void write_vec_val_vec(RT *res, T1 *d, T2 val, coords attr, coords out_attr,
 
 	// ==================================================================
 
-	if (is_valid_for_dynamic_iterator(out_attr)) {
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(attr);
+	nd::iterator::Iterator *out_it = nd::iterator::init_iterator(out_attr);
 
-		// [0]
-		nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
-		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
-				out_attr);
+	big_size_t niter = std::max(it->niter, out_it->niter);
 
-		do {
+	for (big_size_t i = 0; i < niter; i++) {
 
-			T1 *v = d + iter->index();
-			RT *r = res + out_iter->index();
+		T1 *v = d + it->index1d;
+		RT *r = res + out_it->index1d;
 
-			func(*r, *v, val);
+		func(*r, *v, val);
 
-		} while (out_iter->next() && iter->next());
-
-		// [1]
-		nd::iterator::free_iterator(iter);
-		nd::iterator::free_iterator(out_iter);
-
+		ITER_PAIRWISE2_NEXT(out_it, it);
 	}
 
-	else {
-
-		nd::iterator::PairwiseSequential pseqIter(attr, out_attr);
-
-		do {
-
-			T1 *v = d + pseqIter.index(0);
-
-			func(res[pseqIter.index(2)], *v, val);
-
-		} while (pseqIter.next());
-	}
-
+	// [1]
+	nd::iterator::free_iterator(it);
+	nd::iterator::free_iterator(out_it);
 }
 
 /* [4] - lhs = rhs | res = func(d0, d1) | ex. use-case -> boolean function
@@ -216,46 +192,29 @@ void write_vec_vec_vec(RT *res, T1 *d0, T2 *d1, coords attr0, coords attr1,
 
 	// ==================================================================
 
-	// case: 0  (i.e. no broadcast)
-	if (is_valid_for_dynamic_iterator(out_attr)) {
+	// [0]
+	nd::iterator::Iterator *it0 = nd::iterator::init_iterator(attr0);
+	nd::iterator::Iterator *it1 = nd::iterator::init_iterator(attr1);
+	nd::iterator::Iterator *out_it = nd::iterator::init_iterator(out_attr);
 
-		// [0]
-		nd::iterator::Iterator *iter0 = nd::iterator::init_iterator(attr0);
-		nd::iterator::Iterator *iter1 = nd::iterator::init_iterator(attr1);
-		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
-				out_attr);
+	big_size_t niter = out_it->niter;
 
-		do {
+	for (big_size_t i = 0; i < niter; i++) {
 
-			T1 *v0 = d0 + iter0->index();
-			T2 *v1 = d1 + iter1->index();
+		T1 *v0 = d0 + it0->index1d;
+		T2 *v1 = d1 + it1->index1d;
 
-			RT *r = res + out_iter->index();
+		RT *r = res + out_it->index1d;
 
-			func(*r, *v0, *v1);
+		func(*r, *v0, *v1);
 
-		} while (out_iter->next() && iter0->next() && iter1->next());
-
-		// [1]
-		nd::iterator::free_iterator(iter0);
-		nd::iterator::free_iterator(iter1);
-		nd::iterator::free_iterator(out_iter);
-
+		ITER_PAIRWISE3_NEXT(out_it, it0, it1);
 	}
 
-	else {
-
-		nd::iterator::PairwiseSequential pseqIter(attr0, attr1);
-
-		do {
-
-			T1 *v0 = d0 + pseqIter.index(0);
-			T2 *v1 = d1 + pseqIter.index(1);
-
-			func(res[pseqIter.index(2)], *v0, *v1);
-
-		} while (pseqIter.next());
-	}
+	// [1]
+	nd::iterator::free_iterator(it0);
+	nd::iterator::free_iterator(it1);
+	nd::iterator::free_iterator(out_it);
 }
 
 // [5] - lhs = rhs | res = func(d0)
@@ -280,36 +239,22 @@ void write_vec(RT *res, T *d, coords attr, coords out_attr,
 
 	// ==================================================================
 
-	if (is_valid_for_dynamic_iterator(out_attr)) {
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(attr);
+	nd::iterator::Iterator *out_it = nd::iterator::init_iterator(out_attr);
 
-		// [0]
-		nd::iterator::Iterator *iter = nd::iterator::init_iterator(attr);
-		nd::iterator::Iterator *out_iter = nd::iterator::init_iterator(
-				out_attr);
+	big_size_t niter = std::max(it->niter, out_it->niter);
 
-		do {
+	for (big_size_t i = 0; i < niter; i++) {
 
-			res[out_iter->index()] = func(d[iter->index()]);
+		res[out_it->index1d] = func(d[it->index1d]);
 
-		} while (out_iter->next() && iter->next());
-
-		// [1]
-		nd::iterator::free_iterator(iter);
-		nd::iterator::free_iterator(out_iter);
-
+		ITER_PAIRWISE2_NEXT(out_it, it);
 	}
 
-	else {
-
-		nd::iterator::PairwiseSequential pseqIter(attr, out_attr);
-
-		do {
-
-			res[pseqIter.index(2)] = static_cast<RT>(d[pseqIter.index(0)]);
-
-		} while (pseqIter.next());
-	}
-
+	// [1]
+	nd::iterator::free_iterator(it);
+	nd::iterator::free_iterator(out_it);
 }
 
 /* [6] - lhs = rhs | res = sum(d0[i0:i1] * d1[j0:j1])
@@ -320,9 +265,12 @@ template<typename RT, typename T1, typename T2>
 void mul_reduce_sum(RT *res, T1 *d0, T2 *d1, coords out_attr, coords attr0,
 		coords attr1, max_size_t reduce_ndim) {
 
-	nd::iterator::PairwiseSequential pseqIter(attr0, attr1);
+	coords aligned_attr = nd::align_dim(attr0, attr1);
 
-	coords aligned_attr = pseqIter.aligned_coords(2);
+	// [0]
+	nd::iterator::Iterator *it0 = nd::iterator::init_iterator(attr0);
+	nd::iterator::Iterator *it1 = nd::iterator::init_iterator(attr1);
+	nd::iterator::Iterator *ait = nd::iterator::init_iterator(aligned_attr);
 
 	max_size_t aligned_ndim = aligned_attr.ndim;
 
@@ -342,31 +290,32 @@ void mul_reduce_sum(RT *res, T1 *d0, T2 *d1, coords out_attr, coords attr0,
 
 	vec1d<RT> elems(aux_size, 0);
 
-	big_size_t ij;
 	big_size_t vi;
 
-	for (big_size_t i = 0; i < n_chunk; i++) {
+	for (big_size_t k = 0; k < n_chunk; k++) {
 
-		ij = 0;
 		vi = 0;
 
 		elems.fill(aux_size, 0);
 
-		do {
+		for (big_size_t i = 0; i < chunk_size; i++) {
 
-			elems[vi++] += (d0[pseqIter.index(0)] * d1[pseqIter.index(1)]);
+			elems[vi++] += (d0[it0->index1d] * d1[it1->index1d]);
 
 			if (vi >= aux_size) {
 				vi = 0;
 			}
 
-			ij++;
+			ITER_PAIRWISE3_NEXT(ait, it0, it1);
+		}
 
-		} while (pseqIter.next() && (ij < chunk_size));
-
-		res[i] = algorithm::sum<RT>(0, aux_size, elems.ref(0));
+		res[k] = algorithm::sum<RT>(0, aux_size, elems.ref(0));
 	}
 
+	// [1]
+	nd::iterator::free_iterator(it0);
+	nd::iterator::free_iterator(it1);
+	nd::iterator::free_iterator(ait);
 }
 
 // ==========================================================================================

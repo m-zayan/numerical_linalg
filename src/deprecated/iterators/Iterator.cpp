@@ -7,17 +7,17 @@
 #include "Iterator.hpp"
 
 // locked -> true
-nd::iterator::Iterator::Iterator() :
+nd::deprecated::iterator::Iterator::Iterator() :
 		index_1d(0), size(0), iter_type(IteratorType::Undefined), locked(false) {
 
 }
 
-nd::iterator::Iterator::Iterator(coords attr) :
+nd::deprecated::iterator::Iterator::Iterator(coords attr) :
 		index_1d(0), size(attr.size1d), iter_type(attr.iter_type), locked(false) {
 
 }
 
-bool nd::iterator::Iterator::next() {
+bool nd::deprecated::iterator::Iterator::next() {
 
 	if (this->iter_type == IteratorType::Scalar) {
 
@@ -40,27 +40,27 @@ bool nd::iterator::Iterator::next() {
 	return !this->isLocked();
 }
 
-big_size_t nd::iterator::Iterator::index() const {
+big_size_t nd::deprecated::iterator::Iterator::index() const {
 
 	return this->index_1d;
 }
 
-bool nd::iterator::Iterator::isLocked() {
+bool nd::deprecated::iterator::Iterator::isLocked() {
 
 	return this->locked;
 }
 
-void nd::iterator::Iterator::lock() {
+void nd::deprecated::iterator::Iterator::lock() {
 
 	this->locked = true;
 }
 
-void nd::iterator::Iterator::reset() {
+void nd::deprecated::iterator::Iterator::reset() {
 
 	this->index_1d = 0;
 	this->locked = false;
 }
 
-nd::iterator::Iterator::~Iterator() {
+nd::deprecated::iterator::Iterator::~Iterator() {
 }
 

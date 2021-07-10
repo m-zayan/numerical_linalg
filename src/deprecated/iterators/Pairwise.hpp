@@ -4,12 +4,12 @@
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_ITERATORS_PAIRWISE_HPP
-#define SRC_ITERATORS_PAIRWISE_HPP
+#ifndef SRC_DEPRECATED_ITERATORS_PAIRWISE_HPP
+#define SRC_DEPRECATED_ITERATORS_PAIRWISE_HPP
 
 #include "./RandomAccess.hpp"
 
-namespace nd::iterator {
+namespace nd::deprecated::iterator {
 
 class Pairwise {
 
@@ -40,4 +40,4 @@ public:
 
 }
 
-#endif /* SRC_ITERATORS_PAIRWISE_HPP */
+#endif /* SRC_DEPRECATED_ITERATORS_PAIRWISE_HPP */

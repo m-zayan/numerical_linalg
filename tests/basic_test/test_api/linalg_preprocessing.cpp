@@ -19,7 +19,7 @@ void test_api::linalg_preprocessing() {
 	nd::matrix<double, false> tmp = mat.op_view_2d();
 	coords attr = tmp._m_coords();
 
-	nd::iterator::RandomAccess rndIter(attr);
+	nd::deprecated::iterator::RandomAccess rndIter(attr);
 
 	flag8_t state = nd::linalg::_h::forward_substitution_step(tmp, rndIter, 0);
 

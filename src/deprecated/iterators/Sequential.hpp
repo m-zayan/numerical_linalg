@@ -6,12 +6,12 @@
  *	N-dimensional iterator to index vec1d
  */
 
-#ifndef SRC_ITERATORS_SEQUENTIAL_HPP
-#define SRC_ITERATORS_SEQUENTIAL_HPP
+#ifndef SRC_DEPRECATED_ITERATORS_SEQUENTIAL_HPP
+#define SRC_DEPRECATED_ITERATORS_SEQUENTIAL_HPP
 
 #include "./Iterator.hpp"
 
-namespace nd::iterator {
+namespace nd::deprecated::iterator {
 
 class Sequential: public Iterator {
 
@@ -24,7 +24,7 @@ private:
 	max_size_t axis;
 	max_size_t mov_axis;
 
-	vec1d<big_size_t> bounds;
+	strides_t bounds;
 
 	// indices
 	shape_t current;
@@ -35,7 +35,7 @@ private:
 	bool locked;
 
 	shape_t& shape();
-	shape_t& strides();
+	strides_t& strides();
 	max_size_t ndim();
 
 	flag8_t proceed(big_t i);
@@ -68,4 +68,4 @@ public:
 };
 }
 
-#endif /* SRC_ITERATORS_SEQUENTIAL_HPP */
+#endif /* SRC_DEPRECATED_ITERATORS_SEQUENTIAL_HPP */

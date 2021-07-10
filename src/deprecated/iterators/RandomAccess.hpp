@@ -4,12 +4,12 @@
  *	Author: Z. Mohamed
  */
 
-#ifndef SRC_ITERATORS_RandomAccess_HPP
-#define SRC_ITERATORS_RandomAccess_HPP
+#ifndef SRC_DEPRECATED_ITERATORS_RANDOMACESS_HPP
+#define SRC_DEPRECATED_ITERATORS_RANDOMACESS_HPP
 
 #include "./Iterator.hpp"
 
-namespace nd::iterator {
+namespace nd::deprecated::iterator {
 class RandomAccess {
 
 private:
@@ -18,7 +18,7 @@ private:
 
 	shape_t indices_cache;
 
-	shape_t& strides();
+	strides_t& strides();
 	shape_t& shape();
 	shape_t& axes();
 
@@ -45,14 +45,14 @@ public:
 	big_size_t index_at(big_size_t index_1d);
 
 	big_size_t reversed_index_at(big_size_t index_1d, coords &prev_attr,
-			RandomAccess &prev_rndIter, shape_t &reordered_strides);
+			RandomAccess &prev_rndIter, strides_t &reordered_strides);
 
 	bool is_cycle_root(big_size_t index_1d, coords &prev_attr,
-			nd::iterator::RandomAccess &prev_rndIter,
-			shape_t &reordered_strides);
+			nd::deprecated::iterator::RandomAccess &prev_rndIter,
+			strides_t &reordered_strides);
 
 	virtual ~RandomAccess();
 };
 }
 
-#endif /* SRC_ITERATORS_RandomAccess_HPP */
+#endif /* SRC_DEPRECATED_ITERATORS_RANDOMACESS_HPP */
