@@ -267,16 +267,18 @@ inline void Iterator::reinterpret_slice(shape_t &current, shape_t &shape) {
 
 #define ITER_MOVE_TO1D(it, indices) do { \
 	it->index1d = 0; \
-	for(max_size_t i=0; i<it->ndim; i++){ \
-		it->index1d += (it->strides[i] * indices[i]); \
+	ITER_SET_IAXIS1(it, 0); \
+	for(; it->iaxis<it->ndim; it->iaxis++){ \
+		it->index1d += (it->strides[it->iaxis] * indices[it->iaxis]); \
 	} \
 } while(0
 
 /* pcindex: [placeholder-index1d] */
 #define ITER_INDEX_AT1D(it, indices, pcindex) do { \
 	pcindex = 0; \
-	for(max_size_t i=0; i<it->ndim; i++){ \
-		pcindex += (it->strides[i] * indices[i]); \
+	ITER_SET_IAXIS1(it, 0); \
+	for(; it->iaxis<it->ndim; it->iaxis++){ \
+		pcindex += (it->strides[it->iaxis] * indices[it->iaxis]); \
 	} \
 } while(0)
 
