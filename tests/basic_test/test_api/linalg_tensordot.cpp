@@ -12,11 +12,11 @@ void test_api::linalg_tensordot() {
 
 	nd::matrix<int> mat2 = nd::random::uniform<int>(1, 10, { 4, 3, 2 });
 
-	std::cout << "=============== (3, 3, 2) ================\n";
+	std::cout << "=============== (3, 4, 5) ================\n";
 
 	nd::out::_h::print_vec1d(mat1._m_begin(), 0, mat1.size());
 
-	std::cout << "\n\n=============== (2, 4) ================\n";
+	std::cout << "\n\n=============== (4, 3, 2) ================\n";
 
 	nd::out::_h::print_vec1d(mat2._m_begin(), 0, mat2.size());
 

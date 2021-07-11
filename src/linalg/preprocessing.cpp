@@ -16,8 +16,7 @@
  */
 template<typename T, bool ref_h>
 flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
-		nd::iterator::RandomAccess &rndIter, max_size_t column_index,
-		bool scale) {
+		nd::iterator::Iterator *it, max_size_t column_index, bool scale) {
 
 	max_size_t ndim = mat.ndim();
 
@@ -69,7 +68,7 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
 
 			indices[1] = i;
 
-			index = rndIter.nd_index_at(indices);
+			ITER_INDEX_AT1D(it, indices, index);
 
 			// largest absolute value
 			if (mx.first < std::abs(d[index])) {
@@ -95,12 +94,12 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
 				indices[1] = column_index;
 				indices[2] = i;
 
-				idx0 = rndIter.nd_index_at(indices);
+				ITER_INDEX_AT1D(it, indices, idx0);
 
 				indices[1] = max_index;
 				indices[2] = i;
 
-				idx1 = rndIter.nd_index_at(indices);
+				ITER_INDEX_AT1D(it, indices, idx1);
 
 				// permute row (column_index, max_index)
 				std::swap(d[idx0], d[idx1]);
@@ -114,7 +113,7 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
 			indices[1] = column_index;
 			indices[2] = column_index;
 
-			index = rndIter.nd_index_at(indices);
+			ITER_INDEX_AT1D(it, indices, index);
 
 			T scale_inv;
 
@@ -141,7 +140,7 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
 				indices[1] = column_index;
 				indices[2] = i;
 
-				index = rndIter.nd_index_at(indices);
+				ITER_INDEX_AT1D(it, indices, index);
 
 				// scale
 				d[index] *= scale_inv;
@@ -164,9 +163,9 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
 
 template<typename T, bool ref_h>
 flag8_t nd::linalg::_h::forward_substitution_step(nd::matrix<T, ref_h> &mat,
-		nd::iterator::RandomAccess &rndIter, max_size_t column_index) {
+		nd::iterator::Iterator *it, max_size_t column_index) {
 
-	flag8_t is_valid = nd::linalg::_h::partial_pivoting_step(mat, rndIter,
+	flag8_t is_valid = nd::linalg::_h::partial_pivoting_step(mat, it,
 			column_index, true);
 
 	// case: invalid-step
@@ -200,7 +199,7 @@ flag8_t nd::linalg::_h::forward_substitution_step(nd::matrix<T, ref_h> &mat,
 			indices[1] = i;
 			indices[2] = column_index;
 
-			idx1 = rndIter.nd_index_at(indices);
+			ITER_INDEX_AT1D(it, indices, idx1);
 
 			T scale = d[idx1];
 
@@ -209,12 +208,12 @@ flag8_t nd::linalg::_h::forward_substitution_step(nd::matrix<T, ref_h> &mat,
 				indices[1] = column_index;
 				indices[2] = j;
 
-				idx0 = rndIter.nd_index_at(indices);
+				ITER_INDEX_AT1D(it, indices, idx0);
 
 				indices[1] = i;
 				indices[2] = j;
 
-				idx1 = rndIter.nd_index_at(indices);
+				ITER_INDEX_AT1D(it, indices, idx1);
 
 				// elimination step
 				d[idx1] -= (d[idx0] * scale);

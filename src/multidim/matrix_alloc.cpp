@@ -85,7 +85,7 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::copy() {
 
 template<typename T, bool ref_holder>
 nd::matrix<T> nd::_matrix<T, ref_holder>::_m_alloc_if_broadcastable(
-		coords attr0, coords attr1) {
+		coords& attr0, coords& attr1) {
 
 	uflag8_t op_state = nd::_matrix<T, true>::_m_validate_op(attr0, attr1);
 
@@ -119,7 +119,7 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::_m_alloc_if_broadcastable(
 
 template<typename T, bool ref_holder>
 nd::matrix<T> nd::_matrix<T, ref_holder>::_m_alloc_if_broadcastable(
-		coords attr0, coords attr1, T val) {
+		coords& attr0, coords& attr1, T val) {
 
 	uflag8_t op_state = nd::_matrix<T, true>::_m_validate_op(attr0, attr1);
 

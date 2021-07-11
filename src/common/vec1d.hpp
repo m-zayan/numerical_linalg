@@ -47,14 +47,20 @@ public:
 	void push_back(T val);
 	void emplace_back(T val);
 	void pop_back();
+
 	void assign(const_iterator<T> begin, const_iterator<T> end);
+
+	void fill(T val);
 	void fill(big_size_t size, T val);
+
 	void range(T start, T end, T step);
 
 	const_iterator<T> begin();
 	const_iterator<T> end();
 
 	T& operator [](big_size_t index);
+	const T& operator [](big_size_t index) const;
+
 	T& operator ()(big_size_t index, big_size_t step);
 
 	// vec1d = vec1d
@@ -124,9 +130,11 @@ public:
 	 *
 	 * 		check: [./common/algorithm.hpp]
 	 */
-	T sum(big_size_t begin, big_size_t end);
+	template<typename RT = T>
+	RT sum(big_size_t begin, big_size_t end);
 
-	T multiply(big_size_t begin, big_size_t end);
+	template<typename RT = T>
+	RT multiply(big_size_t begin, big_size_t end);
 
 	vec1d<T> reduce_multiply(big_size_t begin, big_size_t end);
 

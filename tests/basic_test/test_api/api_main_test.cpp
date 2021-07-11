@@ -21,31 +21,31 @@ int main() {
 //	[4]
 //	test_api::linalg_dot();
 
-//  [5]
+//	[5]
 //	test_api::linalg_transpose();
 
-// [6]
+//	[6]
 //	test_api::reorder_copy();
 
-// [7]
+//	[7]
 //	test_api::linalg_inplace();
 
-// [8]
+//	[8]
 //	test_api::nd_broadcasting();
 
-// [9]
-//	test_api::ops_nd_matrix();
+//  [9]
+//  test_api::ops_nd_matrix();
 
-// [10]
-//	test_api::linalg_preprocessing();
+//  [10]
+  test_api::linalg_preprocessing();
 
-// [11]
-//	test_api::linalg_lu();
+//  [11]
+//  test_api::linalg_lu();
 
-// [12]
-//	test_api::linalg_tensordot();
+//  [12]
+//  test_api::linalg_tensordot();
 
-// [13]
-	test_api::scalar_like_nd();
+//  [13]
+//  test_api::scalar_like_nd();
 
 }

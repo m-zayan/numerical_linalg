@@ -8,7 +8,6 @@
 //
 //int main() {
 //
-//// [0]
-//	test_api::nd_ops();
-//
+//	// [0]
+//	 test_api::nd_ops();
 //}

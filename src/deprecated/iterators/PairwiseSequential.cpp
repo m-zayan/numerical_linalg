@@ -6,7 +6,7 @@
 
 #include "PairwiseSequential.hpp"
 
-nd::iterator::PairwiseSequential::PairwiseSequential(coords attr0,
+nd::deprecated::iterator::PairwiseSequential::PairwiseSequential(coords attr0,
 		coords attr1) {
 
 	coords out_attr = nd::align_dim(attr0, attr1);
@@ -19,7 +19,7 @@ nd::iterator::PairwiseSequential::PairwiseSequential(coords attr0,
 	this->axis = this->dim_bounds - 1;
 	this->mov_axis = this->dim_bounds - 1;
 
-	this->bounds.fill(3, vec1d<big_size_t>(this->dim_bounds));
+	this->bounds.fill(3, strides_t(this->dim_bounds));
 
 	for (max_size_t i = 0; i < 3; i++) {
 
@@ -37,7 +37,7 @@ nd::iterator::PairwiseSequential::PairwiseSequential(coords attr0,
 }
 // ============================================================
 
-bool nd::iterator::PairwiseSequential::next() {
+bool nd::deprecated::iterator::PairwiseSequential::next() {
 
 	if (this->isLocked()) {
 
@@ -50,14 +50,14 @@ bool nd::iterator::PairwiseSequential::next() {
 	return !this->isLocked();
 }
 
-void nd::iterator::PairwiseSequential::next_prem() {
+void nd::deprecated::iterator::PairwiseSequential::next_prem() {
 
 	flag8_t state = this->proceed(0);
 
 	state = this->update_state(state);
 }
 
-flag8_t nd::iterator::PairwiseSequential::update_state(flag8_t state) {
+flag8_t nd::deprecated::iterator::PairwiseSequential::update_state(flag8_t state) {
 
 	// range: [lower bound, ...]
 	big_t lbound = -1;
@@ -75,7 +75,7 @@ flag8_t nd::iterator::PairwiseSequential::update_state(flag8_t state) {
 }
 
 // update step & return a status flag
-flag8_t nd::iterator::PairwiseSequential::proceed(big_t i) {
+flag8_t nd::deprecated::iterator::PairwiseSequential::proceed(big_t i) {
 
 	// If the current, is upper bound, lock the iterator
 	if (this->mov_axis + i < 0 || this->mov_axis + i >= this->dim_bounds) {
@@ -115,7 +115,7 @@ flag8_t nd::iterator::PairwiseSequential::proceed(big_t i) {
 
 }
 
-void nd::iterator::PairwiseSequential::chunk_proceed(max_size_t axis,
+void nd::deprecated::iterator::PairwiseSequential::chunk_proceed(max_size_t axis,
 		min_size_t pair_index) {
 
 	if (this->shape(axis, pair_index) == 1) {
@@ -132,7 +132,7 @@ void nd::iterator::PairwiseSequential::chunk_proceed(max_size_t axis,
 
 }
 
-void nd::iterator::PairwiseSequential::clip(max_size_t axis,
+void nd::deprecated::iterator::PairwiseSequential::clip(max_size_t axis,
 		min_size_t pair_index) {
 
 	this->icurrent(axis, pair_index) = 0;
@@ -141,66 +141,66 @@ void nd::iterator::PairwiseSequential::clip(max_size_t axis,
 
 // ===============================================================
 
-big_size_t& nd::iterator::PairwiseSequential::ibounds(max_size_t axis,
+big_size_t& nd::deprecated::iterator::PairwiseSequential::ibounds(max_size_t axis,
 		min_size_t pair_index) {
 
 	return this->bounds[pair_index][axis];
 }
 
-max_size_t& nd::iterator::PairwiseSequential::icurrent(max_size_t axis,
+max_size_t& nd::deprecated::iterator::PairwiseSequential::icurrent(max_size_t axis,
 		min_size_t pair_index) {
 
 	return this->current[pair_index][axis];
 }
 
-big_size_t& nd::iterator::PairwiseSequential::iindex(min_size_t pair_index) {
+big_size_t& nd::deprecated::iterator::PairwiseSequential::iindex(min_size_t pair_index) {
 
 	return this->index_1d[pair_index];
 }
 
-big_size_t nd::iterator::PairwiseSequential::index(min_size_t pair_index) {
+big_size_t nd::deprecated::iterator::PairwiseSequential::index(min_size_t pair_index) {
 
 	return this->index_1d[pair_index];
 }
 
-max_size_t nd::iterator::PairwiseSequential::shape(max_size_t axis,
+max_size_t nd::deprecated::iterator::PairwiseSequential::shape(max_size_t axis,
 		min_size_t pair_index) {
 
 	return this->attr_list[pair_index].shape[axis];
 }
 
-big_size_t nd::iterator::PairwiseSequential::strides(max_size_t axis,
+big_size_t nd::deprecated::iterator::PairwiseSequential::strides(max_size_t axis,
 		min_size_t pair_index) {
 
 	return this->attr_list[pair_index].strides[axis];
 }
 
-shape_t nd::iterator::PairwiseSequential::indices(min_size_t pair_index) {
+shape_t nd::deprecated::iterator::PairwiseSequential::indices(min_size_t pair_index) {
 
 	return this->current[pair_index];
 }
 
-max_size_t nd::iterator::PairwiseSequential::iaxis() {
+max_size_t nd::deprecated::iterator::PairwiseSequential::iaxis() {
 
 	return this->axis;
 }
 
-void nd::iterator::PairwiseSequential::lock() {
+void nd::deprecated::iterator::PairwiseSequential::lock() {
 
 	this->locked = true;
 }
 
-bool nd::iterator::PairwiseSequential::isLocked() {
+bool nd::deprecated::iterator::PairwiseSequential::isLocked() {
 
 	return this->locked;
 }
 
-void nd::iterator::PairwiseSequential::unlock() {
+void nd::deprecated::iterator::PairwiseSequential::unlock() {
 
 	this->locked = false;
 }
 
-void nd::iterator::PairwiseSequential::reset() {
+void nd::deprecated::iterator::PairwiseSequential::reset() {
 
 	this->current = vec1d<shape_t>(3, shape_t(this->dim_bounds, 0));
 	this->index_1d = vec1d<big_size_t>(3);
@@ -210,11 +210,11 @@ void nd::iterator::PairwiseSequential::reset() {
 	this->locked = false;
 }
 
-coords nd::iterator::PairwiseSequential::aligned_coords(min_size_t pair_index) {
+coords nd::deprecated::iterator::PairwiseSequential::aligned_coords(min_size_t pair_index) {
 
 	return this->attr_list[pair_index];
 }
 
-nd::iterator::PairwiseSequential::~PairwiseSequential() {
+nd::deprecated::iterator::PairwiseSequential::~PairwiseSequential() {
 }
 

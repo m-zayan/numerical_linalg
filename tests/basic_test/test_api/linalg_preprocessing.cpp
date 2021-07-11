@@ -16,14 +16,13 @@ void test_api::linalg_preprocessing() {
 
 	std::cout << "\n===============================\n";
 
-	nd::matrix<double, false> tmp = mat.op_view_2d();
-	coords attr = tmp._m_coords();
+	coords cview_2d = mat._m_coords().view_2d(false);
 
-	nd::iterator::RandomAccess rndIter(attr);
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(cview_2d);
 
-	flag8_t state = nd::linalg::_h::forward_substitution_step(tmp, rndIter, 0);
+	flag8_t state = nd::linalg::_h::forward_substitution_step(mat, it, 0);
 
-	state = nd::linalg::_h::forward_substitution_step(tmp, rndIter, 1);
+	state = nd::linalg::_h::forward_substitution_step(mat, it, 1);
 
 	nd::out::print_matrix(mat);
 
@@ -37,10 +36,12 @@ void test_api::linalg_preprocessing() {
 
 	nd::out::print_matrix(mat);
 
-	state = nd::linalg::_h::forward_substitution_step(tmp, rndIter, 1);
+	state = nd::linalg::_h::forward_substitution_step(mat, it, 1);
 
 	std::cout << "\n--------------------\n";
 
 	std::cout << "state [1]: " << static_cast<min_t>(state) << ln;
+
+	nd::iterator::free_iterator(it);
 }
 

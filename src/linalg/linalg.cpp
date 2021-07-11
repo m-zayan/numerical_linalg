@@ -213,8 +213,8 @@ nd::matrix<T> nd::linalg::transpose(const nd::matrix<T, rf_h> &mat,
  *
  *	A possible optimization for [1], is to use BABE (Burn At Both Ends)
  *
- *	i.e. nd::iterator::RandomAccess::reversed_index_at(...), and
- *		 nd::iterator::RandomAccess::index_at(...), see also [2] section 3.
+ *	i.e. nd::deprecated::iterator::RandomAccess::reversed_index_at(...), and
+ *		 nd::deprecated::iterator::RandomAccess::index_at(...), see also [2] section 3.
  */
 template<typename T, bool rf_h>
 void nd::linalg::inplace::transpose(nd::matrix<T, rf_h> &mat, shape_t axes) {
@@ -233,10 +233,10 @@ void nd::linalg::inplace::transpose(nd::matrix<T, rf_h> &mat, shape_t axes) {
 	coords attr = mat._m_coords();
 	coords new_attr = attr.permuted(axes, true);
 
-	nd::iterator::RandomAccess rndIter(new_attr);
-	nd::iterator::RandomAccess prev_rndIter(attr);
+	nd::deprecated::iterator::RandomAccess rndIter(new_attr);
+	nd::deprecated::iterator::RandomAccess prev_rndIter(attr);
 
-	shape_t reordered_strides = coords(new_attr.shape).strides;
+	strides_t reordered_strides = coords(new_attr.shape).strides;
 
 	bool is_root;
 
