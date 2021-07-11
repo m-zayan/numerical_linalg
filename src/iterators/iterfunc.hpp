@@ -11,6 +11,17 @@
 
 namespace nd::iterator {
 
+inline big_size_t nd_index_at(const coords &attr, const shape_t &indices) {
+
+	big_size_t index = 0;
+
+	for (max_size_t i = 0; i < attr.ndim; i++) {
+		index += (attr.strides[i] * indices[i]);
+	}
+
+	return index;
+}
+
 inline void check_slice(Iterator *it, const shape_t &start,
 		const shape_t &end) {
 

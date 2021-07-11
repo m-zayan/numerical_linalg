@@ -45,14 +45,14 @@ nd::matrix<T> nd::stack(nd::composite<nd::matrix<T, false>> matrix_list) {
 
 	nd::matrix<T> result(new_shape);
 
-	T *dr = result._m_begin();
-
 	// [0]
 	nd::iterator::Iterator *it = nd::iterator::init_iterator(
 			matrix_list[0]._m_coords());
 
 	nd::iterator::Iterator *out_it = nd::iterator::init_iterator(
 			result._m_coords());
+
+	T *res = result._m_begin();
 
 	for (max_size_t i = 0; i < n_chunk; i++) {
 
@@ -67,7 +67,7 @@ nd::matrix<T> nd::stack(nd::composite<nd::matrix<T, false>> matrix_list) {
 
 		for (big_size_t j = 0; j < chunk_size; j++) {
 
-			dr[out_it->index1d] = d[it->index1d];
+			res[out_it->index1d] = d[it->index1d];
 
 			ITER_PAIRWISE2_NEXT(out_it, it);
 		}

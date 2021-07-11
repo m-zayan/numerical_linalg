@@ -8,107 +8,86 @@
 
 namespace nd::out::_h {
 
-template<typename T>
-void print_vec1d(T *data, nd::deprecated::iterator::RandomAccess &iter, big_size_t begin,
-		big_size_t end) {
+inline void print_rchar(char chr, max_size_t n) {
 
-	std::cout << "[";
-
-	for (big_size_t i = begin; i < end - 1; i++) {
-		std::cout << data[iter.index_at(i)] << ", ";
+	for (max_size_t i = 0; i < n; i++) {
+		std::cout << chr;
 	}
-
-	std::cout << data[iter.index_at(end - 1)] << "]";
-
 }
 
 template<typename T>
-void print_vec1d(T *data, big_size_t begin, big_size_t end) {
+void it_print_vec1d(T *ref, nd::iterator::Iterator *it, big_size_t size) {
 
-	std::cout << "[";
+	for (big_size_t i = 0; i < size - 1; i++) {
 
-	for (big_size_t i = begin; i < end - 1; i++) {
-		std::cout << data[i] << ", ";
+		std::cout << ref[it->index1d] << ", ";
+
+		ITER_NEXT(it);
 	}
 
-	std::cout << data[end - 1] << "]";
+	std::cout << ref[it->index1d];
 
+	ITER_NEXT(it);
+}
+
+template<typename T>
+void print_vec1d(T *ref, big_size_t begin, big_size_t end) {
+
+	std::cout << '[';
+
+	for (big_size_t i = begin; i < end - 1; i++) {
+
+		std::cout << ref[i] << ", ";
+	}
+
+	std::cout << ref[end - 1] << "]\n";
 }
 
 }
 
 namespace nd::out {
 
-template<typename T, bool ref_holder, uflag8_t d_round = 0>
-void print_matrix(const matrix<T, ref_holder> &mat) {
+template<typename T, bool rf_h, uflag8_t d_round = 0>
+void print_matrix(const matrix<T, rf_h> &mat) {
 
-	nd::deprecated::iterator::RandomAccess rndIter(mat._m_coords());
+	nd::matrix<T, false> tmp = mat;
 
-	matrix<T, false> tmp = mat;
+	coords mcoords = tmp._m_coords();
+	mcoords.iter_type = IteratorType::Linear;
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(mcoords);
 
 	T *data = tmp._m_begin();
 
-	max_size_t step = tmp.step_size();
-	max_size_t ndim = tmp.ndim();
-	big_size_t size = tmp.size();
-
-	if (ndim == 0) {
+	if (is_scalar(mcoords)) {
 		std::cout << data[0] << '\n';
 		return;
 	}
 
-	strides_t strides = tmp.strides();
+	big_size_t chunk_size = mat.step_size();
+	big_size_t n_chunk = it->niter / chunk_size;
 
-	if (ndim > 1) {
-		std::cout << "[";
+	nd::out::_h::print_rchar('[', it->ndim);
+
+	for (big_size_t i = 0; i < n_chunk; i++) {
+
+		nd::out::_h::print_rchar('[', it->ndim - it->iaxis - 1);
+
+		nd::out::_h::it_print_vec1d(data, it, chunk_size);
+
+		nd::out::_h::print_rchar(']', it->ndim - it->iaxis - 1);
+
+		if (i != n_chunk - 1) {
+			nd::out::_h::print_rchar('\n', it->ndim - it->iaxis - 1);
+		}
 	}
 
-	for (big_size_t i = 0; i < size; i += step) {
+	nd::out::_h::print_rchar(']', 1);
+	nd::out::_h::print_rchar('\n', 1);
 
-		if (ndim > 1) {
-			for (max_size_t j = 0; j < ndim - 2; j++) {
-
-				if (i % strides[j] == 0) {
-					for (max_size_t k = 0; k < ndim - j - 2; k++) {
-
-						std::cout << "[";
-					}
-
-					break;
-				}
-			}
-		}
-
-		_h::print_vec1d(data, rndIter, i, i + step);
-
-		if (ndim > 1) {
-			for (max_size_t j = 0; j < ndim - 2; j++) {
-
-				if ((i + step) % strides[j] == 0) {
-					for (max_size_t k = 0; k < ndim - j - 2; k++) {
-
-						std::cout << "]";
-					}
-
-					if (i == size - step) {
-						std::cout << ']';
-					} else {
-						for (max_size_t k = 0; k < ndim - j - 2; k++) {
-
-							std::cout << "\n";
-						}
-					}
-					break;
-				}
-			}
-
-			if ((i == size - step && ndim == 2)) {
-				std::cout << "]";
-			}
-		}
-
-		std::cout << '\n';
-	}
+	// [1]
+	nd::iterator::free_iterator(it);
 }
 }
 

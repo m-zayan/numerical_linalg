@@ -367,9 +367,7 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::operator [](
 template<typename T, bool ref_holder>
 void nd::_matrix<T, ref_holder>::assign(shape_t indices, T val) {
 
-	nd::deprecated::iterator::RandomAccess rndIter(this->attr);
-
-	big_size_t index = rndIter.nd_index_at(indices);
+	big_size_t index = nd::iterator::nd_index_at(this->attr, indices);
 
 	(*this->data.get())[index] = val;
 }
