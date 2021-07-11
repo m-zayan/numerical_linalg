@@ -13,12 +13,12 @@ namespace nd::linalg::_h {
 
 template<typename T, bool ref_h>
 flag8_t partial_pivoting_step(nd::matrix<T, ref_h> &mat,
-		nd::deprecated::iterator::RandomAccess &rndIter, max_size_t column_index,
+		nd::iterator::Iterator *it, max_size_t column_index,
 		bool scale = false);
 
 template<typename T, bool ref_h>
 flag8_t forward_substitution_step(nd::matrix<T, ref_h> &mat,
-		nd::deprecated::iterator::RandomAccess &rndIter, max_size_t column_index);
+		nd::iterator::Iterator *it, max_size_t column_index);
 }
 
 namespace nd::linalg {

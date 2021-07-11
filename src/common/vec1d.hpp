@@ -59,6 +59,8 @@ public:
 	const_iterator<T> end();
 
 	T& operator [](big_size_t index);
+	const T& operator [](big_size_t index) const;
+
 	T& operator ()(big_size_t index, big_size_t step);
 
 	// vec1d = vec1d

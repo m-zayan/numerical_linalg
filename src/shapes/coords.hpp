@@ -63,7 +63,7 @@ public:
 
 	using vec1d<max_size_t>::vec1d;
 
-	friend std::ostream& operator <<(std::ostream &os, shape_t shape);
+	friend std::ostream& operator <<(std::ostream &os, const shape_t &shape);
 
 	friend uflag8_t operator &(const shape_t &shape0, const shape_t &shape1);
 
@@ -132,7 +132,10 @@ public:
 	coords pad_dim(max_size_t new_ndim) const;
 	coords pad_dim(max_size_t begin, max_size_t pad_size) const;
 
+	coords view_2d(bool own_data) const;
+
 	void swapaxes(max_size_t ax0, max_size_t ax1);
+
 
 	friend bool operator ==(const coords &attr1, const coords &attr2);
 

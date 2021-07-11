@@ -426,7 +426,7 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::set_new_coords(
 template<typename T, bool ref_holder>
 nd::matrix<T, false> nd::_matrix<T, ref_holder>::op_view_2d() const {
 
-	coords new_attr = this->attr.reduce_ndim(0, this->ndim() - 2, false);
+	coords new_attr = this->attr.view_2d(false);
 
 	nd::matrix<T, false> result(new_attr, this->data, this->c_begin,
 			this->c_end);

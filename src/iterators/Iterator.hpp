@@ -13,56 +13,121 @@ namespace nd::iterator {
 
 struct Iterator {
 
+	shape_t default_shape;
+	strides_t default_strides;
+
+	strides_t default_bounds;
+
+	shape_t default_current;
+
+	// ==============================================
+
 	max_size_t ndim;
 
 	IteratorType iter_type;
 
-	shape_t shape;
-	strides_t strides;
-
-	strides_t bounds;
-
-	shape_t current;
 	big_size_t index1d;
 
 	big_size_t niter;
 
 	max_size_t iaxis;
 
+	// ==============================================
+
+	max_size_t *shape;
+	big_size_t *strides;
+
+	big_size_t *bounds;
+
+	max_size_t *current;
+
+	// ==============================================
+
 	// update-flag
 	bool uflag;
 
 	Iterator() = delete;
 
-	Iterator(const coords &attr) {
+	Iterator(const coords &attr);
 
-		iter_type = attr.iter_type;
-		ndim = attr.ndim;
+	void reset();
 
-		shape = attr.shape;
-		strides = attr.strides;
+	void reinterpret_coords(const coords &attr);
 
-		bounds = strides_t(ndim);
-
-		for (max_size_t i = 0; i < ndim; i++) {
-			bounds[i] = (shape[i] - 1) * strides[i];
-		}
-
-		index1d = 0;
-
-		current = shape_t(ndim, 0);
-
-		niter = attr.size1d;
-		iaxis = attr.ndim - 1;
-
-		uflag = false;
-	}
+	/* [current & shape] <arg> must be a non-temporary */
+	void reinterpret_slice(shape_t &current, shape_t &shape);
 
 	~Iterator() = default;
 };
 
+/* ===================================================================== */
+
+inline Iterator::Iterator(const coords &attr) {
+
+	iter_type = attr.iter_type;
+	ndim = attr.ndim;
+
+	default_shape = attr.shape;
+	default_strides = attr.strides;
+
+	// ==============================================
+
+	default_bounds = strides_t(ndim);
+
+	for (max_size_t i = 0; i < ndim; i++) {
+		default_bounds[i] = (default_shape[i] - 1) * default_strides[i];
+	}
+
+	// ==============================================
+
+	index1d = 0;
+
+	default_current = shape_t(this->ndim, 0);
+
+	niter = attr.size1d;
+	iaxis = attr.ndim - 1;
+
+	uflag = false;
+
+	// ==============================================
+
+	shape = this->default_shape.ref(0);
+	strides = this->default_strides.ref(0);
+	bounds = this->default_bounds.ref(0);
+	current = this->default_current.ref(0);
+
+	// ==============================================
 }
+
+inline void Iterator::reset() {
+
+	index1d = 0;
+
+	default_current.fill(0);
+
+	iaxis = ndim - 1;
+	uflag = false;
+
+	current = default_current.ref(0);
+}
+
+inline void Iterator::reinterpret_coords(const coords &attr) {
+
+	(*this) = Iterator(attr);
+}
+
+inline void Iterator::reinterpret_slice(shape_t &current, shape_t &shape) {
+
+	this->current = current.ref(0);
+	this->shape = shape.ref(0);
+
+	ndim = shape.size();
+}
+
+}
+
 /* ################################################################################## */
+
 #define ITER_LIKE_SCALAR(it) (it->iter_type == IteratorType::Scalar)
 #define ITER_LIKE_NONE(it) (it->iter_type == IteratorType::None)
 #define ITER_LIKE_LINEAR(it) (it->iter_type == IteratorType::Linear)
@@ -70,94 +135,112 @@ struct Iterator {
 
 /* ################################################################################## */
 
-#define ITER1D_MUST_REST(it) do { \
+#define ITER_RESET_IAXIS1(it) do { \
+	it->iaxis = it->ndim - 1; \
+} while(0)
+
+#define ITER_RESET_IAXIS2(it0, it1) do { \
+	ITER_RESET_IAXIS1(it0); \
+	ITER_RESET_IAXIS1(it1); \
+} while(0)
+
+#define ITER_SET_IAXIS1(it, i) do { \
+	it->iaxis = i; \
+} while(0)
+
+#define ITER_SET_IAXIS2(it0, it1, i) do { \
+	ITER_SET_IAXIS1(it0, i); \
+	ITER_SET_IAXIS1(it1, i); \
+} while(0)
+
+#define ITER1D_MUST_RESET(it) do { \
 	if(it->index1d >= it->niter){ \
 	  it->index1d = 0; \
     } \
 } while(0)
 
-#define ITER_IS_VALID_STEP(it, i) \
-	(it->current[i] + 1 < it->shape[i])
+#define ITER_IS_VALID_STEP(it) \
+	(it->current[it->iaxis] + 1 < it->shape[it->iaxis])
 
-#define ITER_UPDATE_STEP(it, i) do { \
-	it->index1d += it->strides[i]; \
-	it->current[i]++; \
-	it->iaxis = i; \
+#define ITER_UPDATE_STEP(it) do { \
+	it->index1d += it->strides[it->iaxis]; \
+	it->current[it->iaxis]++; \
 	it->uflag = true; \
-}while(0)
+} while(0)
 
-#define ITER_CLIP_STEP(it, i) do{ \
-	it->index1d -= it->bounds[i]; \
-	it->current[i] = 0; \
-	it->iaxis = i; \
+#define ITER_CLIP_STEP(it) do{ \
+	it->index1d -= it->bounds[it->iaxis]; \
+	it->current[it->iaxis] = 0; \
 	it->uflag = false; \
-}while(0)
+} while(0)
 
-#define ITER_NEXT_AT(it, i) do { \
-	if (ITER_IS_VALID_STEP(it, i)) { \
-		ITER_UPDATE_STEP(it, i); \
+#define ITER_NEXT_AT(it) do { \
+	if (ITER_IS_VALID_STEP(it)) { \
+		ITER_UPDATE_STEP(it); \
 	} else { \
-		ITER_CLIP_STEP(it, i); \
+		ITER_CLIP_STEP(it); \
 	} \
-}while(0)
+} while(0)
 
 #define ITER_NEXT(it) do { \
 	if(ITER_LIKE_NONE(it)) { \
 		it->index1d++; \
-		ITER1D_MUST_REST(it); \
+		ITER1D_MUST_RESET(it); \
 	}\
 	else if(!ITER_LIKE_SCALAR(it)) { \
-		max_size_t i; \
-		for (i=it->ndim - 1; i > 0; --i) { \
-			if (ITER_IS_VALID_STEP(it, i)) { \
-				ITER_UPDATE_STEP(it, i); \
+		ITER_RESET_IAXIS1(it); \
+		for (; it->iaxis > 0; --it->iaxis) { \
+			if (ITER_IS_VALID_STEP(it)) { \
+				ITER_UPDATE_STEP(it); \
 				break; \
 			} else { \
-				ITER_CLIP_STEP(it, i); \
+				ITER_CLIP_STEP(it); \
 			} \
 		} \
-		if(i == 0){ \
-			ITER_NEXT_AT(it, 0); \
+		if(it->iaxis == 0){ \
+			ITER_NEXT_AT(it); \
 		} \
 	} \
-}while(0)
+} while(0)
 
 /* ################################################################################## */
 
-#define ITER_CHUNK_NEXT_AT(it, i) do { \
-	if (it->shape[i] == 1) { \
-		ITER_CLIP_STEP(it, i); \
+#define ITER_CHUNK_NEXT_AT(it) do { \
+	if (it->shape[it->iaxis] == 1) { \
+		ITER_CLIP_STEP(it); \
 	} else { \
-		ITER_UPDATE_STEP(it, i); \
+		ITER_UPDATE_STEP(it); \
 	} \
-}while(0)
+} while(0)
 
 #define ITER_LIKE_PAIRWISE3_NEXT(out_it, it0, it1) do { \
 	ITER_NEXT(out_it); \
-	for(max_size_t i=out_it->ndim - 1; i > out_it->iaxis; --i) { \
-		ITER_CLIP_STEP(it0, i); \
-		ITER_CLIP_STEP(it1, i); \
+	ITER_RESET_IAXIS2(it0, it1); \
+	for (; it0->iaxis > out_it->iaxis; --it0->iaxis, --it1->iaxis) { \
+		ITER_CLIP_STEP(it0); \
+		ITER_CLIP_STEP(it1); \
 	} \
 	if(out_it->uflag) { \
-		ITER_CHUNK_NEXT_AT(it0, out_it->iaxis); \
-		ITER_CHUNK_NEXT_AT(it1, out_it->iaxis); \
+		ITER_CHUNK_NEXT_AT(it0); \
+		ITER_CHUNK_NEXT_AT(it1); \
 	} else { \
-		ITER_CLIP_STEP(it0, out_it->iaxis); \
-		ITER_CLIP_STEP(it1, out_it->iaxis); \
+		ITER_CLIP_STEP(it0); \
+		ITER_CLIP_STEP(it1); \
 	} \
-}while(0)
+} while(0)
 
-#define ITER_LIKE_PAIRWISE2_NEXT(out_it, it0) do { \
+#define ITER_LIKE_PAIRWISE2_NEXT(out_it, it) do { \
 	ITER_NEXT(out_it); \
-	for(max_size_t i=out_it->ndim - 1; i > out_it->iaxis; --i) { \
-		ITER_CLIP_STEP(it0, i); \
+	ITER_RESET_IAXIS1(it); \
+	for (; it->iaxis > out_it->iaxis; --it->iaxis) { \
+		ITER_CLIP_STEP(it); \
 	} \
 	if(out_it->uflag) { \
-		ITER_CHUNK_NEXT_AT(it0, out_it->iaxis); \
+		ITER_CHUNK_NEXT_AT(it); \
 	} else { \
-		ITER_CLIP_STEP(it0, out_it->iaxis); \
+		ITER_CLIP_STEP(it); \
 	} \
-}while(0)
+} while(0)
 
 /* ################################################################################## */
 
@@ -169,15 +252,32 @@ struct Iterator {
 		ITER_NEXT(it0); \
 		ITER_NEXT(it1); \
 	} \
-}while(0)
+} while(0)
 
-#define ITER_PAIRWISE2_NEXT(out_it, it0) do { \
+#define ITER_PAIRWISE2_NEXT(out_it, it) do { \
 	if(ITER_LIKE_PAIR(out_it)) { \
-		ITER_LIKE_PAIRWISE2_NEXT(out_it, it0); \
+		ITER_LIKE_PAIRWISE2_NEXT(out_it, it); \
 	} else { \
 		ITER_NEXT(out_it); \
-		ITER_NEXT(it0); \
+		ITER_NEXT(it); \
 	} \
-}while(0)
+} while(0)
+
+/* ################################################################################## */
+
+#define ITER_MOVE_TO1D(it, indices) do { \
+	it->index1d = 0; \
+	for(max_size_t i=0; i<it->ndim; i++){ \
+		it->index1d += (it->strides[i] * indices[i]); \
+	} \
+} while(0
+
+/* pcindex: [placeholder-index1d] */
+#define ITER_INDEX_AT1D(it, indices, pcindex) do { \
+	pcindex = 0; \
+	for(max_size_t i=0; i<it->ndim; i++){ \
+		pcindex += (it->strides[i] * indices[i]); \
+	} \
+} while(0)
 
 #endif /* SRC_ITERATORS_ITERATOR_HPP */

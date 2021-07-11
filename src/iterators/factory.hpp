@@ -9,7 +9,7 @@
 #ifndef SRC_ITERATORS_FACTORY_HPP
 #define SRC_ITERATORS_FACTORY_HPP
 
-#include "./Iterator.hpp"
+#include "./iterfunc.hpp"
 
 namespace nd::iterator {
 

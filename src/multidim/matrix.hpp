@@ -11,7 +11,6 @@
 
 #include "./ufunc.hpp"
 
-// nd
 namespace nd {
 
 template<typename T, bool ref_holder = true>
@@ -41,9 +40,10 @@ public:
 
 	static uflag8_t _m_validate_op(const coords &attr0, const coords &attr1);
 
-	static nd::matrix<T> _m_alloc_if_broadcastable(coords& attr0, coords& attr1);
+	static nd::matrix<T> _m_alloc_if_broadcastable(coords &attr0,
+			coords &attr1);
 
-	static nd::matrix<T> _m_alloc_if_broadcastable(coords& attr0, coords& attr1,
+	static nd::matrix<T> _m_alloc_if_broadcastable(coords &attr0, coords &attr1,
 			T val);
 
 	// ===========================================================================
@@ -204,15 +204,24 @@ public:
 	~matrix();
 };
 
-// end matrix class
-
-// ufunc
+/* ##################################################################################### */
 
 template<typename T>
-matrix<T> stack(composite<matrix<T>> matrix_list);
+matrix<T> stack(composite<matrix<T, false>> matrix_list);
+
+/* ##################################################################################### */
+
+namespace random {
+
+template<typename T>
+matrix<T> uniform(T low, T high, shape_t shape);
+
+}
+
+/* ##################################################################################### */
 
 template<typename RT, typename T, bool rf_h>
-matrix<RT> apply(const nd::matrix<T, rf_h> &mat, std::function<RT(T)> func);
+matrix<RT> apply(const matrix<T, rf_h> &mat, std::function<RT(T)> func);
 
 /*
  * 	n_splits = dim_size / AUX_VEC_SIZE
@@ -225,12 +234,7 @@ matrix<RT> apply_along_axis(const matrix<T1, rf_h> &mat,
 						max_size_t)> func, max_size_t axis, T2 initial_acc,
 		std::function<RT(T2&)> ppfunc, bool reduce, bool keepdims);
 
-namespace random {
-
-template<typename T>
-matrix<T> uniform(T low, T high, shape_t shape);
-
-}
+/* ##################################################################################### */
 
 namespace numeric {
 
@@ -279,6 +283,8 @@ template<typename RT, typename T, bool rf_h>
 matrix<RT, true> cumsum(const matrix<T, rf_h> &mat, max_size_t axis);
 
 }
+
+/* ##################################################################################### */
 
 }
 

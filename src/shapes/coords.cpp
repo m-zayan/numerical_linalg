@@ -318,6 +318,11 @@ coords coords::pad_dim(max_size_t begin, max_size_t pad_size) const {
 	return new_attr;
 }
 
+coords coords::view_2d(bool own_data) const {
+
+	return this->reduce_ndim(0, this->ndim - 2, false);
+}
+
 void coords::swapaxes(max_size_t ax0, max_size_t ax1) {
 
 	if (ax0 >= this->ndim || ax1 >= this->ndim) {
@@ -354,7 +359,7 @@ bool operator ==(const coords &attr1, const coords &attr2) {
 
 // =============================== shape_t ===============================
 
-std::ostream& operator <<(std::ostream &os, shape_t shape) {
+std::ostream& operator <<(std::ostream &os, const shape_t &shape) {
 
 	os << '(';
 
@@ -380,19 +385,16 @@ std::ostream& operator <<(std::ostream &os, shape_t shape) {
 // flags: {0: doesn't match, 1: match, 2: broadcastable}
 uflag8_t operator &(const shape_t &shape0, const shape_t &shape1) {
 
-	shape_t temp0 = shape0;
-	shape_t temp1 = shape1;
-
-	max_size_t size0 = temp0.size();
-	max_size_t size1 = temp1.size();
+	max_size_t size0 = shape0.size();
+	max_size_t size1 = shape1.size();
 
 	uflag8_t flag = 1;
 
 	if (size0 == size1) {
 		for (max_size_t i = 0; i < size0; i++) {
-			if (temp0[i] != temp1[i]) {
+			if (shape0[i] != shape1[i]) {
 
-				if (temp0[i] == 1 || temp1[i] == 1) {
+				if (shape0[i] == 1 || shape1[i] == 1) {
 
 					flag = 2;
 				}
@@ -421,7 +423,7 @@ uflag8_t operator &(const shape_t &shape0, const shape_t &shape1) {
 
 		while (i < size0 && j < size1) {
 
-			if ((temp0[i] != temp1[j]) && !(temp0[i] == 1 || temp1[j] == 1)) {
+			if ((shape0[i] != shape1[j]) && !(shape0[i] == 1 || shape1[j] == 1)) {
 				return 0;
 			}
 
@@ -436,21 +438,18 @@ uflag8_t operator &(const shape_t &shape0, const shape_t &shape1) {
 // flags: {0: invalid, 1: empty, 2: lower-bound}
 uflag8_t operator |(const shape_t &lhs, const shape_t &rhs) {
 
-	shape_t temp_lhs = lhs;
-	shape_t temp_rhs = rhs;
-
-	max_size_t n_chunk = std::min(temp_lhs.size(), temp_rhs.size());
+	max_size_t n_chunk = std::min(lhs.size(), rhs.size());
 
 	// case: invalid
 	for (max_size_t i = 0; i < n_chunk; i++) {
-		if (temp_lhs[i] < temp_rhs[i]) {
+		if (lhs[i] < rhs[i]) {
 			return 0;
 		}
 	}
 
 	// case: empty
 	for (max_size_t i = 0; i < n_chunk; i++) {
-		if (temp_lhs[i] == temp_rhs[i]) {
+		if (lhs[i] == rhs[i]) {
 			return 1;
 		}
 	}
@@ -462,34 +461,31 @@ uflag8_t operator |(const shape_t &lhs, const shape_t &rhs) {
 // flags: {0: invalid, 1: empty, 2: slice}
 uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 
-	shape_t temp_lhs = lhs;
-	shape_t temp_rhs = rhs;
-
-	max_size_t n_chunk = std::min(temp_lhs.size(), temp_rhs.size());
+	max_size_t n_chunk = std::min(lhs.size(), rhs.size());
 
 	bool lb_exist = 0;
 
 	// case: invalid
-	if (n_chunk > 0 && temp_lhs[0] < temp_rhs[0]) {
+	if (n_chunk > 0 && lhs[0] < rhs[0]) {
 
 		return 0;
 	}
 
 	for (max_size_t i = 1; i < n_chunk; i++) {
 
-		if (temp_lhs[i - 1] > temp_rhs[i - 1]) {
+		if (lhs[i - 1] > rhs[i - 1]) {
 
 			lb_exist = 1;
 		}
 
-		if (temp_lhs[i] < temp_rhs[i] && !lb_exist) {
+		if (lhs[i] < lhs[i] && !lb_exist) {
 			return 0;
 		}
 	}
 
 	// case: slice
 	for (max_size_t i = 0; i < n_chunk; i++) {
-		if (temp_lhs[i] != temp_rhs[i]) {
+		if (lhs[i] != lhs[i]) {
 
 			return 2;
 		}
