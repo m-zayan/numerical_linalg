@@ -209,6 +209,9 @@ public:
 template<typename T>
 matrix<T> stack(composite<matrix<T, false>> matrix_list);
 
+template<typename T>
+matrix<T> concat(composite<matrix<T, false>> matrix_list, max_size_t axis);
+
 /* ##################################################################################### */
 
 namespace random {

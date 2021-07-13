@@ -51,6 +51,8 @@ struct Iterator {
 	bool uflag;
 
 	Iterator() = delete;
+	Iterator(const Iterator &it) = delete;
+	Iterator(const Iterator &&it) = delete;
 
 	Iterator(const coords &attr);
 
@@ -62,8 +64,10 @@ struct Iterator {
 	void reinterpret_slice(shape_t &current, shape_t &shape);
 
 	void reinterpret_linear();
+	void reinterpret_none();
+	void reinterpret_none(big_size_t size);
 
-	~Iterator() = default;
+	virtual ~Iterator() = default;
 };
 
 /* ===================================================================== */
@@ -78,11 +82,7 @@ inline Iterator::Iterator(const coords &attr) {
 
 	// ==============================================
 
-	default_bounds = strides_t(ndim);
-
-	for (max_size_t i = 0; i < ndim; i++) {
-		default_bounds[i] = (default_shape[i] - 1) * default_strides[i];
-	}
+	default_bounds = get_bounds(default_shape, default_strides);
 
 	// ==============================================
 
@@ -99,10 +99,10 @@ inline Iterator::Iterator(const coords &attr) {
 
 	// ==============================================
 
-	shape = this->default_shape.ref(0);
-	strides = this->default_strides.ref(0);
-	bounds = this->default_bounds.ref(0);
-	current = this->default_current.ref(0);
+	shape = default_shape.ref(0);
+	strides = default_strides.ref(0);
+	bounds = default_bounds.ref(0);
+	current = default_current.ref(0);
 
 	// ==============================================
 }
@@ -120,12 +120,21 @@ inline void Iterator::reset() {
 	uflag = false;
 
 	shape = default_shape.ref(0);
+	strides = default_strides.ref(0);
+	bounds = default_bounds.ref(0);
 	current = default_current.ref(0);
 }
 
 inline void Iterator::reinterpret_coords(const coords &attr) {
 
-	(*this) = Iterator(attr);
+	iter_type = attr.iter_type;
+	ndim = attr.ndim;
+
+	default_shape = attr.shape;
+	default_strides = attr.strides;
+	default_bounds = get_bounds(default_shape, default_strides);
+
+	this->reset();
 }
 
 inline void Iterator::reinterpret_slice(shape_t &current, shape_t &shape) {
@@ -138,6 +147,14 @@ inline void Iterator::reinterpret_slice(shape_t &current, shape_t &shape) {
 
 inline void Iterator::reinterpret_linear() {
 	this->iter_type = IteratorType::Linear;
+}
+
+inline void Iterator::reinterpret_none() {
+	this->iter_type = IteratorType::None;
+}
+
+inline void Iterator::reinterpret_none(big_size_t size) {
+	this->niter = size;
 }
 
 }

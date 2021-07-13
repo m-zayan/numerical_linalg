@@ -132,10 +132,11 @@ public:
 	coords pad_dim(max_size_t new_ndim) const;
 	coords pad_dim(max_size_t begin, max_size_t pad_size) const;
 
-	coords view_2d(bool own_data) const;
+	coords view_3d(bool own_data) const;
+
+	coords concat(const coords &attr, max_size_t ax) const;
 
 	void swapaxes(max_size_t ax0, max_size_t ax1);
-
 
 	friend bool operator ==(const coords &attr1, const coords &attr2);
 
@@ -198,6 +199,24 @@ inline strides_t get_strides(shape_t &shape) {
 	}
 
 	return strides;
+}
+
+inline strides_t get_bounds(shape_t &shape, strides_t &strides) {
+
+	if (shape.size() != strides.size()) {
+
+		throw nd::exception("get_bounds(...), shape.size() != strides.size()");
+	}
+
+	max_size_t ndim = shape.size();
+
+	strides_t bounds = strides_t(ndim);
+
+	for (max_size_t i = 0; i < ndim; i++) {
+		bounds[i] = (shape[i] - 1) * strides[i];
+	}
+
+	return bounds;
 }
 
 inline void check_strides(shape_t &shape, strides_t &strides) {

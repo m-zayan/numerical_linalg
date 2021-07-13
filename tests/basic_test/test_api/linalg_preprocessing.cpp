@@ -16,9 +16,9 @@ void test_api::linalg_preprocessing() {
 
 	std::cout << "\n===============================\n";
 
-	coords cview_2d = mat._m_coords().view_2d(false);
+	coords cview_3d = mat._m_coords().view_3d(false);
 
-	nd::iterator::Iterator *it = nd::iterator::init_iterator(cview_2d);
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(cview_3d);
 
 	flag8_t state = nd::linalg::_h::forward_substitution_step(mat, it, 0);
 

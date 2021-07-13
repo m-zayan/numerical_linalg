@@ -30,8 +30,8 @@ coords::coords(bool own_data) :
 
 coords::coords(shape_t shape) :
 		shape(shape), ndim(shape.size()), size1d(get_size1d(shape)), strides(
-				get_strides(shape)), axes( { }), order('C'), own_data(
-				1), iter_type(IteratorType::None) {
+				get_strides(shape)), axes( { }), order('C'), own_data(1), iter_type(
+				IteratorType::None) {
 
 	if (shape.size() == 0) {
 
@@ -121,14 +121,9 @@ coords& coords::operator =(const coords &attr) {
 	return (*this);
 }
 
-
 coords coords::permuted(const shape_t &axes, bool own_data) const {
 
-	shape_t tmp_shape = this->shape;
-	strides_t tmp_strides = this->strides;
-	shape_t tmp_axes = axes;
-
-	if (tmp_axes.size() != this->ndim) {
+	if (axes.size() != this->ndim) {
 
 		throw nd::exception(
 				"Invalid number of axes, axes.size() != this->ndim()");
@@ -139,16 +134,16 @@ coords coords::permuted(const shape_t &axes, bool own_data) const {
 
 	for (max_size_t i = 0; i < axes.size(); i++) {
 
-		if (tmp_axes[i] >= this->ndim) {
+		if (axes[i] >= this->ndim) {
 
 			throw nd::exception("Invalid axes, axes[i] >= this->ndim()");
 		}
 
-		swaped_shape[i] = tmp_shape[tmp_axes[i]];
-		swaped_strides[i] = tmp_strides[tmp_axes[i]];
+		swaped_shape[i] = this->shape[axes[i]];
+		swaped_strides[i] = this->strides[axes[i]];
 	}
 
-	coords new_attr(swaped_shape, tmp_axes, swaped_strides, own_data,
+	coords new_attr(swaped_shape, axes, swaped_strides, own_data,
 			IteratorType::Linear);
 
 	return new_attr;
@@ -174,11 +169,10 @@ coords coords::swapaxes(max_size_t ax0, max_size_t ax1, bool own_data) const {
 
 	if (ax0 >= this->ndim || ax1 >= this->ndim) {
 
-		throw nd::exception(
-				"Invalid axis of axes, ax0 >= this->ndim || ax1 >= this->ndim");
+		throw nd::exception("Invalid axis: dimension out of range, "
+				"ax0 >= this->ndim || ax1 >= this->ndim");
 	}
 
-	;
 	shape_t swapped_axes = this->axes;
 
 	std::swap(swapped_axes[ax0], swapped_axes[ax1]);
@@ -318,17 +312,23 @@ coords coords::pad_dim(max_size_t begin, max_size_t pad_size) const {
 	return new_attr;
 }
 
-coords coords::view_2d(bool own_data) const {
+coords coords::view_3d(bool own_data) const {
 
-	return this->reduce_ndim(0, this->ndim - 2, false);
+	coords out_attr = this->pad_dim(3);
+
+	return out_attr.reduce_ndim(0, out_attr.ndim - 2, false);
 }
 
 void coords::swapaxes(max_size_t ax0, max_size_t ax1) {
 
 	if (ax0 >= this->ndim || ax1 >= this->ndim) {
 
-		throw nd::exception(
-				"Invalid axis of axes, ax0 >= this->ndim || ax1 >= this->ndim");
+		throw nd::exception("Invalid axis: dimension out of range, "
+				"ax0 >= this->ndim || ax1 >= this->ndim");
+	}
+
+	if (ax0 == ax1) {
+		return;
 	}
 
 	std::swap(this->axes[ax0], this->axes[ax1]);
@@ -336,6 +336,33 @@ void coords::swapaxes(max_size_t ax0, max_size_t ax1) {
 	std::swap(this->strides[ax0], this->strides[ax1]);
 
 	this->iter_type = IteratorType::Linear;
+}
+
+coords coords::concat(const coords &attr, max_size_t ax) const {
+
+	shape_t in_shape = this->shape;
+
+	if (ax >= this->ndim) {
+		throw nd::exception("Invalid axis: dimension out of range");
+	}
+
+	if (this->ndim != attr.ndim) {
+		throw nd::exception("coords::concat(...), "
+				"the number of dimensions must match");
+	}
+
+	for (max_size_t i = 0; i < this->ndim; i++) {
+		if ((in_shape[i] != attr.shape[i]) && (i != ax)) {
+			throw nd::exception("coords::concat(...), "
+					"all dimensions size must match, except dim = ax");
+		}
+	}
+
+	in_shape[ax] += attr.shape[ax];
+
+	coords out_attr(in_shape);
+
+	return out_attr;
 }
 
 bool operator ==(const coords &attr1, const coords &attr2) {
@@ -423,7 +450,8 @@ uflag8_t operator &(const shape_t &shape0, const shape_t &shape1) {
 
 		while (i < size0 && j < size1) {
 
-			if ((shape0[i] != shape1[j]) && !(shape0[i] == 1 || shape1[j] == 1)) {
+			if ((shape0[i] != shape1[j])
+					&& !(shape0[i] == 1 || shape1[j] == 1)) {
 				return 0;
 			}
 
@@ -440,21 +468,21 @@ uflag8_t operator |(const shape_t &lhs, const shape_t &rhs) {
 
 	max_size_t n_chunk = std::min(lhs.size(), rhs.size());
 
-	// case: invalid
+// case: invalid
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (lhs[i] < rhs[i]) {
 			return 0;
 		}
 	}
 
-	// case: empty
+// case: empty
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (lhs[i] == rhs[i]) {
 			return 1;
 		}
 	}
 
-	// case: lower-bound
+// case: lower-bound
 	return 2;
 }
 
@@ -465,7 +493,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 
 	bool lb_exist = 0;
 
-	// case: invalid
+// case: invalid
 	if (n_chunk > 0 && lhs[0] < rhs[0]) {
 
 		return 0;
@@ -483,7 +511,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 		}
 	}
 
-	// case: slice
+// case: slice
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (lhs[i] != lhs[i]) {
 
@@ -491,7 +519,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 		}
 	}
 
-	// case: empty
+// case: empty
 	return 1;
 }
 
@@ -561,7 +589,7 @@ coords nd::align_dim(coords &attr0, coords &attr1, std::string &&signature) {
 coords nd::align_dim(coords &attr0, coords &attr1, vec1d<shape_t> axes,
 		std::string &&signature) {
 
-	// parsing nested structure, for validation
+// parsing nested structure, for validation
 	shape_t axes_shape = nd::parser::parse_shape(axes, signature + ", Axes");
 
 	if (axes_shape.size() != 1 || axes_shape[0] != 2) {
@@ -578,7 +606,7 @@ coords nd::align_dim(coords &attr0, coords &attr1, vec1d<shape_t> axes,
 	shape_t axes0 = attr0.axes;
 	shape_t axes1 = attr1.axes;
 
-	// axes[0].size() == axes[1].size()
+// axes[0].size() == axes[1].size()
 	max_size_t naxes = axes[0].size();
 
 	if (!(ndim0 >= 2 && ndim1 >= 2)) {
@@ -608,13 +636,13 @@ coords nd::align_dim(coords &attr0, coords &attr1, vec1d<shape_t> axes,
 
 	}
 
-	// [1]
+// [1]
 	vec1d<max_size_t> a_axes = algorithm::a_intersect_b_comp(attr0.axes,
 			axes[0]);
 	vec1d<max_size_t> b_axes = algorithm::a_intersect_b_comp(attr1.axes,
 			axes[1]);
 
-	// [2]
+// [2]
 	shape_t out_shape;
 
 	max_size_t i = 0;
@@ -635,11 +663,11 @@ coords nd::align_dim(coords &attr0, coords &attr1, vec1d<shape_t> axes,
 
 	coords out_attr(out_shape, true, IteratorType::Pair);
 
-	// [3]
+// [3]
 	attr0 = attr0.permuted(axes0, false);
 	attr1 = attr1.permuted(axes1, false);
 
-	// [4]
+// [4]
 	max_size_t nsum_axes = a_axes.size();
 
 	attr0 = attr0.pad_dim(nsum_axes, nsum_axes);
@@ -698,14 +726,14 @@ coords nd::align_dim_2d(coords &attr0, coords &attr1, std::string &&signature) {
 
 	}
 
-	// [0]
+// [0]
 	max_size_t max_ndim = std::max(ndim0, ndim1);
 
-	// [1]
+// [1]
 	attr0 = attr0.pad_dim(max_ndim);
 	attr1 = attr1.pad_dim(max_ndim);
 
-	// [2]
+// [2]
 	shape0 = attr0.shape;
 	shape1 = attr1.shape;
 
@@ -721,10 +749,10 @@ coords nd::align_dim_2d(coords &attr0, coords &attr1, std::string &&signature) {
 
 	coords out_attr = coords(out_shape, true, IteratorType::Pair);
 
-	// [3]
+// [3]
 	attr1.swapaxes(max_ndim - 1, max_ndim - 2);
 
-	// [4]
+// [4]
 	attr0 = attr0.pad_dim(max_ndim - 1, 1);
 	attr1 = attr1.pad_dim(max_ndim - 2, 1);
 
