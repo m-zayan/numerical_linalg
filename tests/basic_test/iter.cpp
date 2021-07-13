@@ -95,7 +95,7 @@
 //
 //	auto t_start = std::chrono::high_resolution_clock::now();
 //
-//	// about: O3: 39 ms
+//	// about | O3: 39 ms
 //	for (big_size_t i = 0; i < niter; i++) {
 //
 //		ITER_PAIRWISE2_NEXT(it0, it1);
@@ -134,7 +134,7 @@
 //
 //	auto t_start = std::chrono::high_resolution_clock::now();
 //
-//	// about: O3: 242 ms
+//	// about| O0: 552 ms | O3: 180 ms
 //	for (big_size_t i = 0; i < niter; i++) {
 //
 //		ITER_PAIRWISE3_NEXT(out_it, it0, it1);

@@ -53,10 +53,6 @@ void print_matrix(const matrix<T, rf_h> &mat) {
 	nd::matrix<T, false> tmp = mat;
 
 	coords mcoords = tmp._m_coords();
-	mcoords.iter_type = IteratorType::Linear;
-
-	// [0]
-	nd::iterator::Iterator *it = nd::iterator::init_iterator(mcoords);
 
 	T *data = tmp._m_begin();
 
@@ -64,6 +60,11 @@ void print_matrix(const matrix<T, rf_h> &mat) {
 		std::cout << data[0] << '\n';
 		return;
 	}
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(mcoords);
+
+	it->reinterpret_linear();
 
 	big_size_t chunk_size = mat.step_size();
 	big_size_t n_chunk = it->niter / chunk_size;

@@ -449,7 +449,9 @@ void nd::_matrix<T, ref_holder>::_m_reshape(shape_t shape) {
 template<typename T, bool ref_holder>
 void nd::_matrix<T, ref_holder>::_m_clear_iter_type() {
 
-	this->attr.iter_type = IteratorType::None;
+	if (!is_scalar(this->attr)) {
+		this->attr.iter_type = IteratorType::None;
+	}
 }
 
 template<typename T, bool ref_holder>

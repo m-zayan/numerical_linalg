@@ -9,6 +9,10 @@
 
 #include "../shapes/coords.hpp"
 
+#define SAFEMOVEAXIS(ax) do { \
+	ax == 0 ? ax : --ax; \
+} while(0)
+
 namespace nd::iterator {
 
 struct Iterator {
@@ -57,6 +61,8 @@ struct Iterator {
 	/* [current & shape] <arg> must be a non-temporary */
 	void reinterpret_slice(shape_t &current, shape_t &shape);
 
+	void reinterpret_linear();
+
 	~Iterator() = default;
 };
 
@@ -85,7 +91,9 @@ inline Iterator::Iterator(const coords &attr) {
 	default_current = shape_t(this->ndim, 0);
 
 	niter = attr.size1d;
-	iaxis = attr.ndim - 1;
+	iaxis = ndim;
+
+	SAFEMOVEAXIS(iaxis);
 
 	uflag = false;
 
@@ -105,9 +113,13 @@ inline void Iterator::reset() {
 
 	default_current.fill(0);
 
-	iaxis = ndim - 1;
+	iaxis = ndim;
+
+	SAFEMOVEAXIS(iaxis);
+
 	uflag = false;
 
+	shape = default_shape.ref(0);
 	current = default_current.ref(0);
 }
 
@@ -124,6 +136,10 @@ inline void Iterator::reinterpret_slice(shape_t &current, shape_t &shape) {
 	ndim = shape.size();
 }
 
+inline void Iterator::reinterpret_linear() {
+	this->iter_type = IteratorType::Linear;
+}
+
 }
 
 /* ################################################################################## */
@@ -136,7 +152,8 @@ inline void Iterator::reinterpret_slice(shape_t &current, shape_t &shape) {
 /* ################################################################################## */
 
 #define ITER_RESET_IAXIS1(it) do { \
-	it->iaxis = it->ndim - 1; \
+	it->iaxis = it->ndim; \
+	SAFEMOVEAXIS(it->iaxis); \
 } while(0)
 
 #define ITER_RESET_IAXIS2(it0, it1) do { \
