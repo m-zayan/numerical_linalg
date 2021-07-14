@@ -63,6 +63,10 @@ public:
 
 	using vec1d<max_size_t>::vec1d;
 
+	shape_t(const vec1d<max_size_t> &vec) :
+			shape_t(vec.as_std_vec<max_size_t>()) {
+	}
+
 	friend std::ostream& operator <<(std::ostream &os, const shape_t &shape);
 
 	friend uflag8_t operator &(const shape_t &shape0, const shape_t &shape1);

@@ -253,8 +253,7 @@ coords coords::reduce_ndim(max_size_t begin, max_size_t end,
 
 	shape_t in_shape = this->shape;
 
-	shape_t out_shape = in_shape.reduce_multiply(begin, end).as_std_vec<
-			max_size_t>();
+	shape_t out_shape = in_shape.reduce_multiply(begin, end);
 
 	coords out_attr = coords(out_shape, own_data, this->iter_type);
 
@@ -272,13 +271,12 @@ coords coords::pad_dim(max_size_t new_ndim) const {
 	strides_t strides = this->strides;
 	shape_t axes = this->axes;
 
-	shape_t new_shape = shape.pad(0, pad_size, 1).as_std_vec<max_size_t>();
+	shape_t new_shape = shape.pad(0, pad_size, 1);
 	strides_t new_strides = strides.pad(0, pad_size);
 
 	max_size_t snew_axis = axes.max(0, axes.size()) + 1;
 
-	shape_t new_axes =
-			axes.pad(0, pad_size, snew_axis, 1).as_std_vec<max_size_t>();
+	shape_t new_axes = axes.pad(0, pad_size, snew_axis, 1);
 
 	coords new_attr(new_shape, new_axes, new_strides, this->own_data,
 			this->iter_type);
@@ -298,7 +296,7 @@ coords coords::pad_dim(max_size_t begin, max_size_t pad_size) const {
 	strides_t strides = this->strides;
 	shape_t axes = this->axes;
 
-	shape_t new_shape = shape.pad(begin, pad_size, 1).as_std_vec<max_size_t>();
+	shape_t new_shape = shape.pad(begin, pad_size, 1);
 	strides_t new_strides = strides.pad(begin, pad_size);
 
 	max_size_t snew_axis = axes.max(0, axes.size()) + 1;
@@ -714,8 +712,8 @@ coords nd::align_dim_2d(coords &attr0, coords &attr1, std::string &&signature) {
 		throw nd::exception("Input: mismatch dimension 0");
 	}
 
-	shape_t slice0 = shape0.slice(0, ndim0 - 2).as_std_vec<max_size_t>();
-	shape_t slice1 = shape1.slice(0, ndim1 - 2).as_std_vec<max_size_t>();
+	shape_t slice0 = shape0.slice(0, ndim0 - 2);
+	shape_t slice1 = shape1.slice(0, ndim1 - 2);
 
 	uflag8_t valid_op = (slice0 & slice1);
 

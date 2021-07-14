@@ -323,8 +323,6 @@ template<typename T, bool ref_holder>
 nd::matrix<T, false> nd::_matrix<T, ref_holder>::operator [](
 		max_size_t d_index) {
 
-	max_size_t step = this->strides()[0];
-
 	if (this->ndim() == 0) {
 
 		throw nd::exception("nd::matrix<T> - N-Dim-Index Out Of Range");
@@ -335,30 +333,33 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::operator [](
 		throw nd::exception("nd::matrix<T> - Dim-Index Out Of Range");
 	}
 
-	// case: scalar-like nd::matrix<T>
-	else if (this->ndim() == 1) {
+	max_size_t step = this->strides()[0];
 
-		coords new_attr(false);
+	// case: scalar-like nd::matrix<T>
+	if (this->ndim() == 1) {
+
+		coords chunk_attr(false);
 
 		big_size_t c_begin = this->c_begin + (d_index * step);
 		big_size_t c_end = this->c_begin + (d_index + 1) * step;
 
-		nd::matrix<T, false> mat_chunk(new_attr, this->data, c_begin, c_end);
+		nd::matrix<T, false> mat_chunk(chunk_attr, this->data, c_begin, c_end);
 
 		return mat_chunk;
 	}
 
 	else {
 
-		shape_t cur_shape = this->shape();
+		shape_t chunk_shape = this->shape().slice(1, this->ndim());
+		strides_t chunk_strides = this->strides().slice(1, this->ndim());
 
-		shape_t new_shape(cur_shape.begin() + 1, cur_shape.end());
-		coords new_attr(new_shape, false, this->attr.iter_type);
+		coords chunk_attr(chunk_shape, chunk_strides, false,
+				this->attr.iter_type);
 
 		big_size_t c_begin = this->c_begin + (d_index * step);
 		big_size_t c_end = this->c_begin + (d_index + 1) * step;
 
-		nd::matrix<T, false> mat_chunk(new_attr, this->data, c_begin, c_end);
+		nd::matrix<T, false> mat_chunk(chunk_attr, this->data, c_begin, c_end);
 
 		return mat_chunk;
 	}
