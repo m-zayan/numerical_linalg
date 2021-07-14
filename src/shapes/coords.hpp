@@ -140,6 +140,8 @@ public:
 
 	coords concat(const coords &attr, max_size_t ax) const;
 
+	coords slice(shape_t begin, shape_t end) const;
+
 	void swapaxes(max_size_t ax0, max_size_t ax1);
 
 	friend bool operator ==(const coords &attr1, const coords &attr2);
@@ -378,6 +380,56 @@ inline uflag8_t validate_op_bounds(coords &attr0, coords &attr1,
 
 	// valid | non-trivial bounds
 	return 1;
+}
+
+inline flag8_t check_slice(const coords &attr, const shape_t &begin,
+		const shape_t &end) {
+
+	max_size_t ndim = attr.ndim;
+
+	max_size_t bsize = begin.size();
+	max_size_t esize = end.size();
+
+	if ((bsize > ndim) || (esize > ndim)) {
+
+		return -1;
+	}
+
+	uflag8_t valid_s = (attr.shape | begin);
+	uflag8_t valid_e = (attr.shape | end);
+	uflag8_t valid_order = (end % begin);
+
+	if (valid_s == 0 || valid_e == 0 || valid_order == 0) {
+
+		return -2;
+	}
+
+	return 1;
+}
+
+/*
+ * [begin & end] will be modified
+ */
+inline void adjust_slice(const coords &attr, shape_t &begin, shape_t &end) {
+
+	max_size_t ndim = attr.ndim;
+
+	max_size_t bsize = begin.size();
+	max_size_t esize = end.size();
+
+	shape_t abegin(ndim, 0);
+	shape_t aend = attr.shape;
+
+	for (max_size_t i = 0; i < bsize; i++) {
+		abegin[i] = begin[i];
+	}
+
+	for (max_size_t i = 0; i < esize; i++) {
+		aend[i] = end[i];
+	}
+
+	begin = abegin;
+	end = aend;
 }
 
 // ============================================= nd::parser::_h =============================================

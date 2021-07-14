@@ -14,15 +14,21 @@
 
 namespace nd::linalg::_h {
 
-template<typename T, bool ref_h>
-flag8_t partial_pivoting_step(nd::matrix<T, ref_h> &mat,
+template<typename T, bool rf_h>
+flag8_t partial_pivoting_step(nd::matrix<T, rf_h> &mat,
 		nd::iterator::Iterator *it, max_size_t ccols, max_size_t column_index,
 		bool pivot = true, bool scale = false);
 
-template<typename T, bool ref_h>
-flag8_t gsubstitution_step(nd::matrix<T, ref_h> &mat,
-		nd::iterator::Iterator *it, max_size_t ccols, max_size_t column_index,
-		bool pivot);
+template<typename T, bool rf_h>
+flag8_t gsubstitution_step(nd::matrix<T, rf_h> &mat, nd::iterator::Iterator *it,
+		max_size_t ccols, max_size_t column_index, bool pivot);
+
+template<typename T, bool rf_h0, bool rf_h1>
+nd::matrix<T> augmented(const nd::matrix<T, rf_h0>& lhs, const nd::matrix<T, rf_h1>& rhs);
+
+template<typename T, bool rf_h>
+nd::matrix<T> augmented(const nd::matrix<T, rf_h> &lhs);
+
 }
 
 namespace nd::linalg {

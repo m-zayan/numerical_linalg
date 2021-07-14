@@ -15,7 +15,9 @@ inline big_size_t nd_index_at(const coords &attr, const shape_t &indices) {
 
 	big_size_t index = 0;
 
-	for (max_size_t i = 0; i < attr.ndim; i++) {
+	max_size_t naxes = indices.size();
+
+	for (max_size_t i = 0; i < naxes; i++) {
 		index += (attr.strides[i] * indices[i]);
 	}
 
@@ -38,7 +40,7 @@ inline void check_slice(Iterator *it, const shape_t &start,
 	uflag8_t valid_e = (it->default_shape | end);
 	uflag8_t valid_order = (end % start);
 
-	if (valid_s != 2 || valid_e != 2 || valid_order == 0) {
+	if (valid_s == 0 || valid_e == 0 || valid_order == 0) {
 
 		throw nd::exception("Invalid slice, nd::iterator::Iterator*");
 	}

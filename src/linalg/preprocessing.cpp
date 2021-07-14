@@ -17,8 +17,8 @@
  *
  * 		 [invalid-step <--> singular-matrix-indicator]
  */
-template<typename T, bool ref_h>
-flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
+template<typename T, bool rf_h>
+flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h> &mat,
 		nd::iterator::Iterator *it, max_size_t ccols, max_size_t column_index,
 		bool pivot, bool scale) {
 
@@ -191,8 +191,8 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, ref_h> &mat,
  * 		[invalid-step <--> singular-matrix-indicator]
  */
 
-template<typename T, bool ref_h>
-flag8_t nd::linalg::_h::gsubstitution_step(nd::matrix<T, ref_h> &mat,
+template<typename T, bool rf_h>
+flag8_t nd::linalg::_h::gsubstitution_step(nd::matrix<T, rf_h> &mat,
 		nd::iterator::Iterator *it, max_size_t ccols, max_size_t column_index,
 		bool pivot) {
 
@@ -264,3 +264,42 @@ flag8_t nd::linalg::_h::gsubstitution_step(nd::matrix<T, ref_h> &mat,
 	// case: valid-step
 	return 1;
 }
+
+/*
+ *  nd::matrix<RT>::shape() <-->
+ *
+ *  		(reduced_dims, nrows, mat->ncols + aug->ncols)
+ */
+template<typename T, bool rf_h0, bool rf_h1>
+nd::matrix<T> nd::linalg::_h::augmented(const nd::matrix<T, rf_h0> &lhs,
+		const nd::matrix<T, rf_h1> &rhs) {
+
+	max_size_t ndim = lhs.ndim();
+
+	if (ndim < 2) {
+
+		throw nd::exception("nd::linalg::_h::augmented(...), ndim < 2");
+	}
+
+	// augmentation
+	nd::matrix<T> aug = nd::concat<T>( { lhs, rhs }, ndim - 2);
+
+	return aug.op_view_2d().permute( { 0, 2, 1 });
+}
+
+/*
+ *  nd::matrix<RT>::shape() <-->
+ *
+ *  		(reduced_dims, nrows, mat->ncols + aug->ncols)
+ *
+ *  - [A | I]
+ */
+template<typename T, bool rf_h>
+nd::matrix<T> nd::linalg::_h::augmented(const nd::matrix<T, rf_h> &lhs) {
+
+	// rhs <--> identity
+	nd::matrix<T> rhs = nd::linalg::eye<T>(lhs.shape());
+
+	return nd::linalg::_h::augmented<T>(lhs, rhs);
+}
+

@@ -63,6 +63,8 @@ public:
 
 	matrix<T, false> operator [](max_size_t d_index);
 
+	matrix<T, false> slice(shape_t begin, shape_t end);
+
 	// ===========================================================================
 
 	// _matrix <---> _matrix

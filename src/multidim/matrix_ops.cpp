@@ -357,12 +357,29 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::operator [](
 				this->attr.iter_type);
 
 		big_size_t c_begin = this->c_begin + (d_index * step);
-		big_size_t c_end = this->c_begin + (d_index + 1) * step;
+		big_size_t c_end = this->c_end;
 
 		nd::matrix<T, false> mat_chunk(chunk_attr, this->data, c_begin, c_end);
 
 		return mat_chunk;
 	}
+}
+
+template<typename T, bool ref_holder>
+nd::matrix<T, false> nd::_matrix<T, ref_holder>::slice(shape_t begin,
+		shape_t end) {
+
+	coords chunk_attr = this->attr.slice(begin, end);
+
+	adjust_slice(this->attr, begin, end);
+
+	big_size_t c_begin = nd::iterator::nd_index_at(this->attr, begin);
+	big_size_t c_end = nd::iterator::nd_index_at(this->attr, chunk_attr.shape);
+
+	nd::matrix<T, false> mat_chunk(chunk_attr, this->data, c_begin, c_end);
+
+	return mat_chunk;
+
 }
 
 template<typename T, bool ref_holder>

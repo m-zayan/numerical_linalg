@@ -363,6 +363,37 @@ coords coords::concat(const coords &attr, max_size_t ax) const {
 	return out_attr;
 }
 
+coords coords::slice(shape_t begin, shape_t end) const {
+
+	if (is_scalar(*this)) {
+		throw nd::exception("coords::slice(...), scalar-type");
+	}
+
+	flag8_t is_valid = check_slice(*this, begin, end);
+
+	if (is_valid == -1) {
+
+		throw nd::exception("Invalid slice coords::slice(...), "
+				"dimensions out of range");
+	}
+
+	else if (is_valid == -2) {
+
+		throw nd::exception("Invalid slice coords::slice(...)");
+	}
+
+	// case: valid-slice
+
+	adjust_slice(*this, begin, end);
+
+	shape_t out_shape = end - begin;
+
+	coords out_attr(out_shape, this->axes, this->strides, false,
+			this->iter_type);
+
+	return out_attr;
+}
+
 bool operator ==(const coords &attr1, const coords &attr2) {
 
 	coords temp1 = attr1;
@@ -466,21 +497,21 @@ uflag8_t operator |(const shape_t &lhs, const shape_t &rhs) {
 
 	max_size_t n_chunk = std::min(lhs.size(), rhs.size());
 
-// case: invalid
+	// case: invalid
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (lhs[i] < rhs[i]) {
 			return 0;
 		}
 	}
 
-// case: empty
+	// case: empty
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (lhs[i] == rhs[i]) {
 			return 1;
 		}
 	}
 
-// case: lower-bound
+	// case: lower-bound
 	return 2;
 }
 
@@ -491,7 +522,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 
 	bool lb_exist = 0;
 
-// case: invalid
+	// case: invalid
 	if (n_chunk > 0 && lhs[0] < rhs[0]) {
 
 		return 0;
@@ -509,7 +540,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 		}
 	}
 
-// case: slice
+	// case: slice
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (lhs[i] != lhs[i]) {
 
@@ -517,7 +548,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 		}
 	}
 
-// case: empty
+	// case: empty
 	return 1;
 }
 

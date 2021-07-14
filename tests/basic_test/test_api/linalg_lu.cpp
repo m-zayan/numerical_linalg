@@ -8,6 +8,5 @@
 
 void test_api::linalg_lu() {
 
-
 }
 
