@@ -349,11 +349,7 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 
 /* pcindex: [placeholder-index1d] */
 #define BITER_INDEX_AT1D(it, indices, pcindex) do { \
-	pcindex = 0; \
-	ITER_SET_IAXIS1(it, 0); \
-	for(; it->iaxis<it->ndim; it->iaxis++){ \
-		pcindex += (it->strides[it->iaxis] * indices[it->iaxis]); \
-	} \
+	ITER_INDEX_AT1D(it, indices, pcindex); \
 	if(BITER_IS_ROT(it, pcindex)) { \
 		pcindex = it->rotindex - pcindex; \
 	} \
