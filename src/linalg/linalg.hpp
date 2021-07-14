@@ -9,16 +9,20 @@
 
 #include "../multidim/matrix.hpp"
 
+#define LINALG_EPS 1e-8
+#define LINALG_IEPS 1e8
+
 namespace nd::linalg::_h {
 
 template<typename T, bool ref_h>
 flag8_t partial_pivoting_step(nd::matrix<T, ref_h> &mat,
-		nd::iterator::Iterator *it, max_size_t column_index,
-		bool scale = false);
+		nd::iterator::Iterator *it, max_size_t ccols, max_size_t column_index,
+		bool pivot = true, bool scale = false);
 
 template<typename T, bool ref_h>
-flag8_t forward_substitution_step(nd::matrix<T, ref_h> &mat,
-		nd::iterator::Iterator *it, max_size_t column_index);
+flag8_t gsubstitution_step(nd::matrix<T, ref_h> &mat,
+		nd::iterator::Iterator *it, max_size_t ccols, max_size_t column_index,
+		bool pivot);
 }
 
 namespace nd::linalg {

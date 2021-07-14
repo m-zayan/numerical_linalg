@@ -50,6 +50,12 @@ struct Iterator {
 	// update-flag
 	bool uflag;
 
+	// virtual-rotation-flag
+	bool virtrot;
+
+	// virtual-rotation-pivot
+	big_size_t rotindex;
+
 	Iterator() = delete;
 	Iterator(const Iterator &it) = delete;
 	Iterator(const Iterator &&it) = delete;
@@ -96,6 +102,9 @@ inline Iterator::Iterator(const coords &attr) {
 	SAFEMOVEAXIS(iaxis);
 
 	uflag = false;
+	virtrot = false;
+
+	rotindex = 0;
 
 	// ==============================================
 
@@ -118,6 +127,9 @@ inline void Iterator::reset() {
 	SAFEMOVEAXIS(iaxis);
 
 	uflag = false;
+	virtrot = false;
+
+	rotindex = 0;
 
 	shape = default_shape.ref(0);
 	strides = default_strides.ref(0);
@@ -154,6 +166,9 @@ inline void Iterator::reinterpret_none() {
 }
 
 inline void Iterator::reinterpret_none(big_size_t size) {
+
+	this->reinterpret_none();
+
 	this->niter = size;
 }
 
@@ -305,7 +320,7 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 	for(; it->iaxis<it->ndim; it->iaxis++){ \
 		it->index1d += (it->strides[it->iaxis] * indices[it->iaxis]); \
 	} \
-} while(0
+} while(0)
 
 /* pcindex: [placeholder-index1d] */
 #define ITER_INDEX_AT1D(it, indices, pcindex) do { \
@@ -313,6 +328,34 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 	ITER_SET_IAXIS1(it, 0); \
 	for(; it->iaxis<it->ndim; it->iaxis++){ \
 		pcindex += (it->strides[it->iaxis] * indices[it->iaxis]); \
+	} \
+} while(0)
+
+/* ################################################################################## */
+
+/* --- [bidirectional] --- */
+
+#define BITER_IS_ROT(it, index1d) (it->virtrot && it->rotindex >= index1d)
+
+#define BITER_ROTATE(it) do { \
+	it->virtrot = !(it->virtrot); \
+} while(0)
+
+#define BITER_ROTATE_AT(it, indices) do { \
+	if(it->virtrot) { \
+		ITER_INDEX_AT1D(it, indices, it->rotindex); \
+	} \
+} while(0)
+
+/* pcindex: [placeholder-index1d] */
+#define BITER_INDEX_AT1D(it, indices, pcindex) do { \
+	pcindex = 0; \
+	ITER_SET_IAXIS1(it, 0); \
+	for(; it->iaxis<it->ndim; it->iaxis++){ \
+		pcindex += (it->strides[it->iaxis] * indices[it->iaxis]); \
+	} \
+	if(BITER_IS_ROT(it, pcindex)) { \
+		pcindex = it->rotindex - pcindex; \
 	} \
 } while(0)
 

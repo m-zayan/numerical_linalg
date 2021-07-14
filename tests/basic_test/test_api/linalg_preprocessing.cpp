@@ -6,42 +6,106 @@
 
 #include "./test_api.hpp"
 
+void test0(nd::matrix<double> mat) {
+
+	uflag8_t state;
+
+	max_size_t ccols = 3;
+
+	nd::out::print_matrix(mat);
+
+	std::cout << "\n===============================\n";
+
+	nd::matrix<double, false> mview = mat.op_view_2d();
+
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(mview._m_coords());
+
+	// forward
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 0, false);
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 1, false);
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 2, false);
+
+	nd::out::print_matrix(mat);
+
+	std::cout << "\n-----------------------\n";
+
+	std::cout << "state : " << static_cast<min_t>(state) << ln;
+
+	std::cout << "\n===============================\n";
+}
+
+void test1(nd::matrix<double> mat) {
+
+	uflag8_t state;
+
+	max_size_t ccols = 3;
+
+	nd::out::print_matrix(mat);
+
+	std::cout << "\n===============================\n";
+
+	nd::matrix<double, false> mview = mat.op_view_2d();
+
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(mview._m_coords());
+
+	// forward ---> backward
+	BITER_ROTATE(it);
+
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 0, false);
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 1, false);
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 2, false);
+
+	nd::out::print_matrix(mat);
+
+	std::cout << "\n-----------------------\n";
+
+	std::cout << "state : " << static_cast<min_t>(state) << ln;
+}
+
+void test2(nd::matrix<double> mat) {
+
+	uflag8_t state;
+
+	max_size_t ccols = 3;
+
+	nd::out::print_matrix(mat);
+
+	std::cout << "\n===============================\n";
+
+	nd::matrix<double, false> mview = mat.op_view_2d();
+
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(mview._m_coords());
+
+	// forward
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 0, true);
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 1, true);
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 2, true);
+
+	std::cout << "state : " << static_cast<min_t>(state) << ln;
+
+	std::cout << "\n-----------------------\n";
+
+	// forward ---> backward
+	BITER_ROTATE(it);
+
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 0, false);
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 1, false);
+	state = nd::linalg::_h::gsubstitution_step(mview, it, ccols, 2, false);
+
+	nd::out::print_matrix(mat);
+
+	std::cout << "\n-----------------------\n";
+
+	std::cout << "state : " << static_cast<min_t>(state) << ln;
+}
 void test_api::linalg_preprocessing() {
 
-	shape_t s = { 2, 3, 2 };
+	shape_t s = { 3, 3 };
 
-	nd::matrix<double> mat = nd::random::uniform(-5, 5, s);
+	nd::matrix<double> mat = nd::random::uniform(1, 10, s);
+	nd::matrix<double> S = nd::linalg::matmul<double>(mat,
+			mat.permute( { 1, 0 }));
 
-	nd::out::print_matrix(mat);
-
-	std::cout << "\n===============================\n";
-
-	coords cview_3d = mat._m_coords().view_3d(false);
-
-	nd::iterator::Iterator *it = nd::iterator::init_iterator(cview_3d);
-
-	flag8_t state = nd::linalg::_h::forward_substitution_step(mat, it, 0);
-
-	state = nd::linalg::_h::forward_substitution_step(mat, it, 1);
-
-	nd::out::print_matrix(mat);
-
-	std::cout << "\n===============================\n";
-
-	std::cout << "state [0]: " << static_cast<min_t>(state) << ln;
-
-	std::cout << "\n--------------------\n";
-
-	mat.assign( { 1, 1, 1 }, 0);
-
-	nd::out::print_matrix(mat);
-
-	state = nd::linalg::_h::forward_substitution_step(mat, it, 1);
-
-	std::cout << "\n--------------------\n";
-
-	std::cout << "state [1]: " << static_cast<min_t>(state) << ln;
-
-	nd::iterator::free_iterator(it);
+	test2(S);
 }
 
