@@ -56,24 +56,24 @@ nd::matrix<RT> nd::linalg::matmul(const nd::matrix<T1, rf_h0> &m0,
 	coords attr0 = m0._m_coords();
 	coords attr1 = m1._m_coords();
 
-	attr0.own_data = false;
-	attr1.own_data = false;
-
 	coords out_attr = nd::align_dim_2d(attr0, attr1,
 			"nd::linalg::matmul(...), ");
 
-	nd::matrix<T1> mat0 = m0.set_new_coords(attr0);
-	nd::matrix<T2> mat1 = m1.set_new_coords(attr1);
+	attr0.ownership(false);
+	attr1.ownership(false);
+
+	nd::matrix<T1, false> tmp0 = m0.set_new_coords(attr0);
+	nd::matrix<T2, false> tmp1 = m1.set_new_coords(attr1);
 
 	nd::matrix<RT> result(out_attr);
 
-	T1 *d0 = mat0._m_begin();
-	T2 *d1 = mat1._m_begin();
+	T1 *d0 = tmp0._m_begin();
+	T2 *d1 = tmp1._m_begin();
 
 	RT *res = result._m_begin();
 
-	_m_ops::mul_reduce_sum(res, d0, d1, out_attr, mat0._m_coords(),
-			mat1._m_coords(), 1);
+	_m_ops::mul_reduce_sum(res, d0, d1, out_attr, tmp0._m_coords(),
+			tmp1._m_coords(), 1);
 
 	result._m_clear_iter_type();
 
@@ -87,27 +87,27 @@ nd::matrix<RT> nd::linalg::tensordot(const nd::matrix<T1, rf_h0> &m0,
 	coords attr0 = m0._m_coords();
 	coords attr1 = m1._m_coords();
 
-	attr0.own_data = false;
-	attr1.own_data = false;
-
 	coords out_attr = nd::align_dim(attr0, attr1, axes,
 			"nd::linalg::tensordot(...), ");
 
-	nd::matrix<T1> mat0 = m0.set_new_coords(attr0);
-	nd::matrix<T2> mat1 = m1.set_new_coords(attr1);
+	attr0.ownership(false);
+	attr1.ownership(false);
+
+	nd::matrix<T1, false> tmp0 = m0.set_new_coords(attr0);
+	nd::matrix<T2, false> tmp1 = m1.set_new_coords(attr1);
 
 	nd::matrix<RT> result(out_attr);
 
-	T1 *d0 = mat0._m_begin();
-	T2 *d1 = mat1._m_begin();
+	T1 *d0 = tmp0._m_begin();
+	T2 *d1 = tmp1._m_begin();
 
 	RT *res = result._m_begin();
 
 	// axes[0].size() == axes[1].size()
 	max_size_t naxes = axes[0].size();
 
-	_m_ops::mul_reduce_sum(res, d0, d1, out_attr, mat0._m_coords(),
-			mat1._m_coords(), naxes);
+	_m_ops::mul_reduce_sum(res, d0, d1, out_attr, tmp0._m_coords(),
+			tmp1._m_coords(), naxes);
 
 	result._m_clear_iter_type();
 
@@ -188,7 +188,7 @@ nd::matrix<T> nd::linalg::transpose(const nd::matrix<T, rf_h> &mat,
 //inplace ops
 
 /*
- * # 2D case,
+ * # Brief Analysis for the 2D case,
  *
  * # shape = (N, M)
  * # n = N * M

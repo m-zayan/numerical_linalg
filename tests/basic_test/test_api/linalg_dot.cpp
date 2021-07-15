@@ -20,7 +20,8 @@ void test_api::linalg_dot() {
 
 	nd::out::_h::print_vec1d(mat2._m_begin(), 0, mat2.size());
 
-	std::cout << "\n\n============= dot: (3, 3, 2) - (3, 2, 3) ================\n";
+	std::cout
+			<< "\n\n============= dot: (3, 3, 2) - (3, 2, 3) ================\n";
 	nd::matrix<int> result = nd::linalg::dot<int>(mat1, mat2);
 
 	std::cout << "shape :" << result.shape() << " -- own-data :"

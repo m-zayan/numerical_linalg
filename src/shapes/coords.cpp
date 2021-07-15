@@ -336,6 +336,11 @@ void coords::swapaxes(max_size_t ax0, max_size_t ax1) {
 	this->iter_type = IteratorType::Linear;
 }
 
+void coords::ownership(bool own_data) {
+
+	this->own_data = own_data;
+}
+
 coords coords::concat(const coords &attr, max_size_t ax) const {
 
 	shape_t in_shape = this->shape;

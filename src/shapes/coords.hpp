@@ -143,6 +143,7 @@ public:
 	coords slice(shape_t begin, shape_t end) const;
 
 	void swapaxes(max_size_t ax0, max_size_t ax1);
+	void ownership(bool own_data);
 
 	friend bool operator ==(const coords &attr1, const coords &attr2);
 
