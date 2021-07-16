@@ -8,6 +8,7 @@
 #define SRC_TYPING_GTYPES_TYPES_HPP
 
 #include <iostream>
+#include <iomanip>
 
 #include <initializer_list>
 

@@ -79,7 +79,7 @@ RT reduce_pairwise(big_size_t begin, big_size_t end, T *x,
 	big_size_t n = end - begin;
 
 	if (n <= 1) {
-		return x[0];
+		return x[begin];
 	}
 
 	RT x0 = reduce_pairwise<RT, T>(begin, n / 2, x, func);

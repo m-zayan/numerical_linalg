@@ -8,7 +8,6 @@
 #include "./matrix_ops.cpp"
 #include "./matrix_init.cpp"
 #include "./matrix_numeric.cpp"
-#include "./matrix_stdout.cpp"
 
 // base
 template<typename T, bool ref_holder>

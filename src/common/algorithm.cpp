@@ -191,23 +191,29 @@ RT algorithm::gcd(T1 a, T2 b) {
  * Updating Formulae and a Pairwise Algorithm for Computing Sample Variances:
  *
  * 		http://i.stanford.edu/pub/cstr/reports/cs/tr/79/773/CS-TR-79-773.pdf
+ *
+ * 	s_{i} <--> sample, sum of squares of deviations from the mean.
+ * 	t_{i} <--> sample, sum
  */
 template<typename RT, typename Size>
-std::vector<RT> algorithm::update_variance(RT sum0, RT sum1, RT var0, RT var1,
+std::vector<RT> algorithm::update_variance(RT t0, RT t1, RT s0, RT s1,
 		Size size0, Size size1) {
 
 	RT m = static_cast<RT>(size0);
 	RT n = static_cast<RT>(size1);
 
 	RT ssize = (m + n);
-	RT means_diff = (sum0 / m - sum1 / n);
 
-	RT c = (n * m) / ssize;
-	RT uvar = var0 + var1 + c * (means_diff * means_diff);
+	RT c0 = m / (n * ssize);
+	RT c1 = ssize / m;
 
-	uvar /= (ssize - 1);
+	RT t2 = t0 + t1;
 
-	std::vector<RT> updated = { sum0 + sum1, uvar, ssize };
+	RT diff = (c1 * t0 - t2);
+
+	RT s2 = s0 + s1 + c0 * (diff * diff);
+
+	std::vector<RT> updated = { t2, s2, ssize };
 
 	return updated;
 }

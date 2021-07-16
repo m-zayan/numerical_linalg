@@ -6,68 +6,123 @@
 
 #include "test_api.hpp"
 
+template<typename T>
+void test_min(nd::matrix<T> mat, max_size_t axis = 0) {
+
+	nd::matrix<T> result = nd::numeric::min<int>(mat, axis);
+
+	std::cout << " shape : " << result.shape() << "\n -------------- \n";
+
+	nd::out::print_matrix(result);
+
+	std::cout << "\n ============================= \n";
+}
+
+template<typename T>
+void test_argmin(nd::matrix<T> mat, max_size_t axis = 0) {
+
+	nd::matrix<T> result = nd::numeric::argmin<T>(mat, axis);
+
+	std::cout << " shape : " << result.shape() << "\n -------------- \n";
+
+	nd::out::print_matrix(result);
+
+	std::cout << "\n ============================= \n";
+}
+
+template<typename T>
+void test_max(nd::matrix<T> mat, max_size_t axis = 0) {
+
+	nd::matrix<T> result = nd::numeric::max<T>(mat, axis);
+
+	std::cout << " shape : " << result.shape() << "\n -------------- \n";
+
+	nd::out::print_matrix(result);
+
+	std::cout << "\n ============================= \n";
+}
+
+template<typename T>
+void test_argmax(nd::matrix<T> mat, max_size_t axis = 0) {
+
+	nd::matrix<T> result = nd::numeric::argmax<T>(mat, axis);
+
+	std::cout << " shape : " << result.shape() << "\n -------------- \n";
+
+	nd::out::print_matrix(result);
+
+	std::cout << "\n ============================= \n";
+}
+
+template<typename T>
+void test_sum(nd::matrix<T> mat, max_size_t axis = 0) {
+
+	nd::matrix<T> result = nd::numeric::sum<T>(mat, axis);
+
+	std::cout << " shape : " << result.shape() << "\n -------------- \n";
+
+	nd::out::print_matrix(result);
+
+	std::cout << "\n ============================= \n";
+}
+
+template<typename T>
+void test_mean(nd::matrix<T> mat, max_size_t axis = 0) {
+
+	nd::matrix<double> result = nd::numeric::mean<double>(mat, axis);
+
+	std::cout << " shape : " << result.shape() << "\n -------------- \n";
+
+	nd::out::print_matrix(result);
+
+	std::cout << "\n ============================= \n";
+}
+
+template<typename T>
+void test_var(nd::matrix<T> mat, max_size_t axis = 0) {
+
+	nd::matrix<double> result = nd::numeric::var<double>(mat, axis);
+
+	std::cout << " shape : " << result.shape() << "\n -------------- \n";
+
+	nd::out::print_matrix(result);
+
+	std::cout << "\n ============================= \n";
+}
+
+template<typename T>
+void test_std(nd::matrix<T> mat, max_size_t axis = 0) {
+
+	nd::matrix<double> result = nd::numeric::std<double>(mat, axis);
+
+	std::cout << " shape : " << result.shape() << "\n -------------- \n";
+
+	nd::out::print_matrix(result);
+
+	std::cout << "\n ============================= \n";
+}
+
 void test_api::ops_nd_matrix() {
 
-	shape_t s0 = { 3, 3 };
-	nd::matrix<int> m0 = nd::random::uniform(0, 10, s0);
+	shape_t s = { 20, 20 };
+	nd::matrix<int> mat = nd::random::uniform(0, 10, s);
 
-	nd::out::print_matrix(m0);
-
-	std::cout << "\n ============================= \n";
-
-	nd::matrix<int> out0 = nd::numeric::min<int>(m0, 1);
-
-	std::cout << " shape : " << out0.shape() << "\n -------------- \n";
-
-	nd::out::print_matrix(out0);
+	nd::out::_h::print_vec1d(mat._m_begin(), 0, mat.size());
 
 	std::cout << "\n ============================= \n";
 
-	nd::matrix<double> out1 = nd::numeric::argmin<double>(m0, 1);
+//	test_min(mat);
+//	test_argmin(mat);
 
-	std::cout << " shape : " << out1.shape() << "\n -------------- \n";
+//	test_max(mat);
+//	test_argmax(mat);
 
-	nd::out::print_matrix(out1 + 0.5);
+//	test_sum(mat);
+//	test_mean(mat);
 
-	std::cout << "\n ============================= \n";
+	// pairwise
+	nd::mem::AUX_SIZE = 2;
 
-	nd::matrix<int> out2 = nd::numeric::max<int>(m0, 0, true);
-
-	std::cout << " shape : " << out2.shape() << "\n -------------- \n";
-
-	nd::out::print_matrix(out2);
-
-	std::cout << "\n ============================= \n";
-
-	nd::matrix<max_size_t> out3 = nd::numeric::argmax<max_size_t>(m0, 1, true);
-
-	std::cout << " shape : " << out3.shape() << "\n -------------- \n";
-
-	nd::out::print_matrix(out3 + 0.5);
-
-	std::cout << "\n ============================= \n";
-
-//	nd::mem::AUX_SIZE = 2;
-
-	nd::matrix<double> out4 = nd::numeric::sum<double>(m0, 1);
-
-	std::cout << " shape : " << out4.shape() << "\n -------------- \n";
-
-	nd::out::print_matrix(out4 + 0.5);
-
-	std::cout << "\n ============================= \n";
-
-	nd::matrix<float_32> out5 = nd::numeric::var(m0, 1, true);
-
-	std::cout << " shape : " << out5.shape() << "\n -------------- \n";
-
-	nd::out::print_matrix(out5);
-
-	std::cout << "\n ============================= \n";
-
-	nd::matrix<float_32> out6 = nd::numeric::std(m0, 1, true);
-
-	std::cout << " shape : " << out6.shape() << "\n -------------- \n";
-
-	nd::out::print_matrix(out6);
+	test_var(mat);
+	test_std(mat);
 }

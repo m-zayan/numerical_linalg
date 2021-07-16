@@ -571,8 +571,8 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 	vec1d<T1> elems(aux_size);
 	vec1d<max_size_t> indices(aux_size);
 
-	T1 *d0 = tmp._m_begin();
-	RT *d1 = result._m_begin();
+	T1 *d = tmp._m_begin();
+	RT *res = result._m_begin();
 
 	T2 acc;
 
@@ -583,7 +583,7 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 
 		for (max_size_t j = 0; j < dim_size; j++) {
 
-			elems[vi] = d0[it->index1d];
+			elems[vi] = d[it->index1d];
 			indices[vi] = j;
 
 			vi++;
@@ -601,7 +601,7 @@ nd::matrix<RT> nd::apply_along_axis(const nd::matrix<T1, rf_h> &mat,
 			func(acc, indices, elems, 0, vi);
 		}
 
-		d1[i] = ppfunc(acc);
+		res[i] = ppfunc(acc);
 	}
 
 	// [1]

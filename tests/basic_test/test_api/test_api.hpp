@@ -14,6 +14,8 @@
 #include "../../../src/multidim/matrix.cpp"
 #include "../../../src/linalg/linalg.cpp"
 
+#include "../../../src/io/stdout.hpp"
+
 #define ln '\n'
 
 namespace test_api {

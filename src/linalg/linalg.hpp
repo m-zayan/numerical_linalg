@@ -9,22 +9,22 @@
 
 #include "../multidim/matrix.hpp"
 
-#define LINALG_EPS 1e-8
-#define LINALG_IEPS 1e8
-
 namespace nd::linalg::_h {
 
-template<typename T, bool rf_h>
-flag8_t partial_pivoting_step(nd::matrix<T, rf_h> &mat,
-		nd::iterator::Iterator *it, max_size_t ccols, max_size_t column_index,
-		bool pivot = true, bool scale = false);
+template<typename T, bool rf_h0, bool rf_h1 = false>
+flag8_t partial_pivoting_step(nd::matrix<T, rf_h0> &lhs,
+		nd::iterator::Iterator *it, max_size_t ppcols, max_size_t column_index,
+		bool pivot = true, bool scale = false, nd::matrix<T, rf_h1> *rhsref =
+				nullptr);
 
-template<typename T, bool rf_h>
-flag8_t gsubstitution_step(nd::matrix<T, rf_h> &mat, nd::iterator::Iterator *it,
-		max_size_t ccols, max_size_t column_index, bool pivot);
+template<typename T, bool rf_h0, bool rf_h1 = false>
+flag8_t gsubstitution_step(nd::matrix<T, rf_h0> &lhs,
+		nd::iterator::Iterator *it, max_size_t gscols, max_size_t column_index,
+		bool pivot, nd::matrix<T, rf_h1> *rhsref = nullptr);
 
 template<typename T, bool rf_h0, bool rf_h1>
-nd::matrix<T> augmented(const nd::matrix<T, rf_h0>& lhs, const nd::matrix<T, rf_h1>& rhs);
+nd::matrix<T> augmented(const nd::matrix<T, rf_h0> &lhs,
+		const nd::matrix<T, rf_h1> &rhs);
 
 template<typename T, bool rf_h>
 nd::matrix<T> augmented(const nd::matrix<T, rf_h> &lhs);

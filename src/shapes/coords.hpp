@@ -54,6 +54,8 @@ namespace nd::state {
 
 extern bounded_t<uflag8_t> BroadcastingLevel;
 
+extern bounded_t<std::string> PrintOptions;
+
 }
 
 // =============================== shape_t ===============================

@@ -10,23 +10,32 @@
  * mat.shape() ---> (reduced_dims, nrows, ncols)
  * column_index ---> pivot
  *
- * ### ccols:
- * 		for an augmented-matrix <--> [ccols < ncols]
+ * ### ppcols:
+ * 		e.g. for an augmented-matrix <--> [ppcols < ncols]
  *
  * {1: valid-step, -1: invalid-step}
  *
  * 		 [invalid-step <--> singular-matrix-indicator]
  */
-template<typename T, bool rf_h>
-flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h> &mat,
-		nd::iterator::Iterator *it, max_size_t ccols, max_size_t column_index,
-		bool pivot, bool scale) {
+template<typename T, bool rf_h0, bool rf_h1>
+flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h0> &lhs,
+		nd::iterator::Iterator *it, max_size_t ppcols, max_size_t column_index,
+		bool pivot, bool scale, nd::matrix<T, rf_h1> *rhsref) {
 
-	max_size_t ndim = mat.ndim();
+	max_size_t ndim = lhs.ndim();
 
-	max_size_t n_chunk = mat.shape()[0];
-	max_size_t nrows = mat.shape()[1];
-	max_size_t ncols = mat.shape()[2];
+	max_size_t n_chunk = lhs.shape()[0];
+	max_size_t nrows = lhs.shape()[1];
+	max_size_t ncols = lhs.shape()[2];
+
+	// -------------------------------------------------------------
+
+	max_size_t rndim;
+	max_size_t rn_chunk;
+	max_size_t rnrows;
+	max_size_t rncols;
+
+	// -------------------------------------------------------------
 
 	if (ndim != 3) {
 		throw nd::exception(
@@ -46,7 +55,32 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h> &mat,
 						"std::is_integral<T>::value && scale");
 	}
 
-	T *d = mat._m_begin();
+	// -------------------------------------------------------------------------------
+
+	T *d = lhs._m_begin();
+
+	T *b;
+
+	// -------------------------------------------------------------------------------
+
+	if (rhsref != nullptr) {
+
+		rndim = rhsref->ndim();
+
+		rn_chunk = rhsref->shape()[0];
+		rnrows = rhsref->shape()[1];
+		rncols = rhsref->shape()[2];
+
+		if (rndim != ndim || rn_chunk != n_chunk || rnrows != nrows) {
+			throw nd::exception(
+					"Invalid Call for, nd::linalg::_h::partial_pivoting_step(...)\n\t"
+							"inconsistent [lhs | rhs]");
+		}
+
+		b = rhsref->_m_begin();
+	}
+
+	// -------------------------------------------------------------------------------
 
 	shape_t indices(ndim);
 
@@ -54,8 +88,8 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h> &mat,
 	max_size_t invalid_idx = std::numeric_limits<max_size_t>::max();
 
 	// epsilon
-	T EPS = LINALG_EPS;
-	T IEPS = LINALG_IEPS;
+	T EPS = std::numeric_limits<T>::epsilon();
+	T IEPS = std::numeric_limits<T>::max();
 
 	for (max_size_t k = 0; k < n_chunk; k++) {
 
@@ -68,7 +102,7 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h> &mat,
 		// [1] ============================================================
 
 		indices[1] = nrows - 1;
-		indices[2] = ccols - 1;
+		indices[2] = ppcols - 1;
 
 		BITER_ROTATE_AT(it, indices);
 
@@ -120,6 +154,27 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h> &mat,
 					// permute row (column_index, max_index)
 					std::swap(d[idx0], d[idx1]);
 				}
+
+				// -------------------------------------------------------------
+
+				if (rhsref != nullptr) {
+
+					for (max_size_t i = 0; i < rncols; i++) {
+
+						indices[1] = column_index;
+						indices[2] = i;
+
+						BITER_INDEX_AT1D(it, indices, idx0);
+
+						indices[1] = max_index;
+						indices[2] = i;
+
+						BITER_INDEX_AT1D(it, indices, idx1);
+
+						// permute row (column_index, max_index)
+						std::swap(b[idx0], b[idx1]);
+					}
+				}
 			}
 		}
 
@@ -159,6 +214,8 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h> &mat,
 				scale_inv = 1.0 / d[index];
 			}
 
+			// -------------------------------------------------------------
+
 			for (max_size_t i = 0; i < ncols; i++) {
 
 				indices[1] = column_index;
@@ -168,6 +225,22 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h> &mat,
 
 				// scale
 				d[index] *= scale_inv;
+			}
+
+			// -------------------------------------------------------------
+
+			if (rhsref != nullptr) {
+
+				for (max_size_t i = 0; i < rncols; i++) {
+
+					indices[1] = column_index;
+					indices[2] = i;
+
+					BITER_INDEX_AT1D(it, indices, index);
+
+					// scale
+					b[index] *= scale_inv;
+				}
 			}
 		}
 
@@ -180,8 +253,8 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h> &mat,
 /*
  * mat.shape() ---> (reduced_dims, nrows, ncols)
  *
- * ### ccols:
- * 		for an augmented-matrix <--> [ccols < ncols]
+ * ### gscols:
+ * 		e.g. for an augmented-matrix <--> [gscols < ncols]
  *
  * {-1: invalid-step,
  *  0: last-pivot,
@@ -191,31 +264,69 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h> &mat,
  * 		[invalid-step <--> singular-matrix-indicator]
  */
 
-template<typename T, bool rf_h>
-flag8_t nd::linalg::_h::gsubstitution_step(nd::matrix<T, rf_h> &mat,
-		nd::iterator::Iterator *it, max_size_t ccols, max_size_t column_index,
-		bool pivot) {
+template<typename T, bool rf_h0, bool rf_h1>
+flag8_t nd::linalg::_h::gsubstitution_step(nd::matrix<T, rf_h0> &lhs,
+		nd::iterator::Iterator *it, max_size_t gscols, max_size_t column_index,
+		bool pivot, nd::matrix<T, rf_h1> *rhsref) {
 
-	flag8_t is_valid = nd::linalg::_h::partial_pivoting_step(mat, it, ccols,
-			column_index, pivot, true);
+	flag8_t is_valid = nd::linalg::_h::partial_pivoting_step(lhs, it, gscols,
+			column_index, pivot, true, rhsref);
 
 	// case: invalid-step
 	if (is_valid == -1) {
 		return -1;
 	}
 
-	max_size_t ndim = mat.ndim();
+	// -------------------------------------------------------------------------------
 
-	max_size_t n_chunk = mat.shape()[0];
-	max_size_t nrows = mat.shape()[1];
-	max_size_t ncols = mat.shape()[2];
+	max_size_t ndim = lhs.ndim();
+
+	max_size_t n_chunk = lhs.shape()[0];
+	max_size_t nrows = lhs.shape()[1];
+	max_size_t ncols = lhs.shape()[2];
+
+	// -------------------------------------------------------------------------------
+
+	max_size_t rndim;
+	max_size_t rn_chunk;
+	max_size_t rnrows;
+	max_size_t rncols;
+
+	// -------------------------------------------------------------------------------
 
 	// case: last-pivot || first-pivot
 	if (column_index + 1 == nrows) {
 		return it->virtrot;
 	}
 
-	T *d = mat._m_begin();
+	// -------------------------------------------------------------------------------
+
+	T *d = lhs._m_begin();
+
+	T *b;
+
+	// -------------------------------------------------------------------------------
+
+	if (rhsref != nullptr) {
+
+		rndim = rhsref->ndim();
+
+		rn_chunk = rhsref->shape()[0];
+		rnrows = rhsref->shape()[1];
+		rncols = rhsref->shape()[2];
+
+		if (rndim != ndim || rn_chunk != n_chunk || rnrows != nrows) {
+
+			// Debugging ... | must have been executed <--> partial_pivoting_step(...)
+			throw nd::exception(
+					"Invalid Call for, nd::linalg::_h::gsubstitution_step(...)\n\t"
+							"inconsistent [lhs | rhs]");
+		}
+
+		b = rhsref->_m_begin();
+	}
+
+	// -------------------------------------------------------------------------------
 
 	shape_t indices(ndim);
 
@@ -228,7 +339,7 @@ flag8_t nd::linalg::_h::gsubstitution_step(nd::matrix<T, rf_h> &mat,
 		// [0] ============================================================
 
 		indices[1] = nrows - 1;
-		indices[2] = ccols - 1;
+		indices[2] = gscols - 1;
 
 		BITER_ROTATE_AT(it, indices);
 
@@ -242,6 +353,8 @@ flag8_t nd::linalg::_h::gsubstitution_step(nd::matrix<T, rf_h> &mat,
 			BITER_INDEX_AT1D(it, indices, idx1);
 
 			T scale = d[idx1];
+
+			// -------------------------------------------------------------
 
 			for (max_size_t j = 0; j < ncols; j++) {
 
@@ -257,6 +370,27 @@ flag8_t nd::linalg::_h::gsubstitution_step(nd::matrix<T, rf_h> &mat,
 
 				// elimination step
 				d[idx1] -= (d[idx0] * scale);
+			}
+
+			// -------------------------------------------------------------
+
+			if (rhsref != nullptr) {
+
+				for (max_size_t j = 0; j < rncols; j++) {
+
+					indices[1] = column_index;
+					indices[2] = j;
+
+					BITER_INDEX_AT1D(it, indices, idx0);
+
+					indices[1] = i;
+					indices[2] = j;
+
+					BITER_INDEX_AT1D(it, indices, idx1);
+
+					// elimination step
+					b[idx1] -= (b[idx0] * scale);
+				}
 			}
 		}
 	}

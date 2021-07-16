@@ -1,10 +1,13 @@
 /*
- * matrix_stdout.cpp
+ * stdout.hpp
  *
- *	Author: Z. Mohamed
+ *      Author: Z. Mohamed
  */
 
-#include "./matrix.hpp"
+#ifndef SRC_IO_STDOUT_HPP
+#define SRC_IO_STDOUT_HPP
+
+#include "../multidim/matrix.hpp"
 
 namespace nd::out::_h {
 
@@ -47,7 +50,7 @@ void print_vec1d(T *ref, big_size_t begin, big_size_t end) {
 
 namespace nd::out {
 
-template<typename T, bool rf_h, uflag8_t d_round = 0>
+template<typename T, bool rf_h>
 void print_matrix(const matrix<T, rf_h> &mat) {
 
 	nd::matrix<T, false> tmp = mat;
@@ -75,7 +78,7 @@ void print_matrix(const matrix<T, rf_h> &mat) {
 
 		nd::out::_h::print_rchar('[', it->ndim - it->iaxis - 1);
 
-		nd::out::_h::it_print_vec1d(data, it, chunk_size);
+		nd::out::_h::it_print_vec1d<T>(data, it, chunk_size);
 
 		nd::out::_h::print_rchar(']', it->ndim - it->iaxis - 1);
 
@@ -92,3 +95,4 @@ void print_matrix(const matrix<T, rf_h> &mat) {
 }
 }
 
+#endif /* SRC_IO_STDOUT_HPP */

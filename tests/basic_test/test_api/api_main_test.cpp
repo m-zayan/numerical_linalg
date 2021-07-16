@@ -34,7 +34,7 @@ int main() {
 //	test_api::nd_broadcasting();
 
 //  [9]
-//  test_api::ops_nd_matrix();
+  test_api::ops_nd_matrix();
 
 //  [10]
 //  test_api::linalg_preprocessing();
@@ -49,6 +49,6 @@ int main() {
 //  test_api::scalar_like_nd();
 
 //  [14]
-	test_api::opsv2_nd_matrix();
+//	test_api::opsv2_nd_matrix();
 
 }

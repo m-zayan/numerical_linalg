@@ -46,10 +46,10 @@ RT gcd(T1 a, T2 b);
 
 /* return a merged samples' mean, variance and total size [2-samples].
  *
- * 	vec1d<RT> = {updated_mean, updated_var, total_size}
+ * 	vec1d<RT> = {updated_t, updated_s, total_size}
  */
 template<typename RT = float_auto, typename Size>
-std::vector<RT> update_variance(RT sum0, RT sum1, RT var0, RT var1, Size size0,
+std::vector<RT> update_variance(RT t0, RT t1, RT s0, RT s1, Size size0,
 		Size size1);
 
 template<typename T>
