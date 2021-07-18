@@ -792,3 +792,26 @@ coords nd::align_dim_2d(coords &attr0, coords &attr1, std::string &&signature) {
 
 	return out_attr;
 }
+
+/*
+ * in_attr <--> [will be modified]
+ */
+coords nd::concat_all(vec1d<coords> &in_attr, max_size_t ax) {
+
+	max_size_t n = in_attr.size();
+
+	for (max_size_t i = 0; i < n; i++) {
+		in_attr[i].swapaxes(0, ax);
+	}
+
+	coords out_attr = in_attr[0];
+
+	for (max_size_t i = 1; i < 2; i++) {
+		out_attr = out_attr.concat(in_attr[i], 0);
+	}
+
+	// reverse <--> in_attr[i].swapaxes(...)
+	out_attr.swapaxes(0, ax);
+
+	return out_attr;
+}

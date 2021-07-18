@@ -28,13 +28,13 @@ int main() {
 //	test_api::reorder_copy();
 
 //	[7]
-//	test_api::linalg_inplace();
+//	test_api::linalg_experimental();
 
 //	[8]
 //	test_api::nd_broadcasting();
 
 //  [9]
-  test_api::ops_nd_matrix();
+//  test_api::ops_nd_matrix();
 
 //  [10]
 //  test_api::linalg_preprocessing();

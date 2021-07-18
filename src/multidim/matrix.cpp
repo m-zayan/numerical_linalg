@@ -6,8 +6,8 @@
 
 #include "./matrix_alloc.cpp"
 #include "./matrix_ops.cpp"
-#include "./matrix_init.cpp"
 #include "./matrix_numeric.cpp"
+#include "./matrix_init.cpp"
 
 // base
 template<typename T, bool ref_holder>

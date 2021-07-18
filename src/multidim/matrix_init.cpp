@@ -12,9 +12,6 @@ nd::matrix<T> nd::stack(nd::composite<nd::matrix<T, false>> matrix_list) {
 	// stack-size
 	max_size_t n_chunk = matrix_list.size();
 
-	// element-size
-	big_size_t chunk_size;
-
 	if (n_chunk == 0) {
 
 		throw nd::exception(
@@ -61,16 +58,9 @@ nd::matrix<T> nd::stack(nd::composite<nd::matrix<T, false>> matrix_list) {
 			it->reinterpret_coords(matrix_list[i]._m_coords());
 		}
 
-		chunk_size = it->niter;
-
 		T *d = matrix_list[i]._m_begin();
 
-		for (big_size_t j = 0; j < chunk_size; j++) {
-
-			res[out_it->index1d] = d[it->index1d];
-
-			ITER_PAIRWISE2_NEXT(out_it, it);
-		}
+		_m_it::copy<T, T>(res, d, it, out_it);
 	}
 
 	// [1]
@@ -85,8 +75,6 @@ nd::matrix<T> nd::concat(nd::composite<nd::matrix<T, false>> matrix_list,
 		max_size_t axis) {
 
 	max_size_t n_chunk = matrix_list.size();
-
-	big_size_t chunk_size;
 
 	if (n_chunk == 0) {
 
@@ -106,26 +94,15 @@ nd::matrix<T> nd::concat(nd::composite<nd::matrix<T, false>> matrix_list,
 	vec1d<coords> in_attr(n_chunk);
 
 	for (max_size_t i = 0; i < n_chunk; i++) {
-
 		in_attr[i] = matrix_list[i]._m_coords();
-		in_attr[i].swapaxes(0, axis);
 	}
 
-	coords out_attr = in_attr[0];
-
-	for (max_size_t i = 1; i < n_chunk; i++) {
-
-		out_attr = out_attr.concat(in_attr[i], 0);
-	}
-
-	// reverse <--> in_attr[i].swapaxes(...)
-	out_attr.swapaxes(0, axis);
+	coords out_attr = nd::concat_all(in_attr, axis);
 
 	nd::matrix<T> result(out_attr);
 
 	// [0]
 	nd::iterator::Iterator *it = nd::iterator::init_iterator(in_attr[0]);
-
 	nd::iterator::Iterator *out_it = nd::iterator::init_iterator(out_attr);
 
 	T *res = result._m_begin();
@@ -137,16 +114,9 @@ nd::matrix<T> nd::concat(nd::composite<nd::matrix<T, false>> matrix_list,
 			it->reinterpret_coords(in_attr[i]);
 		}
 
-		chunk_size = it->niter;
-
 		T *d = matrix_list[i]._m_begin();
 
-		for (big_size_t j = 0; j < chunk_size; j++) {
-
-			res[out_it->index1d] = d[it->index1d];
-
-			ITER_PAIRWISE2_NEXT(out_it, it);
-		}
+		_m_it::copy<T, T>(res, d, it, out_it);
 	}
 
 	// [1]

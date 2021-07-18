@@ -1,5 +1,5 @@
 /*
- * preprocessing.cpp
+ * inplace.cpp
  *
  *      Author: Z. Mohamed
  */
@@ -18,7 +18,7 @@
  * 		 [invalid-step <--> singular-matrix-indicator]
  */
 template<typename T, bool rf_h0, bool rf_h1>
-flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h0> &lhs,
+flag8_t nd::linalg::inplace::partial_pivoting_step(nd::matrix<T, rf_h0> &lhs,
 		nd::iterator::Iterator *it, max_size_t ppcols, max_size_t column_index,
 		bool pivot, bool scale, nd::matrix<T, rf_h1> *rhsref) {
 
@@ -39,19 +39,19 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h0> &lhs,
 
 	if (ndim != 3) {
 		throw nd::exception(
-				"Invalid Call for, nd::linalg::_h::partial_pivoting_step(...)\n\t"
+				"Invalid Call for, nd::linalg::inplace::partial_pivoting_step(...)\n\t"
 						"ndim != 3");
 	}
 
 	if (ncols <= column_index || nrows <= column_index) {
 		throw nd::exception(
-				"Invalid Call for, nd::linalg::_h::partial_pivoting_step(...)\n\t"
+				"Invalid Call for, nd::linalg::inplace::partial_pivoting_step(...)\n\t"
 						"ncols <= column_index || nrows <= column_index");
 	}
 
 	if (std::is_integral<T>::value && scale) {
 		throw nd::exception(
-				"Invalid Call for, nd::linalg::_h::partial_pivoting_step(...)\n\t"
+				"Invalid Call for, nd::linalg::inplace::partial_pivoting_step(...)\n\t"
 						"std::is_integral<T>::value && scale");
 	}
 
@@ -73,7 +73,7 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h0> &lhs,
 
 		if (rndim != ndim || rn_chunk != n_chunk || rnrows != nrows) {
 			throw nd::exception(
-					"Invalid Call for, nd::linalg::_h::partial_pivoting_step(...)\n\t"
+					"Invalid Call for, nd::linalg::inplace::partial_pivoting_step(...)\n\t"
 							"inconsistent [lhs | rhs]");
 		}
 
@@ -195,7 +195,7 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h0> &lhs,
 
 					// Debugging ... | must have been executed in case-zero
 					throw nd::exception(
-							"nd::linalg::_h::partial_pivoting_step(...), has been failed");
+							"nd::linalg::inplace::partial_pivoting_step(...), has been failed");
 				}
 
 				else {
@@ -250,6 +250,8 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h0> &lhs,
 	return 1;
 }
 
+/* ==================================================================================== */
+
 /*
  * mat.shape() ---> (reduced_dims, nrows, ncols)
  *
@@ -265,12 +267,12 @@ flag8_t nd::linalg::_h::partial_pivoting_step(nd::matrix<T, rf_h0> &lhs,
  */
 
 template<typename T, bool rf_h0, bool rf_h1>
-flag8_t nd::linalg::_h::gsubstitution_step(nd::matrix<T, rf_h0> &lhs,
+flag8_t nd::linalg::inplace::gsubstitution_step(nd::matrix<T, rf_h0> &lhs,
 		nd::iterator::Iterator *it, max_size_t gscols, max_size_t column_index,
 		bool pivot, nd::matrix<T, rf_h1> *rhsref) {
 
-	flag8_t is_valid = nd::linalg::_h::partial_pivoting_step(lhs, it, gscols,
-			column_index, pivot, true, rhsref);
+	flag8_t is_valid = nd::linalg::inplace::partial_pivoting_step(lhs, it,
+			gscols, column_index, pivot, true, rhsref);
 
 	// case: invalid-step
 	if (is_valid == -1) {
@@ -319,7 +321,7 @@ flag8_t nd::linalg::_h::gsubstitution_step(nd::matrix<T, rf_h0> &lhs,
 
 			// Debugging ... | must have been executed <--> partial_pivoting_step(...)
 			throw nd::exception(
-					"Invalid Call for, nd::linalg::_h::gsubstitution_step(...)\n\t"
+					"Invalid Call for, nd::linalg::inplace::gsubstitution_step(...)\n\t"
 							"inconsistent [lhs | rhs]");
 		}
 
@@ -398,42 +400,3 @@ flag8_t nd::linalg::_h::gsubstitution_step(nd::matrix<T, rf_h0> &lhs,
 	// case: valid-step
 	return 1;
 }
-
-/*
- *  nd::matrix<RT>::shape() <-->
- *
- *  		(reduced_dims, nrows, mat->ncols + aug->ncols)
- */
-template<typename T, bool rf_h0, bool rf_h1>
-nd::matrix<T> nd::linalg::_h::augmented(const nd::matrix<T, rf_h0> &lhs,
-		const nd::matrix<T, rf_h1> &rhs) {
-
-	max_size_t ndim = lhs.ndim();
-
-	if (ndim < 2) {
-
-		throw nd::exception("nd::linalg::_h::augmented(...), ndim < 2");
-	}
-
-	// augmentation
-	nd::matrix<T> aug = nd::concat<T>( { lhs, rhs }, ndim - 2);
-
-	return aug.op_view_2d().permute( { 0, 2, 1 });
-}
-
-/*
- *  nd::matrix<RT>::shape() <-->
- *
- *  		(reduced_dims, nrows, mat->ncols + aug->ncols)
- *
- *  - [A | I]
- */
-template<typename T, bool rf_h>
-nd::matrix<T> nd::linalg::_h::augmented(const nd::matrix<T, rf_h> &lhs) {
-
-	// rhs <--> identity
-	nd::matrix<T> rhs = nd::linalg::eye<T>(lhs.shape());
-
-	return nd::linalg::_h::augmented<T>(lhs, rhs);
-}
-

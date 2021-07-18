@@ -169,6 +169,9 @@ coords align_dim(coords &attr0, coords &attr1, vec1d<shape_t> axes,
 
 coords align_dim_2d(coords &attr0, coords &attr1, std::string &&signature = "");
 
+// in_attr
+coords concat_all(vec1d<coords> &in_attr, max_size_t ax);
+
 }
 
 inline big_size_t get_size1d(shape_t &shape, max_size_t begin, max_size_t end) {

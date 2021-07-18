@@ -333,6 +333,26 @@ void contiguous_write_vec_val(T1 *d, T2 val, coords attr,
 
 }
 
+// ==========================================================================================
+
+}
+
+namespace _m_it {
+
+template<typename RT, typename T>
+void copy(RT *res, T *d, nd::iterator::Iterator *it,
+		nd::iterator::Iterator *out_it) {
+
+	big_size_t chunk_size = it->niter;
+
+	for (big_size_t j = 0; j < chunk_size; j++) {
+
+		res[out_it->index1d] = static_cast<RT>(d[it->index1d]);
+
+		ITER_PAIRWISE2_NEXT(out_it, it);
+	}
+}
+
 }
 
 #endif /* SRC_MULTIDIM_UFUNC_HPP */

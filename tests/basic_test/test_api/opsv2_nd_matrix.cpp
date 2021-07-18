@@ -6,7 +6,7 @@
 
 #include "test_api.hpp"
 
-void test0() {
+void test_concat() {
 
 	shape_t s0 = { 3, 3 };
 	nd::matrix<int> m0 = nd::random::uniform<int>(-5, 5, s0);
@@ -28,17 +28,17 @@ void test0() {
 
 }
 
-void test1() {
+void test_aug() {
 
 	shape_t s = { 3, 3 };
 
-	nd::matrix<double> mat = nd::random::uniform<double>(1, 10, s);
+	nd::matrix<int> mat = nd::random::uniform<int>(1, 10, s);
 
 	nd::out::print_matrix(mat);
 
 	std::cout << "\n==========================\n";
 
-	nd::matrix<double> aug = nd::linalg::_h::augmented<double>(mat);
+	nd::matrix<double> aug = nd::linalg::augmented<double>(mat);
 
 	nd::out::print_matrix(aug[0]);
 
@@ -80,5 +80,5 @@ void test1() {
 
 void test_api::opsv2_nd_matrix() {
 
-	test1();
+	test_concat();
 }
