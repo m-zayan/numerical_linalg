@@ -108,12 +108,6 @@ template<typename RT, typename T, bool rf_h>
 nd::matrix<RT, true> nd::numeric::var(const nd::matrix<T, rf_h> &mat,
 		max_size_t axis, bool keepdims) {
 
-//	vec1d<RT> initial_acc(3, 0);
-//
-//	nd::matrix<RT, true> result = nd::apply_along_axis(mat,
-//			nd::numeric::_h::seq_var<RT, T>, axis, initial_acc,
-//			nd::numeric::_h::ppseq_var<RT>, true, keepdims);
-
 	max_size_t dim_size = mat._m_coords().shape[axis];
 	max_size_t aux_size = nd::mem::clip_dim(dim_size);
 

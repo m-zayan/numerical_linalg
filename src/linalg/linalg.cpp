@@ -5,7 +5,6 @@
  */
 
 //#include "./linalg.hpp"
-
 #include "./reshape.cpp"
 #include "./inplace.cpp"
 
@@ -20,37 +19,9 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 				"shape, has to be greater than or equal 2, shape.size() >= 2");
 	}
 
-	nd::matrix<T> mat(shape, 0);
+	nd::matrix<T> result(shape, 0);
 
-	max_size_t ndim = mat.ndim();
-
-	max_size_t step0 = shape[ndim - 1];
-	max_size_t step1 = shape[ndim - 2];
-
-	max_size_t step = std::min(step0, step1);
-
-	big_size_t chunk_step = step0 * step1;
-
-	big_size_t size = mat.size();
-
-	big_size_t k;
-
-	T *d = mat._m_begin();
-
-	for (big_size_t i = 0; i < size; i += chunk_step) {
-
-		k = 0;
-
-		for (max_size_t j = 0; j < step; j++) {
-
-			d[i + j + k] = 1;
-
-			k += step0;
-		}
-
-	}
-
-	return mat;
+	return result;
 }
 
 template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>

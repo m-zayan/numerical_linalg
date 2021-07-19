@@ -369,9 +369,9 @@ template<typename T, bool ref_holder>
 nd::matrix<T, false> nd::_matrix<T, ref_holder>::slice(shape_t begin,
 		shape_t end) {
 
-	coords chunk_attr = this->attr.slice(begin, end);
-
 	adjust_slice(this->attr, begin, end);
+
+	coords chunk_attr = this->attr.slice(begin, end);
 
 	big_size_t c_begin = nd::iterator::nd_index_at(this->attr, begin);
 	big_size_t c_end = nd::iterator::nd_index_at(this->attr, chunk_attr.shape);
@@ -442,7 +442,7 @@ nd::matrix<T, false> nd::_matrix<T, ref_holder>::set_new_coords(
 template<typename T, bool ref_holder>
 nd::matrix<T, false> nd::_matrix<T, ref_holder>::op_view_2d() const {
 
-	coords new_attr = this->attr.view_3d(false);
+	coords new_attr = this->attr.view3d(false);
 
 	nd::matrix<T, false> result(new_attr, this->data, this->c_begin,
 			this->c_end);

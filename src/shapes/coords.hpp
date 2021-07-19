@@ -37,7 +37,7 @@ inline max_size_t clip_dim(max_size_t dim_size) {
 
 }
 
-// =============================== nd::state ===============================
+// =================================== nd::state =====================================
 
 namespace nd::state {
 /*
@@ -54,11 +54,10 @@ namespace nd::state {
 
 extern bounded_t<uflag8_t> BroadcastingLevel;
 
-extern bounded_t<std::string> PrintOptions;
-
 }
 
-// =============================== shape_t ===============================
+// ===================================== shape_t ======================================
+
 class shape_t: public vec1d<max_size_t> {
 
 public:
@@ -78,16 +77,17 @@ public:
 
 };
 
-// =============================== strides_t ===============================
+// ====================================== strides_t ====================================
+
 using strides_t = vec1d<big_size_t>;
 
-/* =============================== IteratorType =============================== */
+/* ===================================== IteratorType ================================== */
 
 enum IteratorType {
 	Undefined, Scalar, None, Linear, Random, Pair
 };
 
-/* =============================== coords ===============================
+/* ======================================= coords =======================================
  *
  * 		matrix attributes (ex. dimensions)
  */
@@ -109,6 +109,8 @@ public:
 
 	IteratorType iter_type;
 
+	// -------------------------------------------------------------
+
 	coords();
 
 	explicit coords(bool own_data);
@@ -125,42 +127,72 @@ public:
 	coords(shape_t shape, shape_t axes, strides_t strides, bool own_data,
 			IteratorType iter_type);
 
+	// -------------------------------------------------------------
+
 	coords& operator =(const coords &attr);
+
+	// -------------------------------------------------------------
 
 	coords permuted(const shape_t &axes, bool own_data) const;
 	coords reverse_permute(bool own_data) const;
 	coords swapaxes(max_size_t ax0, max_size_t ax1, bool own_data) const;
 	coords transpose(bool own_data) const;
 
+	// -------------------------------------------------------------
+
 	coords reduce(max_size_t axis, bool keepdims) const;
 	coords reduce_ndim(max_size_t start, max_size_t end, bool own_data) const;
+
+	// -------------------------------------------------------------
 
 	coords pad_dim(max_size_t new_ndim) const;
 	coords pad_dim(max_size_t begin, max_size_t pad_size) const;
 
-	coords view_3d(bool own_data) const;
+	// -------------------------------------------------------------
+
+	coords view3d(bool own_data) const;
+
+	// -------------------------------------------------------------
 
 	coords concat(const coords &attr, max_size_t ax) const;
 
+	// -------------------------------------------------------------
+
 	coords slice(shape_t begin, shape_t end) const;
+
+	// -------------------------------------------------------------
+
+	coords reinterpret_sortedaxes(bool own_data) const;
+
+	coords reinterpret_view3d(bool own_data) const;
+
+	// -------------------------------------------------------------
 
 	void swapaxes(max_size_t ax0, max_size_t ax1);
 	void ownership(bool own_data);
 
+	// -------------------------------------------------------------
+
 	friend bool operator ==(const coords &attr1, const coords &attr2);
 
+	// -------------------------------------------------------------
+
 	virtual ~coords();
+
+	// -------------------------------------------------------------
 
 	coords(const coords &attr);
 	coords(const coords &&attr);
 };
 
-// ======================================================================
+// =====================================================================================
 
 namespace nd {
 
 coords has_max_ndim(const coords &attr0, const coords &attr1,
 		std::string &&signature = "");
+
+// -------------------------------------------------------------
 
 coords align_dim(coords &attr0, coords &attr1, std::string &&signature = "");
 
@@ -169,10 +201,13 @@ coords align_dim(coords &attr0, coords &attr1, vec1d<shape_t> axes,
 
 coords align_dim_2d(coords &attr0, coords &attr1, std::string &&signature = "");
 
-// in_attr
+// -------------------------------------------------------------
+
 coords concat_all(vec1d<coords> &in_attr, max_size_t ax);
 
 }
+
+// =====================================================================================
 
 inline big_size_t get_size1d(shape_t &shape, max_size_t begin, max_size_t end) {
 
@@ -260,7 +295,7 @@ inline void check_strides(shape_t &shape, strides_t &strides) {
 	}
 }
 
-// =================================================================================================================
+// =====================================================================================
 
 inline bool equal_size(coords &attr0, coords &attr1) {
 
@@ -299,13 +334,6 @@ inline bool require_pair_iterator(const coords &attr) {
 
 	return (attr.iter_type == IteratorType::Pair);
 }
-
-// ------------------------------------------------------
-
-//inline bool is_valid_for_dynamic_iterator(const coords &attr) {
-//
-//	return (require_no_iterator(attr) || require_linear_iterator(attr));
-//}
 
 // ------------------------------------------------------
 
@@ -405,7 +433,8 @@ inline flag8_t check_slice(const coords &attr, const shape_t &begin,
 	uflag8_t valid_e = (attr.shape | end);
 	uflag8_t valid_order = (end % begin);
 
-	if (valid_s == 0 || valid_e == 0 || valid_order == 0) {
+	// case: lower-bound <--> [empty is invalid]
+	if (valid_s != 2 || valid_e == 0 || valid_order != 2) {
 
 		return -2;
 	}
@@ -438,7 +467,7 @@ inline void adjust_slice(const coords &attr, shape_t &begin, shape_t &end) {
 	end = aend;
 }
 
-// ============================================= nd::parser::_h =============================================
+// ================================= nd::parser::_h ===================================
 
 namespace nd::parser::_h {
 
@@ -454,7 +483,7 @@ void parse_shape(vec1d<T> &nested_vec1d, shape_t &out_shape,
 
 }
 
-// =============================================   nd::parser   =============================================
+// =================================== nd::parser =====================================
 
 namespace nd::parser {
 
@@ -463,7 +492,7 @@ shape_t parse_shape(vec1d<T> nested_vec1d, std::string signature = "");
 
 }
 
-// =================================================================================================================
+// =====================================================================================
 
 template<typename T>
 void nd::parser::_h::parse_shape(T &scalar, shape_t &out_shape,

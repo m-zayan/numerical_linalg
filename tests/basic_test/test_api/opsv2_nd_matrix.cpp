@@ -78,7 +78,26 @@ void test_aug() {
 	std::cout << slice2.shape() << '\n';
 }
 
+void test_slice(shape_t shape, shape_t begin, shape_t end) {
+
+	nd::matrix<int> mat = nd::random::uniform<int>(1, 10, shape);
+
+	nd::out::print_matrix(mat);
+
+	std::cout << "\n==========================\n";
+
+	nd::matrix<int, false> slice = mat.slice(begin, end);
+
+	std::cout << "shape :" << slice.shape() << ", " << "strides :"
+			<< shape_t(slice.strides()) << '\n';
+
+	std::cout << "\n---------------------\n";
+
+	nd::out::print_matrix(slice);
+
+}
+
 void test_api::opsv2_nd_matrix() {
 
-	test_concat();
+	test_slice( { 3, 3 }, { 0 }, { 3, 1 });
 }

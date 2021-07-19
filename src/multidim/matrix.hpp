@@ -16,8 +16,8 @@ namespace nd {
 template<typename T, bool ref_holder = true>
 class matrix;
 
-template<typename T>
-using composite = vec1d<T>;
+template<typename T, bool ref_holder = true>
+using composite = vec1d<matrix<T, ref_holder>>;
 
 template<typename T, bool ref_holder>
 class _matrix {
@@ -209,10 +209,10 @@ public:
 /* ##################################################################################### */
 
 template<typename T>
-matrix<T> stack(composite<matrix<T, false>> matrix_list);
+matrix<T> stack(composite<T, false> matrix_list);
 
 template<typename T>
-matrix<T> concat(composite<matrix<T, false>> matrix_list, max_size_t axis);
+matrix<T> concat(composite<T, false> matrix_list, max_size_t axis);
 
 /* ##################################################################################### */
 

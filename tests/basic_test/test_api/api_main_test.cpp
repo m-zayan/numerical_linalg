@@ -49,6 +49,6 @@ int main() {
 //  test_api::scalar_like_nd();
 
 //  [14]
-//	test_api::opsv2_nd_matrix();
+	test_api::opsv2_nd_matrix();
 
 }

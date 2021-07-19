@@ -40,7 +40,8 @@ inline void check_slice(Iterator *it, const shape_t &start,
 	uflag8_t valid_e = (it->default_shape | end);
 	uflag8_t valid_order = (end % start);
 
-	if (valid_s == 0 || valid_e == 0 || valid_order == 0) {
+	// case: lower-bound <--> [empty is invalid]
+	if (valid_s != 2 || valid_e == 0 || valid_order != 2) {
 
 		throw nd::exception("Invalid slice, nd::iterator::Iterator*");
 	}

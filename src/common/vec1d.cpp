@@ -226,7 +226,7 @@ vec1d<T> vec1d<T>::operator =(const vec1d<T> &vec) {
 
 // vec1d == vec1d
 template<typename T>
-bool vec1d<T>::operator ==(const vec1d<T> &vec) {
+bool vec1d<T>::operator ==(const vec1d<T> &vec) const {
 
 	if (this->size() != vec.size()) {
 		throw std::logic_error("Invalid boolean operation, "
@@ -245,7 +245,7 @@ bool vec1d<T>::operator ==(const vec1d<T> &vec) {
 
 // vec1d != vec1d
 template<typename T>
-bool vec1d<T>::operator !=(const vec1d<T> &vec) {
+bool vec1d<T>::operator !=(const vec1d<T> &vec) const {
 
 	if (this->size() != vec.size()) {
 		throw std::logic_error("Invalid boolean operation, "
@@ -278,7 +278,7 @@ vec1d<bool> vec1d<T>::operator ==(const T &val) {
 
 // vec1d + vec1d
 template<typename T>
-vec1d<T> vec1d<T>::operator +(const vec1d<T> &vec) {
+vec1d<T> vec1d<T>::operator +(const vec1d<T> &vec) const {
 
 	if (this->size() != vec.size()) {
 		throw std::logic_error("Invalid element-wise operation, "
@@ -313,7 +313,7 @@ vec1d<T>& vec1d<T>::operator +=(const vec1d<T> &vec) {
 
 // vec1d + (int | long long | ...etc)
 template<typename T>
-vec1d<T> vec1d<T>::operator +(const T &val) {
+vec1d<T> vec1d<T>::operator +(const T &val) const {
 
 	vec1d<T> res_vec(*this);
 
@@ -340,7 +340,7 @@ vec1d<T>& vec1d<T>::operator +=(const T &val) {
 // vec1d - vec1d
 
 template<typename T>
-vec1d<T> vec1d<T>::operator -(const vec1d<T> &vec) {
+vec1d<T> vec1d<T>::operator -(const vec1d<T> &vec) const {
 
 	if (this->size() != vec.size()) {
 		throw std::logic_error("Invalid element-wise operation, "
@@ -375,7 +375,7 @@ vec1d<T>& vec1d<T>::operator -=(const vec1d<T> &vec) {
 
 // vec1d - (int | long long | ...etc)
 template<typename T>
-vec1d<T> vec1d<T>::operator -(const T &val) {
+vec1d<T> vec1d<T>::operator -(const T &val) const {
 
 	vec1d<T> res_vec(*this);
 
@@ -402,7 +402,7 @@ vec1d<T>& vec1d<T>::operator -=(const T &val) {
 // vec1d * vec1d
 
 template<typename T>
-vec1d<T> vec1d<T>::operator *(const vec1d<T> &vec) {
+vec1d<T> vec1d<T>::operator *(const vec1d<T> &vec) const {
 
 	if (this->size() != vec.size()) {
 		throw std::logic_error("Invalid element-wise operation, "
@@ -437,7 +437,7 @@ vec1d<T>& vec1d<T>::operator *=(const vec1d<T> &vec) {
 
 // vec1d * (int | long long | ...etc)
 template<typename T>
-vec1d<T> vec1d<T>::operator *(const T &val) {
+vec1d<T> vec1d<T>::operator *(const T &val) const {
 
 	vec1d<T> res_vec(*this);
 
@@ -463,7 +463,7 @@ vec1d<T>& vec1d<T>::operator *=(const T &val) {
 
 // vec1d / (int | long long | ...etc)
 template<typename T>
-vec1d<T> vec1d<T>::operator /(const T &val) {
+vec1d<T> vec1d<T>::operator /(const T &val) const {
 
 	vec1d<T> res_vec(*this);
 
@@ -488,7 +488,7 @@ vec1d<T>& vec1d<T>::operator /=(const T &val) {
 // ====================================================================
 
 template<typename T>
-vec1d<T> vec1d<T>::slice(big_size_t begin, big_size_t end) {
+vec1d<T> vec1d<T>::slice(big_size_t begin, big_size_t end) const {
 
 	if (begin > end || end > this->size()) {
 
@@ -508,7 +508,7 @@ vec1d<T> vec1d<T>::slice(big_size_t begin, big_size_t end) {
 }
 
 template<typename T>
-vec1d<T> vec1d<T>::merge(vec1d<T> vec) {
+vec1d<T> vec1d<T>::merge(vec1d<T> vec) const {
 
 	big_size_t new_size = this->size() + vec.size();
 
@@ -529,7 +529,7 @@ vec1d<T> vec1d<T>::merge(vec1d<T> vec) {
 
 template<typename T>
 vec1d<T> vec1d<T>::pad(big_size_t begin, big_size_t pad_size, T pad_val,
-		T step) {
+		T step) const {
 
 	if (begin >= this->size()) {
 
@@ -546,7 +546,7 @@ vec1d<T> vec1d<T>::pad(big_size_t begin, big_size_t pad_size, T pad_val,
 }
 
 template<typename T>
-vec1d<T> vec1d<T>::pad(big_size_t begin, big_size_t pad_size) {
+vec1d<T> vec1d<T>::pad(big_size_t begin, big_size_t pad_size) const {
 
 	if (begin >= this->size()) {
 
@@ -603,7 +603,7 @@ void vec1d<T>::apply_in_range(big_size_t begin, big_size_t end,
 }
 
 template<typename T>
-T vec1d<T>::min(big_size_t begin, big_size_t end) {
+T vec1d<T>::min(big_size_t begin, big_size_t end) const {
 
 	if (begin > end || end > this->size()) {
 
@@ -621,7 +621,7 @@ T vec1d<T>::min(big_size_t begin, big_size_t end) {
 }
 
 template<typename T>
-T vec1d<T>::max(big_size_t begin, big_size_t end) {
+T vec1d<T>::max(big_size_t begin, big_size_t end) const {
 
 	if (begin > end || end > this->size()) {
 
@@ -640,7 +640,7 @@ T vec1d<T>::max(big_size_t begin, big_size_t end) {
 
 template<typename T>
 template<typename RT>
-RT vec1d<T>::sum(big_size_t begin, big_size_t end) {
+RT vec1d<T>::sum(big_size_t begin, big_size_t end) const {
 
 	if (begin > end || end > this->size()) {
 
@@ -659,7 +659,7 @@ RT vec1d<T>::sum(big_size_t begin, big_size_t end) {
 
 template<typename T>
 template<typename RT>
-RT vec1d<T>::multiply(big_size_t begin, big_size_t end) {
+RT vec1d<T>::multiply(big_size_t begin, big_size_t end) const {
 
 	if (begin > end || end > this->size()) {
 
@@ -676,7 +676,7 @@ RT vec1d<T>::multiply(big_size_t begin, big_size_t end) {
 }
 
 template<typename T>
-vec1d<T> vec1d<T>::reduce_multiply(big_size_t begin, big_size_t end) {
+vec1d<T> vec1d<T>::reduce_multiply(big_size_t begin, big_size_t end) const {
 
 	if (begin > end || end > this->size()) {
 
@@ -711,7 +711,7 @@ vec1d<T> vec1d<T>::reduce_multiply(big_size_t begin, big_size_t end) {
 }
 
 template<typename T>
-bool vec1d<T>::is_sorted(big_size_t begin, big_size_t end) {
+bool vec1d<T>::is_sorted(big_size_t begin, big_size_t end) const {
 
 	if (begin > end || end > this->size()) {
 

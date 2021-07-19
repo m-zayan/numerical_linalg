@@ -69,11 +69,11 @@ nd::matrix<RT> nd::linalg::augmented(const nd::matrix<T1, rf_h0> &m0,
  *  - [A | I]
  */
 template<typename RT, typename T, bool rf_h>
-nd::matrix<RT> nd::linalg::augmented(const nd::matrix<T, rf_h> &lhs) {
+nd::matrix<RT> nd::linalg::augmented(const nd::matrix<T, rf_h> &mat) {
 
 	// rhs <--> identity
-	nd::matrix < RT > rhs = nd::linalg::eye < T > (lhs.shape());
+	nd::matrix < RT > rhs = nd::linalg::eye < T > (mat.shape());
 
-	return nd::linalg::augmented < RT > (lhs, rhs);
+	return nd::linalg::augmented < RT > (mat, rhs);
 }
 

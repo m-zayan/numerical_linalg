@@ -158,18 +158,18 @@ inline void Iterator::reinterpret_slice(shape_t &current, shape_t &shape) {
 }
 
 inline void Iterator::reinterpret_linear() {
-	this->iter_type = IteratorType::Linear;
+	iter_type = IteratorType::Linear;
 }
 
 inline void Iterator::reinterpret_none() {
-	this->iter_type = IteratorType::None;
+	iter_type = IteratorType::None;
 }
 
 inline void Iterator::reinterpret_none(big_size_t size) {
 
 	this->reinterpret_none();
 
-	this->niter = size;
+	niter = size;
 }
 
 }

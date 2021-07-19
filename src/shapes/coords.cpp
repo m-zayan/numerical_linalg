@@ -236,12 +236,12 @@ coords coords::reduce_ndim(max_size_t begin, max_size_t end,
 
 	max_size_t out_ndim = end - begin + 1;
 
-	if (this->ndim < out_ndim) {
-		throw nd::exception("coords::reduce_ndim(...), out_dim - Out Of Range");
+	if (is_scalar(*this)) {
+		throw nd::exception("coords::reduce_ndim(...), scalar-type");
 	}
 
-	if (this->ndim <= 2) {
-		throw nd::exception("coords::reduce_ndim(...), this->ndim <= 0");
+	if (this->ndim < out_ndim) {
+		throw nd::exception("coords::reduce_ndim(...), out_dim - Out Of Range");
 	}
 
 	shape_t axes = this->axes;
@@ -310,7 +310,7 @@ coords coords::pad_dim(max_size_t begin, max_size_t pad_size) const {
 	return new_attr;
 }
 
-coords coords::view_3d(bool own_data) const {
+coords coords::view3d(bool own_data) const {
 
 	coords out_attr = this->pad_dim(3);
 
@@ -374,6 +374,14 @@ coords coords::slice(shape_t begin, shape_t end) const {
 		throw nd::exception("coords::slice(...), scalar-type");
 	}
 
+	if (this->ndim != begin.size() || begin.size() != end.size()) {
+
+		// Debugging
+		throw nd::exception(
+				"Invalid slice coords::slice(...), arguments-shape,\n\t"
+						"consider using - adjust_slice(...)");
+	}
+
 	flag8_t is_valid = check_slice(*this, begin, end);
 
 	if (is_valid == -1) {
@@ -389,14 +397,28 @@ coords coords::slice(shape_t begin, shape_t end) const {
 
 	// case: valid-slice
 
-	adjust_slice(*this, begin, end);
-
 	shape_t out_shape = end - begin;
 
 	coords out_attr(out_shape, this->axes, this->strides, false,
 			this->iter_type);
 
 	return out_attr;
+}
+
+coords coords::reinterpret_sortedaxes(bool own_data) const {
+
+	coords view(*this);
+
+	std::sort(view.axes.begin(), view.axes.end());
+
+	return view;
+}
+
+coords coords::reinterpret_view3d(bool own_data) const {
+
+	coords out_attr = this->reinterpret_sortedaxes(own_data);
+
+	return out_attr.view3d(own_data);
 }
 
 bool operator ==(const coords &attr1, const coords &attr2) {
@@ -540,21 +562,21 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 			lb_exist = 1;
 		}
 
-		if (lhs[i] < lhs[i] && !lb_exist) {
+		if (lhs[i] < rhs[i] && !lb_exist) {
 			return 0;
 		}
 	}
 
-	// case: slice
+	// case: empty
 	for (max_size_t i = 0; i < n_chunk; i++) {
-		if (lhs[i] != lhs[i]) {
+		if (lhs[i] == rhs[i]) {
 
-			return 2;
+			return 1;
 		}
 	}
 
-	// case: empty
-	return 1;
+	// case: slice
+	return 2;
 }
 
 // ============================================= nd =============================================

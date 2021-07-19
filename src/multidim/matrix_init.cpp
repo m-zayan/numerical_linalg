@@ -7,7 +7,7 @@
 #include "./matrix.hpp"
 
 template<typename T>
-nd::matrix<T> nd::stack(nd::composite<nd::matrix<T, false>> matrix_list) {
+nd::matrix<T> nd::stack(nd::composite<T, false> matrix_list) {
 
 	// stack-size
 	max_size_t n_chunk = matrix_list.size();
@@ -71,7 +71,7 @@ nd::matrix<T> nd::stack(nd::composite<nd::matrix<T, false>> matrix_list) {
 }
 
 template<typename T>
-nd::matrix<T> nd::concat(nd::composite<nd::matrix<T, false>> matrix_list,
+nd::matrix<T> nd::concat(nd::composite<T, false> matrix_list,
 		max_size_t axis) {
 
 	max_size_t n_chunk = matrix_list.size();

@@ -169,7 +169,8 @@ void nd::deprecated::iterator::Sequential::slice(shape_t start, shape_t end) {
 	uflag8_t valid_e = (this->shape() | end);
 	uflag8_t valid_order = (end % start);
 
-	if (valid_s == 0 || valid_e == 0 || valid_order == 0) {
+	// case: lower-bound <--> [empty is invalid]
+	if (valid_s != 2 || valid_e == 0 || valid_order != 2) {
 
 		throw nd::exception("Invalid, "
 				"nd::deprecated::iterator::Sequential::slice(...)");
