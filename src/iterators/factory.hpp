@@ -26,6 +26,21 @@ inline Iterator* init_iterator(const coords &attr) {
 	}
 }
 
+inline Iterator* init_2d_iterator(const coords &attr) {
+
+	if (!undefined_iterator(attr)) {
+
+		coords view3d = attr.reinterpret_view3d(false);
+
+		return (new Iterator(view3d));
+
+	} else {
+
+		throw nd::exception(
+				"nd::iterator::init_iterator(...), Invalid Iterator Type");
+	}
+}
+
 inline void free_iterator(Iterator *it) {
 
 	delete it;

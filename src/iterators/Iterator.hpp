@@ -9,9 +9,26 @@
 
 #include "../shapes/coords.hpp"
 
+/* ################################################################################## */
+
+#define IMAX_FLIPFLOPS 8
+
+/* ################################################################################## */
+
+#define ABS(a) \
+	((a >= 0) ? a : (-a))
+
+#define MIN(a, b) \
+	((a > b) ? b : a)
+
+#define	AXISMOD(ax, v) \
+	(ax >= v ? ax - v: 0)
+
 #define SAFEMOVEAXIS(ax) do { \
 	ax == 0 ? ax : --ax; \
 } while(0)
+
+/* ################################################################################## */
 
 namespace nd::iterator {
 
@@ -56,6 +73,9 @@ struct Iterator {
 	// virtual-rotation-pivot
 	big_size_t rotindex;
 
+	// auxiliary state
+	big_t flipflop[IMAX_FLIPFLOPS];
+
 	Iterator() = delete;
 	Iterator(const Iterator &it) = delete;
 	Iterator(const Iterator &&it) = delete;
@@ -63,6 +83,8 @@ struct Iterator {
 	Iterator(const coords &attr);
 
 	void reset();
+
+	void reset_ref();
 
 	void reinterpret_coords(const coords &attr);
 
@@ -118,9 +140,11 @@ inline Iterator::Iterator(const coords &attr) {
 
 inline void Iterator::reset() {
 
-	index1d = 0;
-
 	default_current.fill(0);
+
+	default_bounds = get_bounds(default_shape, default_strides);
+
+	index1d = 0;
 
 	iaxis = ndim;
 
@@ -130,6 +154,13 @@ inline void Iterator::reset() {
 	virtrot = false;
 
 	rotindex = 0;
+
+	niter = get_size1d(default_shape);
+
+	this->reset_ref();
+}
+
+inline void Iterator::reset_ref() {
 
 	shape = default_shape.ref(0);
 	strides = default_strides.ref(0);
@@ -141,6 +172,8 @@ inline void Iterator::reinterpret_coords(const coords &attr) {
 
 	iter_type = attr.iter_type;
 	ndim = attr.ndim;
+
+	niter = attr.size1d;
 
 	default_shape = attr.shape;
 	default_strides = attr.strides;
@@ -202,11 +235,15 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 	ITER_SET_IAXIS1(it1, i); \
 } while(0)
 
+// ------------------------------------------------------
+
 #define ITER1D_MUST_RESET(it) do { \
 	if(it->index1d >= it->niter){ \
 	  it->index1d = 0; \
     } \
 } while(0)
+
+// ------------------------------------------------------
 
 #define ITER_IS_VALID_STEP(it) \
 	(it->current[it->iaxis] + 1 < it->shape[it->iaxis])
@@ -222,6 +259,8 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 	it->current[it->iaxis] = 0; \
 	it->uflag = false; \
 } while(0)
+
+// ------------------------------------------------------
 
 #define ITER_NEXT_AT(it) do { \
 	if (ITER_IS_VALID_STEP(it)) { \
@@ -262,6 +301,8 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 	} \
 } while(0)
 
+// ------------------------------------------------------
+
 #define ITER_LIKE_PAIRWISE3_NEXT(out_it, it0, it1) do { \
 	ITER_NEXT(out_it); \
 	ITER_RESET_IAXIS2(it0, it1); \
@@ -291,7 +332,7 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 	} \
 } while(0)
 
-/* ################################################################################## */
+// ------------------------------------------------------
 
 #define ITER_PAIRWISE3_NEXT(out_it, it0, it1) do { \
 	if(ITER_LIKE_PAIR(out_it)) { \
@@ -337,6 +378,8 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 
 #define BITER_IS_ROT(it, index1d) (it->virtrot && it->rotindex >= index1d)
 
+// ------------------------------------------------------
+
 #define BITER_ROTATE(it) do { \
 	it->virtrot = !(it->virtrot); \
 } while(0)
@@ -347,6 +390,8 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 	} \
 } while(0)
 
+// ------------------------------------------------------
+
 /* pcindex: [placeholder-index1d] */
 #define BITER_INDEX_AT1D(it, indices, pcindex) do { \
 	ITER_INDEX_AT1D(it, indices, pcindex); \
@@ -354,5 +399,116 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 		pcindex = it->rotindex - pcindex; \
 	} \
 } while(0)
+
+/* ################################################################################## */
+
+/* --- [diagonal-] ---
+ *
+ *	coords must be a 3d view
+ */
+
+#define DI3_AXIS(it) \
+	((it->flipflop[0] > 0) ? 2 : 1)
+
+#define DI3_IVAXIS(it) \
+	((it->flipflop[0] > 0) ? 1 : 2)
+
+// ------------------------------------------------------
+
+#define DI3_SHAPE(it) \
+	(it->shape[DI3_AXIS(it)])
+
+#define DI3_IVSHAPE(it) \
+	(it->shape[DI3_IVAXIS(it)])
+
+#define DI3_STRIDES(it) \
+	(it->strides[DI3_AXIS(it)])
+
+#define DI3_IVSTRIDES(it) \
+	(it->strides[DI3_IVAXIS(it)])
+
+// ------------------------------------------------------
+
+#define DI3_DIMSIZE(it) \
+	AXISMOD(DI3_SHAPE(it), ABS(it->flipflop[0]))
+
+#define DI3_NITER2(it) \
+	MIN(DI3_DIMSIZE(it), DI3_IVSHAPE(it))
+
+#define DI3_NITER3(it) \
+	(it->shape[0])
+
+#define DI3_INDEX(it) \
+	(ABS(it->flipflop[0]) * DI3_STRIDES(it))
+
+#define DI3_MUST_RESET(it) do { \
+	if(it->index1d >= it->niter) { \
+		DI3_RESET_INDEX3(it); \
+	} \
+} while(0)
+
+// ------------------------------------------------------
+
+#define DI3_RESET_INDEX2(it) do { \
+	it->current[1] = 0; \
+	it->current[2] = 0; \
+	it->index1d = DI3_INDEX(it); \
+} while(0)
+
+#define DI3_RESET_INDEX3(it) do { \
+	it->current[0] = 0; \
+	it->current[1] = 0; \
+	it->current[2] = 0; \
+	it->index1d = DI3_INDEX(it); \
+} while(0)
+
+// ------------------------------------------------------
+
+#define DI3_MOVE_ALONG(it, dshift) do { \
+	it->flipflop[0] = dshift; \
+	DI3_RESET_INDEX3(it); \
+	it->flipflop[1] = DI3_NITER2(it); \
+} while(0)
+
+// ------------------------------------------------------
+
+#define DI3_CLIP2(it) do { \
+	it->index1d -= (it->current[1] * it->strides[1]); \
+	it->index1d -= (it->current[2] * it->strides[2]); \
+	it->current[1] = 0; \
+	it->current[2] = 0; \
+} while(0)
+
+// ------------------------------------------------------
+
+#define DI3_IS_NEXT3(it) \
+	((it->flipflop[1] <= it->current[1] + 1) || \
+			(it->flipflop[1] <= it->current[2] + 1))
+
+// ------------------------------------------------------
+
+#define DI3_NEXT2(it) do { \
+	it->current[1]++; \
+	it->current[2]++; \
+	it->index1d += it->strides[1]; \
+	it->index1d += it->strides[2]; \
+} while(0)
+
+#define DI3_NEXT3(it) do { \
+	DI3_CLIP2(it); \
+	it->current[0]++; \
+	it->index1d += it->bounds[1]; \
+} while(0)
+
+// ------------------------------------------------------
+
+#define DI3_NEXT(it) do { \
+	if(DI3_IS_NEXT3(it)) { \
+		DI3_NEXT3(it); \
+	} else { \
+		DI3_NEXT2(it); \
+	} \
+	DI3_MUST_RESET(it); \
+}while(0)
 
 #endif /* SRC_ITERATORS_ITERATOR_HPP */
