@@ -10,8 +10,8 @@
 
 #include "./experimental.cpp"
 
-template<typename T>
-nd::matrix<T> nd::linalg::eye(shape_t shape) {
+template<typename RT>
+nd::matrix<RT> nd::linalg::eye(shape_t shape, max_t dshift) {
 
 	if (shape.size() < 2) {
 
@@ -19,7 +19,26 @@ nd::matrix<T> nd::linalg::eye(shape_t shape) {
 				"shape, has to be greater than or equal 2, shape.size() >= 2");
 	}
 
-	nd::matrix<T> result(shape, 0);
+	nd::matrix<RT> result(shape, 0);
+
+	nd::iterator::Iterator *it = nd::iterator::init_2d_iterator(
+			result._m_coords());
+
+	DI3_MOVE_ALONG(it, dshift);
+
+	max_size_t chunk_size = DI3_NITER2(it);
+	max_size_t n_chunk = DI3_NITER3(it);
+
+	big_size_t niter = chunk_size * n_chunk;
+
+	RT *res = result._m_begin();
+
+	for (big_size_t i = 0; i < niter; i++) {
+
+		res[it->index1d] = 1;
+
+		DI3_NEXT(it);
+	}
 
 	return result;
 }

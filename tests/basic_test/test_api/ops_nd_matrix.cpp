@@ -120,7 +120,7 @@ void test_api::ops_nd_matrix() {
 //	test_sum(mat);
 //	test_mean(mat);
 
-	// pairwise
+// pairwise
 	nd::mem::AUX_SIZE = 2;
 
 	test_var(mat);

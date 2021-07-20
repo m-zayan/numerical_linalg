@@ -13,8 +13,11 @@ namespace nd::linalg {
 
 /* ================================================================================= */
 
-template<typename T>
-nd::matrix<T> eye(shape_t shape);
+template<typename RT>
+nd::matrix<RT> eye(shape_t shape, max_t dshift = 0);
+
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> diag(const nd::matrix<T, rf_h> &mat, max_t dshift = 0);
 
 template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
 nd::matrix<RT> augmented(const nd::matrix<T1, rf_h0> &m0,

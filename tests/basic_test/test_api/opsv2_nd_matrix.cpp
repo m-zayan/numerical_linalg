@@ -97,7 +97,23 @@ void test_slice(shape_t shape, shape_t begin, shape_t end) {
 
 }
 
+void test_eye(shape_t shape, max_t dshift) {
+
+	nd::matrix<int> mat = nd::linalg::eye<int>(shape, dshift);
+
+	std::cout << "shape :" << mat.shape() << ", " << "strides :"
+			<< shape_t(mat.strides()) << '\n';
+
+	std::cout << "\n---------------------\n";
+
+	nd::out::print_matrix(mat);
+
+	std::cout << "\n==========================\n";
+}
+
 void test_api::opsv2_nd_matrix() {
 
-	test_slice( { 3, 3 }, { 0 }, { 3, 1 });
+	for (max_t i = -3; i <= 3; i++) {
+		test_eye( { 3, 4 }, i);
+	}
 }
