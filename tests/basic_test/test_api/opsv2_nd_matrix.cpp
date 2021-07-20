@@ -113,6 +113,10 @@ void test_eye(shape_t shape, max_t dshift) {
 
 void test_api::opsv2_nd_matrix() {
 
+	for (max_t i = -1; i <= 3; i++) {
+		test_eye( { 3 }, i);
+	}
+
 	for (max_t i = -3; i <= 3; i++) {
 		test_eye( { 3, 4 }, i);
 	}

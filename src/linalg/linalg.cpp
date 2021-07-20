@@ -13,10 +13,10 @@
 template<typename RT>
 nd::matrix<RT> nd::linalg::eye(shape_t shape, max_t dshift) {
 
-	if (shape.size() < 2) {
+	if (shape.size() == 0) {
 
-		nd::exception(
-				"shape, has to be greater than or equal 2, shape.size() >= 2");
+		nd::exception("nd::linalg::eye(...), "
+				"shape has to be greater than or equal 1, shape.size() == 0");
 	}
 
 	nd::matrix<RT> result(shape, 0);
