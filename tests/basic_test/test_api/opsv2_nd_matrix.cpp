@@ -111,13 +111,33 @@ void test_eye(shape_t shape, max_t dshift) {
 	std::cout << "\n==========================\n";
 }
 
+void test_diag(shape_t shape, max_t dshift) {
+
+	nd::matrix<int> mat = nd::random::uniform<int>(1, 10, shape);
+
+	nd::out::print_matrix(mat);
+
+	std::cout << "\n==========================\n";
+
+	nd::matrix<double> result = nd::linalg::diag<double>(mat, dshift);
+
+	std::cout << "shape :" << result.shape() << ", " << "strides :"
+			<< shape_t(result.strides()) << '\n';
+
+	std::cout << "\n---------------------\n";
+
+	nd::out::print_matrix(result);
+
+	std::cout << "\n==========================\n";
+}
+
 void test_api::opsv2_nd_matrix() {
 
-	for (max_t i = -1; i <= 3; i++) {
-		test_eye( { 3 }, i);
-	}
+//	for (max_t i = 0; i <= 2; i++) {
+//		test_diag( { 3 }, i);
+//	}
 
-	for (max_t i = -3; i <= 3; i++) {
-		test_eye( { 3, 4 }, i);
+	for (max_t i = -2; i <= 2; i++) {
+		test_diag( { 3, 4 }, i);
 	}
 }

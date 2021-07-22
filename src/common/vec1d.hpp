@@ -64,13 +64,13 @@ public:
 	T& operator ()(big_size_t index, big_size_t step);
 
 	// vec1d = vec1d
-	vec1d<T> operator =(const vec1d<T> &vec);
+	vec1d<T>& operator =(const vec1d<T> &vec);
 
 	// vec1d = std::vector<T>
-	vec1d<T> operator =(const std::vector<T> &vec);
+	vec1d<T>& operator =(const std::vector<T> &vec);
 
 	// vec1d = {1, 2, 3, ...etc} ---> std::initializer_list<T>
-	vec1d<T> operator =(const std::initializer_list<T> &std_init_list);
+	vec1d<T>& operator =(const std::initializer_list<T> &std_init_list);
 
 	// vector <---> vector
 	bool operator ==(const vec1d<T> &vec) const;
@@ -122,6 +122,8 @@ public:
 	 */
 	void apply_in_range(big_size_t begin, big_size_t end,
 			std::function<T(T vec_i)> custom_func);
+
+	void slice_assign(const vec1d<T> &vec);
 
 	T min(big_size_t begin, big_size_t end) const;
 	T max(big_size_t begin, big_size_t end) const;

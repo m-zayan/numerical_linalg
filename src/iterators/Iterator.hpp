@@ -509,6 +509,6 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 		DI3_NEXT2(it); \
 	} \
 	DI3_MUST_RESET(it); \
-}while(0)
+} while(0)
 
 #endif /* SRC_ITERATORS_ITERATOR_HPP */

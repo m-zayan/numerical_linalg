@@ -199,7 +199,7 @@ T& vec1d<T>::operator ()(big_size_t index, big_size_t step) {
 
 // vec1d = std::vector<T>
 template<typename T>
-vec1d<T> vec1d<T>::operator =(const std::vector<T> &vec) {
+vec1d<T>& vec1d<T>::operator =(const std::vector<T> &vec) {
 
 	this->values.assign(vec.begin(), vec.end());
 
@@ -208,7 +208,7 @@ vec1d<T> vec1d<T>::operator =(const std::vector<T> &vec) {
 
 // vec1d = {1, 2, 3, ...etc} ---> std::initializer_list<T>
 template<typename T>
-vec1d<T> vec1d<T>::operator =(const std::initializer_list<T> &std_init_list) {
+vec1d<T>& vec1d<T>::operator =(const std::initializer_list<T> &std_init_list) {
 
 	this->values.assign(std_init_list.begin(), std_init_list.end());
 
@@ -217,7 +217,7 @@ vec1d<T> vec1d<T>::operator =(const std::initializer_list<T> &std_init_list) {
 
 // vec1d = vec1d
 template<typename T>
-vec1d<T> vec1d<T>::operator =(const vec1d<T> &vec) {
+vec1d<T>& vec1d<T>::operator =(const vec1d<T> &vec) {
 
 	this->values.assign(vec.values.begin(), vec.values.end());
 
@@ -600,6 +600,18 @@ void vec1d<T>::apply_in_range(big_size_t begin, big_size_t end,
 	for (big_size_t i = begin; i < end; i++) {
 		this->operator [](i) = custom_func(this->operator [](i));
 	}
+}
+
+template<typename T>
+void vec1d<T>::slice_assign(const vec1d<T> &vec) {
+
+	big_size_t size = std::min(this->size(), vec.size());
+
+	for (big_size_t i = 0; i < size; i++) {
+
+		this->operator [](i) = vec[i];
+	}
+
 }
 
 template<typename T>
