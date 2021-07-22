@@ -21,6 +21,7 @@ nd::matrix<RT> nd::linalg::eye(shape_t shape, max_t dshift) {
 
 	nd::matrix<RT> result(shape, 0);
 
+	// [0]
 	nd::iterator::Iterator *it = nd::iterator::init_2d_iterator(
 			result._m_coords());
 
@@ -39,6 +40,52 @@ nd::matrix<RT> nd::linalg::eye(shape_t shape, max_t dshift) {
 
 		DI3_NEXT(it);
 	}
+
+	// [1]
+	nd::iterator::free_iterator(it);
+
+	return result;
+}
+
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> nd::linalg::diag(const nd::matrix<T, rf_h> &mat, max_t dshift) {
+
+	nd::matrix<T, false> tmp = mat;
+
+	coords mcoords = tmp._m_coords();
+	coords view3d = mcoords.reinterpret_view3d(false);
+
+	nd::matrix<RT> result(view3d.shape, 0);
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(view3d);
+
+	DI3_MOVE_ALONG(it, dshift);
+
+	max_size_t chunk_size = DI3_NITER2(it);
+	max_size_t n_chunk = DI3_NITER3(it);
+
+	if (n_chunk == 0) {
+
+		throw nd::exception("nd::linalg::diag(...),\n\t"
+				"yields an empty nd::matrix<RT, ...>");
+	}
+
+	big_size_t niter = chunk_size * n_chunk;
+
+	T *d = tmp._m_begin();
+
+	RT *res = result._m_begin();
+
+	for (big_size_t i = 0; i < niter; i++) {
+
+		res[i] = static_cast<RT>(d[it->index1d]);
+
+		DI3_NEXT(it);
+	}
+
+	// [1]
+	nd::iterator::free_iterator(it);
 
 	return result;
 }

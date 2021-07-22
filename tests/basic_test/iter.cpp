@@ -209,7 +209,7 @@
 //	// about| O0: 5418 ms | O3: 1456 ms
 //	for (max_size_t i = 0; i < n_chunk; i++) {
 //
-//		for (max_size_t i = 0; i < chunk_size; i++) {
+//		for (max_size_t j = 0; j < chunk_size; j++) {
 //
 //			DI3_NEXT(it);
 //		}

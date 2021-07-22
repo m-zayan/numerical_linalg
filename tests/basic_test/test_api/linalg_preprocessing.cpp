@@ -18,6 +18,7 @@ void test0(nd::matrix<double> mat) {
 
 	nd::matrix<double, false> mview = mat.op_view_2d();
 
+	// [0]
 	nd::iterator::Iterator *it = nd::iterator::init_iterator(mview._m_coords());
 
 	// forward
@@ -32,6 +33,9 @@ void test0(nd::matrix<double> mat) {
 	std::cout << "state : " << static_cast<min_t>(state) << ln;
 
 	std::cout << "\n===============================\n";
+
+	// [1]
+	nd::iterator::free_iterator(it);
 }
 
 void test1(nd::matrix<double> mat) {
@@ -46,6 +50,7 @@ void test1(nd::matrix<double> mat) {
 
 	nd::matrix<double, false> mview = mat.op_view_2d();
 
+	// [0]
 	nd::iterator::Iterator *it = nd::iterator::init_iterator(mview._m_coords());
 
 	// forward ---> backward
@@ -60,6 +65,9 @@ void test1(nd::matrix<double> mat) {
 	std::cout << "\n-----------------------\n";
 
 	std::cout << "state : " << static_cast<min_t>(state) << ln;
+
+	// [1]
+	nd::iterator::free_iterator(it);
 }
 
 void test2(nd::matrix<double> mat) {
@@ -74,6 +82,7 @@ void test2(nd::matrix<double> mat) {
 
 	nd::matrix<double, false> mview = mat.op_view_2d();
 
+	// [0]
 	nd::iterator::Iterator *it = nd::iterator::init_iterator(mview._m_coords());
 
 	// forward
@@ -97,6 +106,9 @@ void test2(nd::matrix<double> mat) {
 	std::cout << "\n-----------------------\n";
 
 	std::cout << "state : " << static_cast<min_t>(state) << ln;
+
+	// [1]
+	nd::iterator::free_iterator(it);
 }
 
 void test3(nd::matrix<double> mat) {
@@ -114,12 +126,16 @@ void test3(nd::matrix<double> mat) {
 
 	nd::matrix<double> inv = nd::linalg::eye<double>(mview.shape());
 
+	// [0]
 	nd::iterator::Iterator *it = nd::iterator::init_iterator(mview._m_coords());
 
 	// forward
-	state = nd::linalg::inplace::gsubstitution_step(mview, it, ccols, 0, true, &inv);
-	state = nd::linalg::inplace::gsubstitution_step(mview, it, ccols, 1, true, &inv);
-	state = nd::linalg::inplace::gsubstitution_step(mview, it, ccols, 2, true, &inv);
+	state = nd::linalg::inplace::gsubstitution_step(mview, it, ccols, 0, true,
+			&inv);
+	state = nd::linalg::inplace::gsubstitution_step(mview, it, ccols, 1, true,
+			&inv);
+	state = nd::linalg::inplace::gsubstitution_step(mview, it, ccols, 2, true,
+			&inv);
 
 	std::cout << "state : " << static_cast<min_t>(state) << ln;
 
@@ -152,6 +168,9 @@ void test3(nd::matrix<double> mat) {
 	nd::matrix<double> mminv = nd::linalg::matmul<double>(mcopy[0], inv[0]);
 
 	nd::out::print_matrix(mminv);
+
+	// [1]
+	nd::iterator::free_iterator(it);
 }
 
 void test_api::linalg_preprocessing() {
