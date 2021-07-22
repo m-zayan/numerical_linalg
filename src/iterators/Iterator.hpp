@@ -473,8 +473,7 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 // ------------------------------------------------------
 
 #define DI3_CLIP2(it) do { \
-	it->index1d -= (it->current[1] * it->strides[1]); \
-	it->index1d -= (it->current[2] * it->strides[2]); \
+	it->index1d = DI3_INDEX(it); \
 	it->current[1] = 0; \
 	it->current[2] = 0; \
 } while(0)
@@ -497,7 +496,7 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 #define DI3_NEXT3(it) do { \
 	DI3_CLIP2(it); \
 	it->current[0]++; \
-	it->index1d += it->bounds[1]; \
+	it->index1d += (it->strides[0] * it->current[0]); \
 } while(0)
 
 // ------------------------------------------------------

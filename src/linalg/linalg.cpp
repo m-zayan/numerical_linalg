@@ -96,14 +96,19 @@ nd::matrix<RT> nd::linalg::diag(const nd::matrix<T, rf_h> &mat, max_t dshift) {
 
 	// -------------------------------------------------------------
 
-	shape_t out_shape = { chunk_size };
+	shape_t out_shape;
 
 	if (in_ndim > v_ndim) {
 
 		out_shape = mcoords.shape.slice(0, in_ndim - 2);
 	}
 
-	out_shape.emplace_back(n_chunk);
+	else {
+
+		out_shape = { n_chunk };
+	}
+
+	out_shape.emplace_back(chunk_size);
 
 	// -------------------------------------------------------------
 

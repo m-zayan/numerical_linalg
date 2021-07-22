@@ -138,6 +138,6 @@ void test_api::opsv2_nd_matrix() {
 //	}
 
 	for (max_t i = -2; i <= 2; i++) {
-		test_diag( { 3, 4 }, i);
+		test_diag( {2, 3, 4 }, i);
 	}
 }
