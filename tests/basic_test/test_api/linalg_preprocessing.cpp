@@ -181,6 +181,6 @@ void test_api::linalg_preprocessing() {
 	nd::matrix<double> S = nd::linalg::matmul<double>(mat,
 			mat.permute( { 1, 0 }));
 
-	test3(S);
+	test0(S);
 }
 

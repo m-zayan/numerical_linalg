@@ -11,7 +11,23 @@
 
 /* ################################################################################## */
 
+#define RESET_IN_RANGE(arr, l, r, value) do { \
+	std::fill(std::begin(arr) + l, std::begin(arr) + r, value); \
+} while(0)
+
+#define RESET_ALL(arr, value) do { \
+	std::fill(std::begin(arr), std::end(arr), value); \
+} while(0)
+
+#define CLEAR_ALL(arr) do { \
+	std::fill(std::begin(arr), std::end(arr), 0); \
+} while(0)
+
+/* ################################################################################## */
+
 #define IMAX_FLIPFLOPS 8
+#define IMAX_BIT 4
+#define IMAX_AUX1D 4
 
 /* ################################################################################## */
 
@@ -64,14 +80,11 @@ struct Iterator {
 
 	// ==============================================
 
-	// update-flag
-	bool uflag;
+	// flags
+	bool bit[IMAX_BIT];
 
-	// virtual-rotation-flag
-	bool virtrot;
-
-	// virtual-rotation-pivot
-	big_size_t rotindex;
+	// auxiliary index1d
+	big_size_t aux1d[IMAX_AUX1D];
 
 	// auxiliary state
 	big_t flipflop[IMAX_FLIPFLOPS];
@@ -123,11 +136,6 @@ inline Iterator::Iterator(const coords &attr) {
 
 	SAFEMOVEAXIS(iaxis);
 
-	uflag = false;
-	virtrot = false;
-
-	rotindex = 0;
-
 	// ==============================================
 
 	shape = default_shape.ref(0);
@@ -136,6 +144,10 @@ inline Iterator::Iterator(const coords &attr) {
 	current = default_current.ref(0);
 
 	// ==============================================
+
+	CLEAR_ALL(bit);
+	CLEAR_ALL(aux1d);
+	CLEAR_ALL(flipflop);
 }
 
 inline void Iterator::reset() {
@@ -150,14 +162,15 @@ inline void Iterator::reset() {
 
 	SAFEMOVEAXIS(iaxis);
 
-	uflag = false;
-	virtrot = false;
-
-	rotindex = 0;
-
 	niter = get_size1d(default_shape);
 
 	this->reset_ref();
+
+	// ==============================================
+
+	CLEAR_ALL(bit);
+	CLEAR_ALL(aux1d);
+	CLEAR_ALL(flipflop);
 }
 
 inline void Iterator::reset_ref() {
@@ -251,13 +264,13 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 #define ITER_UPDATE_STEP(it) do { \
 	it->index1d += it->strides[it->iaxis]; \
 	it->current[it->iaxis]++; \
-	it->uflag = true; \
+	it->bit[0] = true; \
 } while(0)
 
 #define ITER_CLIP_STEP(it) do{ \
 	it->index1d -= it->bounds[it->iaxis]; \
 	it->current[it->iaxis] = 0; \
-	it->uflag = false; \
+	it->bit[0] = false; \
 } while(0)
 
 // ------------------------------------------------------
@@ -310,7 +323,7 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 		ITER_CLIP_STEP(it0); \
 		ITER_CLIP_STEP(it1); \
 	} \
-	if(out_it->uflag) { \
+	if(out_it->bit[0]) { \
 		ITER_CHUNK_NEXT_AT(it0); \
 		ITER_CHUNK_NEXT_AT(it1); \
 	} else { \
@@ -325,7 +338,7 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 	for (; it->iaxis > out_it->iaxis; --it->iaxis) { \
 		ITER_CLIP_STEP(it); \
 	} \
-	if(out_it->uflag) { \
+	if(out_it->bit[0]) { \
 		ITER_CHUNK_NEXT_AT(it); \
 	} else { \
 		ITER_CLIP_STEP(it); \
@@ -376,17 +389,18 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 
 /* --- [bidirectional] --- */
 
-#define BITER_IS_ROT(it, index1d) (it->virtrot && it->rotindex >= index1d)
+#define BITER_IS_ROT(it, index1d) (it->bit[1] && it->aux1d[1] >= index1d)
 
 // ------------------------------------------------------
 
 #define BITER_ROTATE(it) do { \
-	it->virtrot = !(it->virtrot); \
+	it->bit[1] = !(it->bit[1]); \
 } while(0)
 
-#define BITER_ROTATE_AT(it, indices) do { \
-	if(it->virtrot) { \
-		ITER_INDEX_AT1D(it, indices, it->rotindex); \
+#define BITER_ROTATE_AT(it, begin, end) do { \
+	if(it->bit[1]) { \
+		ITER_INDEX_AT1D(it, begin, it->aux1d[0]); \
+		ITER_INDEX_AT1D(it, end, it->aux1d[1]); \
 	} \
 } while(0)
 
@@ -396,7 +410,8 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 #define BITER_INDEX_AT1D(it, indices, pcindex) do { \
 	ITER_INDEX_AT1D(it, indices, pcindex); \
 	if(BITER_IS_ROT(it, pcindex)) { \
-		pcindex = it->rotindex - pcindex; \
+		pcindex = it->aux1d[1] - pcindex; \
+		pcindex += it->aux1d[0]; \
 	} \
 } while(0)
 
@@ -472,14 +487,6 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 
 // ------------------------------------------------------
 
-#define DI3_CLIP2(it) do { \
-	it->index1d = DI3_INDEX(it); \
-	it->current[1] = 0; \
-	it->current[2] = 0; \
-} while(0)
-
-// ------------------------------------------------------
-
 #define DI3_IS_NEXT3(it) \
 	((it->flipflop[1] <= it->current[1] + 1) || \
 			(it->flipflop[1] <= it->current[2] + 1))
@@ -494,7 +501,7 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 } while(0)
 
 #define DI3_NEXT3(it) do { \
-	DI3_CLIP2(it); \
+	DI3_RESET_INDEX2(it); \
 	it->current[0]++; \
 	it->index1d += (it->strides[0] * it->current[0]); \
 } while(0)

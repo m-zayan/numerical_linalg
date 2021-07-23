@@ -28,6 +28,15 @@ nd::matrix<RT> augmented(const nd::matrix<T, rf_h> &mat);
 
 /* ================================================================================= */
 
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> det(const nd::matrix<T, rf_h> &mat);
+
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> norm(const nd::matrix<T, rf_h> &mat, flag8_t n_ord,
+		max_size_t axis, bool keepdims = false);
+
+/* ================================================================================= */
+
 template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
 nd::matrix<RT> matmul(const nd::matrix<T1, rf_h0> &m0,
 		const nd::matrix<T2, rf_h1> &m1);
@@ -47,8 +56,8 @@ nd::matrix<RT> tensordot(const nd::matrix<T1, rf_h0> &m0,
 template<typename T, bool rf_h>
 nd::matrix<T> transpose(const nd::matrix<T, rf_h> &mat, shape_t axes);
 
-template<typename RT, typename T, bool rf_h>
-nd::matrix<RT> inverse(const nd::matrix<T, rf_h> &mat);
+template<typename RT = float_auto, typename T, bool rf_h>
+nd::matrix<RT> inverse(const nd::matrix<T, rf_h> &mat, bool pivot = true);
 
 template<typename RT, typename T, bool rf_h>
 nd::matrix<RT> pseudo_inverse(const nd::matrix<T, rf_h> &mat);
@@ -94,16 +103,16 @@ nd::composite<RT> eigen(const nd::matrix<T, rf_h> &mat);
 
 namespace nd::linalg::inplace {
 
-template<typename T, bool rf_h0, bool rf_h1 = false>
-flag8_t partial_pivoting_step(nd::matrix<T, rf_h0> &lhs,
+template<typename T1, typename T2 = float_auto, bool rf_h0, bool rf_h1 = false>
+flag8_t partial_pivoting_step(nd::matrix<T1, rf_h0> &lhs,
 		nd::iterator::Iterator *it, max_size_t ppcols, max_size_t column_index,
-		bool pivot = true, bool scale = false, nd::matrix<T, rf_h1> *rhsref =
+		bool pivot = true, bool scale = false, nd::matrix<T2, rf_h1> *rhsref =
 				nullptr);
 
-template<typename T, bool rf_h0, bool rf_h1 = false>
-flag8_t gsubstitution_step(nd::matrix<T, rf_h0> &lhs,
+template<typename T1, typename T2 = float_auto, bool rf_h0, bool rf_h1 = false>
+flag8_t gsubstitution_step(nd::matrix<T1, rf_h0> &lhs,
 		nd::iterator::Iterator *it, max_size_t gscols, max_size_t column_index,
-		bool pivot, nd::matrix<T, rf_h1> *rhsref = nullptr);
+		bool pivot, nd::matrix<T2, rf_h1> *rhsref = nullptr);
 
 /* ================================================================================= */
 
@@ -123,8 +132,8 @@ flag8_t householder(nd::matrix<T1, rf_h0> &mat, nd::matrix<T2, rf_h1> &qmat);
 namespace nd::v0::linalg::inplace {
 
 // auto-choice <--> [L || U]
-template<typename RT, typename T, bool rf_h>
-nd::matrix<RT> triangular(const nd::matrix<T, rf_h> &mat);
+template<typename T, bool rf_h>
+void triangular(nd::matrix<T, rf_h> &mat);
 
 template<typename T, bool rf_h>
 void transpose(nd::matrix<T, rf_h> &mat, shape_t axes);

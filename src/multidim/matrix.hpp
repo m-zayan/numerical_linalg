@@ -83,8 +83,8 @@ public:
 	template<bool ref_h>
 	mat_t& operator -=(const matrix<T, ref_h> &mat);
 
-	template<bool ref_h>
-	matrix<T> operator *(const matrix<T, ref_h> &mat);
+	template<typename U, bool ref_h>
+	matrix<T> operator *(const matrix<U, ref_h> &mat);
 
 	template<bool ref_h>
 	mat_t& operator *=(const matrix<T, ref_h> &mat);

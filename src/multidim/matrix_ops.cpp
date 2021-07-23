@@ -218,11 +218,11 @@ nd::matrix<T, ref_holder>& nd::_matrix<T, ref_holder>::operator -=(
 
 // nd::matrix<T> * nd::matrix<T>
 template<typename T, bool ref_holder>
-template<bool ref_h>
+template<typename U, bool ref_h>
 nd::matrix<T> nd::_matrix<T, ref_holder>::operator *(
-		const matrix<T, ref_h> &mat) {
+		const matrix<U, ref_h> &mat) {
 
-	nd::matrix<T, false> temp = mat;
+	nd::matrix<U, false> temp = mat;
 
 	coords attr0 = this->attr;
 	coords attr1 = temp._m_coords();
@@ -231,12 +231,12 @@ nd::matrix<T> nd::_matrix<T, ref_holder>::operator *(
 			attr0, attr1, 0);
 
 	T *d0 = this->_m_begin();
-	T *d1 = temp._m_begin();
+	U *d1 = temp._m_begin();
 
 	T *d2 = result._m_begin();
 
-	_m_ops::write_vec_vec_vec<T, T, T>(d2, d0, d1, attr0, attr1,
-			result._m_coords(), _v_ops::mul<T, T, T>);
+	_m_ops::write_vec_vec_vec<T, T, U>(d2, d0, d1, attr0, attr1,
+			result._m_coords(), _v_ops::mul<T, T, U>);
 
 	result._m_clear_iter_type();
 

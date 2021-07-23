@@ -133,11 +133,15 @@ void test_diag(shape_t shape, max_t dshift) {
 
 void test_api::opsv2_nd_matrix() {
 
+//	for (max_t i = -2; i <= 2; i++) {
+//		test_eye( { 2, 3, 4 }, i);
+//	}
+
 //	for (max_t i = 0; i <= 2; i++) {
 //		test_diag( { 3 }, i);
 //	}
 
 	for (max_t i = -2; i <= 2; i++) {
-		test_diag( {2, 3, 4 }, i);
+		test_diag( { 2, 3, 4 }, i);
 	}
 }

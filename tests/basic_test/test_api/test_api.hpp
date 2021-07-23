@@ -18,6 +18,14 @@
 
 #define ln '\n'
 
+inline void epline(max_size_t size = 50) {
+	std::cout << std::string(size, '=') << ln;
+}
+
+inline void eppline(max_size_t size = 50) {
+	std::cout << ln << std::string(size, '=') << ln;
+}
+
 namespace test_api {
 
 void sum_alg(unsigned int test_size);
@@ -33,7 +41,7 @@ void linalg_experimental();
 void nd_broadcasting();
 void ops_nd_matrix();
 void linalg_preprocessing();
-void linalg_lu();
+void linalg_op();
 void scalar_like_nd();
 void opsv2_nd_matrix();
 

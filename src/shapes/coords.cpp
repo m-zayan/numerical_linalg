@@ -421,14 +421,11 @@ coords coords::reinterpret_view3d(bool own_data) const {
 	return out_attr.view3d(own_data);
 }
 
-bool operator ==(const coords &attr1, const coords &attr2) {
+bool operator ==(const coords &attr1, const coords &attr2){
 
-	coords temp1 = attr1;
-	coords temp2 = attr2;
-
-	if (temp1.ndim == temp2.ndim) {
-		for (max_size_t i = 0; i < temp1.ndim; i++) {
-			if (temp1.shape[i] != temp2.shape[i]) {
+	if (attr1.ndim == attr2.ndim) {
+		for (max_size_t i = 0; i < attr1.ndim; i++) {
+			if (attr1.shape[i] != attr2.shape[i]) {
 				return false;
 			}
 		}
@@ -438,6 +435,33 @@ bool operator ==(const coords &attr1, const coords &attr2) {
 	else {
 		return false;
 	}
+}
+
+max_size_t coords::nrows() const {
+
+	if (ndim < 2) {
+		return ndim;
+	}
+
+	return shape[ndim - 2];
+}
+
+max_size_t coords::ncols() const {
+
+	if (ndim == 0) {
+		return 0;
+	}
+
+	return shape[ndim - 1];
+}
+
+bool coords::is_square() const {
+
+	if (ndim < 2) {
+		return 0;
+	}
+
+	return (shape[ndim - 1] == shape[ndim - 2]);
 }
 
 // =============================== shape_t ===============================
@@ -524,21 +548,21 @@ uflag8_t operator |(const shape_t &lhs, const shape_t &rhs) {
 
 	max_size_t n_chunk = std::min(lhs.size(), rhs.size());
 
-	// case: invalid
+// case: invalid
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (lhs[i] < rhs[i]) {
 			return 0;
 		}
 	}
 
-	// case: empty
+// case: empty
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (lhs[i] == rhs[i]) {
 			return 1;
 		}
 	}
 
-	// case: lower-bound
+// case: lower-bound
 	return 2;
 }
 
@@ -549,7 +573,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 
 	bool lb_exist = 0;
 
-	// case: invalid
+// case: invalid
 	if (n_chunk > 0 && lhs[0] < rhs[0]) {
 
 		return 0;
@@ -567,7 +591,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 		}
 	}
 
-	// case: empty
+// case: empty
 	for (max_size_t i = 0; i < n_chunk; i++) {
 		if (lhs[i] == rhs[i]) {
 
@@ -575,7 +599,7 @@ uflag8_t operator %(const shape_t &lhs, const shape_t &rhs) {
 		}
 	}
 
-	// case: slice
+// case: slice
 	return 2;
 }
 
@@ -832,7 +856,7 @@ coords nd::concat_all(vec1d<coords> &in_attr, max_size_t ax) {
 		out_attr = out_attr.concat(in_attr[i], 0);
 	}
 
-	// reverse <--> in_attr[i].swapaxes(...)
+// reverse <--> in_attr[i].swapaxes(...)
 	out_attr.swapaxes(0, ax);
 
 	return out_attr;
