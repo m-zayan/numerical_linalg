@@ -44,8 +44,8 @@ public:
 	void reserve(big_size_t size);
 	void resize(big_size_t size);
 
-	void push_back(T val);
-	void emplace_back(T val);
+	void push_back(const T &val);
+	void emplace_back(const T &val);
 	void pop_back();
 
 	void assign(const_iterator<T> begin, const_iterator<T> end);

@@ -40,7 +40,7 @@
 ////  test_api::linalg_preprocessing();
 //
 ////  [11]
-////  test_api::linalg_op();
+//  test_api::linalg_op();
 //
 ////  [12]
 ////  test_api::linalg_tensordot();

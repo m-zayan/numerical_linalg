@@ -103,16 +103,26 @@ nd::composite<RT> eigen(const nd::matrix<T, rf_h> &mat);
 
 namespace nd::linalg::inplace {
 
-template<typename T1, typename T2 = float_auto, bool rf_h0, bool rf_h1 = false>
+template<typename T1, typename T2 = float_auto, typename T3 = mask_t,
+		bool rf_h0, bool rf_h1 = false, bool rf_h2 = false>
 flag8_t partial_pivoting_step(nd::matrix<T1, rf_h0> &lhs,
 		nd::iterator::Iterator *it, max_size_t ppcols, max_size_t column_index,
-		bool pivot = true, bool scale = false, nd::matrix<T2, rf_h1> *rhsref =
+		nd::matrix<T2, rf_h1> *rhsref = nullptr, nd::matrix<T3, rf_h2> *perm =
 				nullptr);
 
-template<typename T1, typename T2 = float_auto, bool rf_h0, bool rf_h1 = false>
+template<typename T1, typename T2 = float_auto, typename T3 = mask_t,
+		bool rf_h0, bool rf_h1 = false, bool rf_h2 = false>
+flag8_t psubstitution_step(nd::matrix<T1, rf_h0> &lhs,
+		nd::iterator::Iterator *it, max_size_t pscols, max_size_t column_index,
+		bool pivot, uflag8_t state = 0, nd::matrix<T2, rf_h1> *rhsref = nullptr,
+		nd::matrix<T3, rf_h2> *perm = nullptr);
+
+template<typename T1, typename T2 = float_auto, typename T3 = mask_t,
+		bool rf_h0, bool rf_h1 = false, bool rf_h2 = false>
 flag8_t gsubstitution_step(nd::matrix<T1, rf_h0> &lhs,
 		nd::iterator::Iterator *it, max_size_t gscols, max_size_t column_index,
-		bool pivot, nd::matrix<T2, rf_h1> *rhsref = nullptr);
+		bool pivot, uflag8_t state = 0, nd::matrix<T2, rf_h1> *rhsref = nullptr,
+		nd::matrix<T3, rf_h2> *perm = nullptr);
 
 /* ================================================================================= */
 

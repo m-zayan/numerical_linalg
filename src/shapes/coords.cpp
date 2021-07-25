@@ -8,8 +8,8 @@
 
 // =================================================================
 
-bounded_t<max_size_t> nd::mem::AUX_SIZE( { 2, 512, 1028, 2048 }, "AUX_SIZE",
-		2048);
+bounded_t<max_size_t> nd::mem::AUX_SIZE( { 2, 4, 8, 16, 32, 64, 128, 256, 512,
+		1028, 2048 }, "AUX_SIZE", 2);
 
 bounded_t<uflag8_t> nd::state::BroadcastingLevel( { 0, 1, 2 },
 		"BroadcastingLevel", 2);
@@ -421,7 +421,7 @@ coords coords::reinterpret_view3d(bool own_data) const {
 	return out_attr.view3d(own_data);
 }
 
-bool operator ==(const coords &attr1, const coords &attr2){
+bool operator ==(const coords &attr1, const coords &attr2) {
 
 	if (attr1.ndim == attr2.ndim) {
 		for (max_size_t i = 0; i < attr1.ndim; i++) {

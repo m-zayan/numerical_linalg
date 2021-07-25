@@ -25,7 +25,7 @@
 //		ITER_NEXT(it);
 //	}
 //
-//	delete it;
+//	nd::iterator::free_iterator(it);
 //}
 //
 //void test1() {
@@ -48,8 +48,8 @@
 //		ITER_NEXT(it1);
 //	}
 //
-//	delete it0;
-//	delete it1;
+//	nd::iterator::free_iterator(it0);
+//	nd::iterator::free_iterator(it1);
 //}
 //
 //void test2() {
@@ -75,8 +75,8 @@
 //		ITER_PAIRWISE2_NEXT(it0, it1);
 //	}
 //
-//	delete it0;
-//	delete it1;
+//	nd::iterator::free_iterator(it0);
+//	nd::iterator::free_iterator(it1);
 //}
 //
 //void test3() {
@@ -111,8 +111,8 @@
 //
 //	std::cout << "end\n";
 //
-//	delete it0;
-//	delete it1;
+//	nd::iterator::free_iterator(it0);
+//	nd::iterator::free_iterator(it1);
 //}
 //
 //void test4() {
@@ -150,9 +150,9 @@
 //
 //	std::cout << "end\n";
 //
-//	delete it0;
-//	delete it1;
-//	delete out_it;
+//	nd::iterator::free_iterator(out_it);
+//	nd::iterator::free_iterator(it0);
+//	nd::iterator::free_iterator(it1);
 //}
 //
 //void test5() {
@@ -228,7 +228,62 @@
 //	nd::iterator::free_iterator(it);
 //}
 //
+//void test7() {
+//
+//	shape_t s0 = { 10, 1000, 1000 };
+//	shape_t s1 = { 10, 1000, 1000 };
+//
+//	coords attr0(s0), attr1(s1);
+//
+//	coords out_attr = nd::align_dim_2d(attr0, attr1, "iter-test");
+//
+//	nd::iterator::Iterator *out_it = new nd::iterator::Iterator(out_attr);
+//	nd::iterator::Iterator *it0 = new nd::iterator::Iterator(attr0);
+//	nd::iterator::Iterator *it1 = new nd::iterator::Iterator(attr1);
+//
+//	coords aligned_attr = nd::align_dim(attr0, attr1);
+//
+//	max_size_t aligned_ndim = aligned_attr.ndim;
+//
+//	big_size_t n_chunk = aligned_attr.shape.multiply(0, aligned_ndim - 2);
+//
+//	big_size_t chunk_size = aligned_attr.shape.multiply(aligned_ndim - 2,
+//			aligned_ndim);
+//
+//	big_size_t niter = n_chunk * chunk_size;
+//
+//	std::cout << "n-iter :" << niter / 1e9 << " B " << '\n';
+//
+//	std::cout << "start\n";
+//
+//	auto t_start = std::chrono::high_resolution_clock::now();
+//
+//	/* about| O3: 107 s
+//	 *	(i.e. many mispredicted branches >>
+//	 *		even for ITER_LIKE_NONE(...) - about |  O3: 14 s)
+//	 */
+//	for (big_size_t i = 0; i < niter; i++) {
+//
+//		ITER_PAIRWISE3_NEXT(out_it, it0, it1);
+//	}
+//
+//	auto t_end = std::chrono::high_resolution_clock::now();
+//
+//	long double time = std::chrono::duration_cast<std::chrono::seconds>(
+//			t_end - t_start).count();
+//
+//	std::cout << "Execution Time = " << time << " s " << ln;
+//	std::cout << "\n---------------\n";
+//
+//	std::cout << "end\n";
+//
+//	nd::iterator::free_iterator(out_it);
+//	nd::iterator::free_iterator(it0);
+//	nd::iterator::free_iterator(it1);
+//
+//}
+//
 //int main() {
 //
-//	test6();
+//	test7();
 //}

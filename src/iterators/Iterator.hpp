@@ -11,6 +11,12 @@
 
 /* ################################################################################## */
 
+#define IMAX_FLIPFLOPS 8
+#define IMAX_BIT 4
+#define IMAX_AUX1D 4
+
+/* ################################################################################## */
+
 #define RESET_IN_RANGE(arr, l, r, value) do { \
 	std::fill(std::begin(arr) + l, std::begin(arr) + r, value); \
 } while(0)
@@ -22,12 +28,6 @@
 #define CLEAR_ALL(arr) do { \
 	std::fill(std::begin(arr), std::end(arr), 0); \
 } while(0)
-
-/* ################################################################################## */
-
-#define IMAX_FLIPFLOPS 8
-#define IMAX_BIT 4
-#define IMAX_AUX1D 4
 
 /* ################################################################################## */
 

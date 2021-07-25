@@ -362,7 +362,7 @@ nd::matrix<RT> nd::linalg::inverse(const nd::matrix<T, rf_h> &mat, bool pivot) {
 	for (max_size_t i = 0; i < ncols; i++) {
 
 		state = nd::linalg::inplace::gsubstitution_step(mcopy, it, ncols, i,
-				pivot, &rview);
+				pivot, 0, &rview);
 
 		if (state == -1) {
 			throw nd::exception("nd::linalg::inverse(...),\n\t"
@@ -378,7 +378,7 @@ nd::matrix<RT> nd::linalg::inverse(const nd::matrix<T, rf_h> &mat, bool pivot) {
 	for (max_size_t i = 0; i < ncols; i++) {
 
 		state = nd::linalg::inplace::gsubstitution_step(mcopy, it, ncols, i,
-				false, &rview);
+				false, 1, &rview);
 
 		if (state == -1) {
 			throw nd::exception("nd::linalg::inverse(...),\n\t"
@@ -392,4 +392,64 @@ nd::matrix<RT> nd::linalg::inverse(const nd::matrix<T, rf_h> &mat, bool pivot) {
 	nd::iterator::free_iterator(it);
 
 	return result;
+}
+
+template<typename RT, typename T, bool rf_h>
+nd::composite<RT> nd::linalg::lu(const nd::matrix<T, rf_h> &mat) {
+
+	coords mcoords = mat._m_coords();
+	coords cview3d = mcoords.reinterpret_view3d(false);
+
+	// -------------------------------------------------------------------------------
+
+	if (!mcoords.is_square()) {
+		throw nd::exception("nd::linalg::lu(...),\n\t"
+				"nd::matrix<T, ...> - must be a square matrix");
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// L
+	nd::matrix<RT> L = nd::linalg::eye<RT>(mcoords.shape, 0);
+
+	nd::matrix<RT, false> lview = L.set_new_coords(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	nd::matrix<RT> U = mat;
+
+	nd::matrix<RT, false> uview = U.set_new_coords(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	flag8_t state;
+
+	max_size_t ncols = cview3d.ncols();
+
+	// -------------------------------------------------------------------------------
+
+	// forward
+	for (max_size_t i = 0; i < ncols; i++) {
+
+		state = nd::linalg::inplace::psubstitution_step(uview, it, ncols, i,
+				false, 1, &lview);
+
+		if (state == -1) {
+			throw nd::exception("nd::linalg::lu(...),\n\t"
+					"nd::matrix<T, ...> - LU decomposition has been failed, "
+					"consider using - nd::linalg::plu(...) - instead");
+		}
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// [1]
+	nd::iterator::free_iterator(it);
+
+	return {L, U};
 }

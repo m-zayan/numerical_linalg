@@ -290,6 +290,8 @@ void mul_reduce_sum(RT *res, T1 *d0, T2 *d1, coords out_attr, coords attr0,
 
 	vec1d<RT> elems(aux_size, 0);
 
+	RT *auxref = elems.ref(0);
+
 	big_size_t vi;
 
 	for (big_size_t k = 0; k < n_chunk; k++) {
@@ -300,7 +302,7 @@ void mul_reduce_sum(RT *res, T1 *d0, T2 *d1, coords out_attr, coords attr0,
 
 		for (big_size_t i = 0; i < chunk_size; i++) {
 
-			elems[vi++] += (d0[it0->index1d] * d1[it1->index1d]);
+			auxref[vi++] += (d0[it0->index1d] * d1[it1->index1d]);
 
 			if (vi >= aux_size) {
 				vi = 0;
@@ -309,7 +311,7 @@ void mul_reduce_sum(RT *res, T1 *d0, T2 *d1, coords out_attr, coords attr0,
 			ITER_PAIRWISE3_NEXT(ait, it0, it1);
 		}
 
-		res[k] = algorithm::sum<RT>(0, aux_size, elems.ref(0));
+		res[k] = algorithm::sum<RT>(0, aux_size, auxref);
 	}
 
 	// [1]

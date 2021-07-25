@@ -99,12 +99,12 @@ void vec1d<T>::resize(big_size_t size) {
 }
 
 template<typename T>
-void vec1d<T>::push_back(T val) {
+void vec1d<T>::push_back(const T& val) {
 	this->values.push_back(val);
 }
 
 template<typename T>
-void vec1d<T>::emplace_back(T val) {
+void vec1d<T>::emplace_back(const T& val) {
 	this->values.emplace_back(val);
 }
 
