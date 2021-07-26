@@ -768,3 +768,116 @@ nd::composite<RT> nd::linalg::ldu(const nd::matrix<T, rf_h> &mat) {
 	return {L, D, U};
 }
 
+/* ===================================================================================== */
+
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> nd::linalg::upper_triangular(const nd::matrix<T, rf_h> &mat) {
+
+	coords mcoords = mat._m_coords();
+	coords cview3d = mcoords.reinterpret_view3d(false);
+
+	// -------------------------------------------------------------------------------
+
+	if (!mcoords.is_square()) {
+		throw nd::exception("nd::linalg::upper_triangular(...),\n\t"
+				"nd::matrix<T, ...> - must be a square matrix");
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// U
+	nd::matrix<RT> U = mat;
+
+	nd::matrix<RT, false> uview = U.set_new_coords(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	flag8_t state;
+
+	max_size_t ncols = cview3d.ncols();
+
+	// -------------------------------------------------------------------------------
+
+	// forward
+	for (max_size_t i = 0; i < ncols; i++) {
+
+		state = nd::linalg::inplace::psubstitution_step(uview, it, ncols, i,
+				false, 0);
+
+		if (state == -1) {
+			throw nd::exception("nd::linalg::upper_triangular(...),\n\t"
+					"nd::matrix<T, ...> - Reduction has been failed | "
+					"Pivoting is required");
+		}
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// [1]
+	nd::iterator::free_iterator(it);
+
+	return U;
+}
+
+/* ===================================================================================== */
+
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> nd::linalg::lower_triangular(const nd::matrix<T, rf_h> &mat) {
+
+	coords mcoords = mat._m_coords();
+	coords cview3d = mcoords.reinterpret_view3d(false);
+
+	// -------------------------------------------------------------------------------
+
+	if (!mcoords.is_square()) {
+		throw nd::exception("nd::linalg::lower_triangular(...),\n\t"
+				"nd::matrix<T, ...> - must be a square matrix");
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// L
+	nd::matrix<RT> L = mat;
+
+	nd::matrix<RT, false> lview = L.set_new_coords(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	flag8_t state;
+
+	max_size_t ncols = cview3d.ncols();
+
+	// -------------------------------------------------------------------------------
+
+	// backward
+	BITER_ROTATE(it);
+
+	for (max_size_t i = 0; i < ncols; i++) {
+
+		state = nd::linalg::inplace::psubstitution_step(lview, it, ncols, i,
+				false, 0);
+
+		if (state == -1) {
+			throw nd::exception("nd::linalg::lower_triangular(...),\n\t"
+					"nd::matrix<T, ...> - Reduction has been failed | "
+					"Pivoting is required");
+		}
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// [1]
+	nd::iterator::free_iterator(it);
+
+	return L;
+}

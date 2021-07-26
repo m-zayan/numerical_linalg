@@ -415,7 +415,7 @@ flag8_t nd::linalg::inplace::psubstitution_step(nd::matrix<T1, rf_h0> &lhs,
 
 			// -------------------------------------------------------------
 
-			if (state == 1) {
+			if (b != nullptr && state == 1) {
 
 				b[index] = -cscale;
 			}

@@ -96,6 +96,36 @@ void test_ldu(shape_t shape) {
 	nd::out::print_matrix(mat_);
 }
 
+void test_upper(shape_t shape) {
+
+	nd::matrix<int> mat = nd::random::uniform(1, 100, shape);
+
+	nd::out::print_matrix(mat);
+
+	epline();
+
+	nd::matrix<double> U = nd::linalg::upper_triangular<double>(mat);
+
+	nd::out::print_matrix(U);
+
+	epline();
+}
+
+void test_lower(shape_t shape) {
+
+	nd::matrix<int> mat = nd::random::uniform(1, 100, shape);
+
+	nd::out::print_matrix(mat);
+
+	epline();
+
+	nd::matrix<double> U = nd::linalg::lower_triangular<double>(mat);
+
+	nd::out::print_matrix(U);
+
+	epline();
+}
+
 void test_api::linalg_op() {
 
 //	test_inv( {3, 4, 4 });
@@ -104,6 +134,10 @@ void test_api::linalg_op() {
 
 //	test_plu( { 2, 3, 3 });
 
-	test_ldu( { 2, 3, 3 });
+//	test_ldu( { 2, 3, 3 });
+
+//	test_upper( {2, 3, 3 });
+
+	test_lower({2, 3, 3});
 }
 
