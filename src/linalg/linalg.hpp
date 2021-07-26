@@ -19,6 +19,12 @@ nd::matrix<RT> eye(shape_t shape, max_t dshift = 0);
 template<typename RT, typename T, bool rf_h>
 nd::matrix<RT> diag(const nd::matrix<T, rf_h> &mat, max_t dshift = 0);
 
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> diag2d(const nd::matrix<T, rf_h> &mat, max_t dshift = 0);
+
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> mask_diag(const nd::matrix<T, rf_h> &mat, max_t dshift = 0);
+
 template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
 nd::matrix<RT> augmented(const nd::matrix<T1, rf_h0> &m0,
 		const nd::matrix<T2, rf_h1> &m1);
@@ -107,8 +113,8 @@ template<typename T1, typename T2 = float_auto, typename T3 = mask_t,
 		bool rf_h0, bool rf_h1 = false, bool rf_h2 = false>
 flag8_t partial_pivoting_step(nd::matrix<T1, rf_h0> &lhs,
 		nd::iterator::Iterator *it, max_size_t ppcols, max_size_t column_index,
-		nd::matrix<T2, rf_h1> *rhsref = nullptr, nd::matrix<T3, rf_h2> *perm =
-				nullptr);
+		uflag8_t state = 0, nd::matrix<T2, rf_h1> *rhsref = nullptr,
+		nd::matrix<T3, rf_h2> *perm = nullptr);
 
 template<typename T1, typename T2 = float_auto, typename T3 = mask_t,
 		bool rf_h0, bool rf_h1 = false, bool rf_h2 = false>
@@ -136,6 +142,14 @@ flag8_t gram_schmidt(nd::matrix<T1, rf_h0> &mat, nd::matrix<T2, rf_h1> &qmat);
 
 template<typename T1, typename T2, bool rf_h0, bool rf_h1>
 flag8_t householder(nd::matrix<T1, rf_h0> &mat, nd::matrix<T2, rf_h1> &qmat);
+
+/* ================================================================================= */
+
+template<typename T, bool rf_h>
+void diag_add(nd::matrix<T, rf_h> &mat, T value, max_t dshift = 0);
+
+template<typename T, bool rf_h>
+void diag_factor_out(nd::matrix<T, rf_h> &m0, max_t dshift = 0);
 
 }
 

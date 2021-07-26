@@ -465,6 +465,12 @@ void nd::_matrix<T, ref_holder>::_m_reshape(shape_t shape) {
 }
 
 template<typename T, bool ref_holder>
+void nd::_matrix<T, ref_holder>::_m_swapaxes(max_size_t ax0, max_size_t ax1) {
+
+	this->attr.swapaxes(ax0, ax1);
+}
+
+template<typename T, bool ref_holder>
 void nd::_matrix<T, ref_holder>::_m_clear_iter_type() {
 
 	if (!is_scalar(this->attr)) {

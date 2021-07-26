@@ -105,7 +105,7 @@ nd::matrix<RT> nd::linalg::diag(const nd::matrix<T, rf_h> &mat, max_t dshift) {
 		out_shape = mcoords.shape.slice(0, in_ndim - 2);
 	}
 
-	else {
+	else if (in_ndim > 2) {
 
 		out_shape = { n_chunk };
 	}
@@ -132,6 +132,169 @@ nd::matrix<RT> nd::linalg::diag(const nd::matrix<T, rf_h> &mat, max_t dshift) {
 	for (big_size_t i = 0; i < niter; i++) {
 
 		res[i] = static_cast<RT>(d[it->index1d]);
+
+		DI3_NEXT(it);
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// [1]
+	nd::iterator::free_iterator(it);
+
+	return result;
+}
+
+/* ===================================================================================== */
+
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> nd::linalg::diag2d(const nd::matrix<T, rf_h> &mat,
+		max_t dshift) {
+
+	nd::matrix<T, false> tmp = mat;
+
+	// -------------------------------------------------------------------------------
+
+	coords mcoords = tmp._m_coords();
+	coords view3d = mcoords.reinterpret_view3d(false);
+
+	// -------------------------------------------------------------------------------
+
+	max_size_t in_ndim = mcoords.ndim;
+	max_size_t v_ndim = view3d.ndim;
+
+	// -------------------------------------------------------------------------------
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(view3d);
+
+	// -------------------------------------------------------------------------------
+
+	DI3_MOVE_ALONG(it, dshift);
+
+	max_size_t chunk_size = DI3_NITER2(it);
+	max_size_t n_chunk = DI3_NITER3(it);
+
+	// -------------------------------------------------------------------------------
+
+	if (chunk_size == 0) {
+
+		throw nd::exception("nd::linalg::diag2d(...),\n\t"
+				"yields an empty nd::matrix<RT, ...>");
+	}
+
+	// -------------------------------------------------------------------------------
+
+	shape_t out_shape;
+
+	if (in_ndim > v_ndim) {
+
+		out_shape = mcoords.shape.slice(0, in_ndim - 2);
+	}
+
+	else if (in_ndim > 2) {
+
+		out_shape = { n_chunk };
+	}
+
+	out_shape = out_shape.merge( { chunk_size, chunk_size });
+
+	// -------------------------------------------------------------------------------
+
+	nd::matrix<RT> result(out_shape, 0);
+
+	// -------------------------------------------------------------------------------
+
+	// niter == result.size()
+	big_size_t niter = chunk_size * n_chunk;
+
+	// -------------------------------------------------------------------------------
+
+	T *d = tmp._m_begin();
+
+	RT *res = result._m_begin();
+
+	// -------------------------------------------------------------------------------
+
+	// [1]
+	nd::iterator::Iterator *out_it = nd::iterator::init_2d_iterator(
+			result._m_coords());
+
+	// -------------------------------------------------------------------------------
+
+	DI3_MOVE_ALONG(out_it, 0);
+
+	// -------------------------------------------------------------------------------
+
+	for (big_size_t i = 0; i < niter; i++) {
+
+		res[out_it->index1d] = static_cast<RT>(d[it->index1d]);
+
+		DI3_NEXT(it);
+		DI3_NEXT(out_it);
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// [2]
+	nd::iterator::free_iterator(it);
+	nd::iterator::free_iterator(out_it);
+
+	return result;
+}
+
+/* ===================================================================================== */
+
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> nd::linalg::mask_diag(const nd::matrix<T, rf_h> &mat,
+		max_t dshift) {
+
+	nd::matrix<T, false> tmp = mat;
+
+	// -------------------------------------------------------------------------------
+
+	coords mcoords = tmp._m_coords();
+	coords view3d = mcoords.reinterpret_view3d(false);
+
+	// -------------------------------------------------------------------------------
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(view3d);
+
+	// -------------------------------------------------------------------------------
+
+	DI3_MOVE_ALONG(it, dshift);
+
+	max_size_t chunk_size = DI3_NITER2(it);
+	max_size_t n_chunk = DI3_NITER3(it);
+
+	// -------------------------------------------------------------------------------
+
+	if (chunk_size == 0) {
+
+		throw nd::exception("nd::linalg::diag(...),\n\t"
+				"yields an empty nd::matrix<RT, ...>");
+	}
+
+	// -------------------------------------------------------------------------------
+
+	nd::matrix<RT> result(mcoords.shape, 0);
+
+	// -------------------------------------------------------------------------------
+
+	// niter == result.size()
+	big_size_t niter = chunk_size * n_chunk;
+
+	// -------------------------------------------------------------------------------
+
+	T *d = tmp._m_begin();
+
+	RT *res = result._m_begin();
+
+	// -------------------------------------------------------------------------------
+
+	for (big_size_t i = 0; i < niter; i++) {
+
+		res[it->index1d] = static_cast<RT>(d[it->index1d]);
 
 		DI3_NEXT(it);
 	}
@@ -394,6 +557,8 @@ nd::matrix<RT> nd::linalg::inverse(const nd::matrix<T, rf_h> &mat, bool pivot) {
 	return result;
 }
 
+/* ===================================================================================== */
+
 template<typename RT, typename T, bool rf_h>
 nd::composite<RT> nd::linalg::lu(const nd::matrix<T, rf_h> &mat) {
 
@@ -416,6 +581,7 @@ nd::composite<RT> nd::linalg::lu(const nd::matrix<T, rf_h> &mat) {
 
 	// -------------------------------------------------------------------------------
 
+	// U
 	nd::matrix<RT> U = mat;
 
 	nd::matrix<RT, false> uview = U.set_new_coords(cview3d);
@@ -453,3 +619,152 @@ nd::composite<RT> nd::linalg::lu(const nd::matrix<T, rf_h> &mat) {
 
 	return {L, U};
 }
+
+/* ===================================================================================== */
+
+template<typename RT, typename T, bool rf_h>
+nd::composite<RT> nd::linalg::plu(const nd::matrix<T, rf_h> &mat) {
+
+	coords mcoords = mat._m_coords();
+	coords cview3d = mcoords.reinterpret_view3d(false);
+
+	// -------------------------------------------------------------------------------
+
+	if (!mcoords.is_square()) {
+		throw nd::exception("nd::linalg::plu(...),\n\t"
+				"nd::matrix<T, ...> - must be a square matrix");
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// P
+	nd::matrix<RT> P = nd::linalg::eye<RT>(mcoords.shape, 0);
+
+	nd::matrix<RT, false> pview = P.set_new_coords(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	// L
+	nd::matrix<RT> L(mcoords.shape, 0);
+
+	nd::matrix<RT, false> lview = L.set_new_coords(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	// U
+	nd::matrix<RT> U = mat;
+
+	nd::matrix<RT, false> uview = U.set_new_coords(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	flag8_t state;
+
+	max_size_t ncols = cview3d.ncols();
+
+	// -------------------------------------------------------------------------------
+
+	// forward
+	for (max_size_t i = 0; i < ncols; i++) {
+
+		state = nd::linalg::inplace::psubstitution_step(uview, it, ncols, i,
+				true, 1, &lview, &pview);
+
+		if (state == -1) {
+			throw nd::exception("nd::linalg::plu(...),\n\t"
+					"nd::matrix<T, ...> - singular matrix");
+		}
+	}
+
+	// -------------------------------------------------------------------------------
+
+	nd::linalg::inplace::diag_add<RT>(L, 1);
+
+	// -------------------------------------------------------------------------------
+
+	max_size_t ndim = mcoords.ndim;
+
+	P._m_swapaxes(ndim - 1, ndim - 2);
+
+	// -------------------------------------------------------------------------------
+
+	// [1]
+	nd::iterator::free_iterator(it);
+
+	return {P, L, U};
+}
+
+/* ===================================================================================== */
+
+template<typename RT, typename T, bool rf_h>
+nd::composite<RT> nd::linalg::ldu(const nd::matrix<T, rf_h> &mat) {
+
+	coords mcoords = mat._m_coords();
+	coords cview3d = mcoords.reinterpret_view3d(false);
+
+	// -------------------------------------------------------------------------------
+
+	if (!mcoords.is_square()) {
+		throw nd::exception("nd::linalg::ldu(...),\n\t"
+				"nd::matrix<T, ...> - must be a square matrix");
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// L
+	nd::matrix<RT> L = nd::linalg::eye<RT>(mcoords.shape, 0);
+
+	nd::matrix<RT, false> lview = L.set_new_coords(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	// U
+	nd::matrix<RT> U = mat;
+
+	nd::matrix<RT, false> uview = U.set_new_coords(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	flag8_t state;
+
+	max_size_t ncols = cview3d.ncols();
+
+	// -------------------------------------------------------------------------------
+
+	// forward
+	for (max_size_t i = 0; i < ncols; i++) {
+
+		state = nd::linalg::inplace::psubstitution_step(uview, it, ncols, i,
+				false, 1, &lview);
+
+		if (state == -1) {
+
+			throw nd::exception("nd::linalg::ldu(...),\n\t"
+					"nd::matrix<T, ...> - LDU decomposition has been failed");
+		}
+	}
+
+	// -------------------------------------------------------------------------------
+
+	nd::matrix<RT> D = nd::linalg::mask_diag<RT>(U, 0);
+
+	nd::linalg::inplace::diag_factor_out(U);
+
+	// -------------------------------------------------------------------------------
+
+	// [1]
+	nd::iterator::free_iterator(it);
+
+	return {L, D, U};
+}
+

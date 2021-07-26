@@ -21,7 +21,8 @@ template<typename T1, typename T2, typename T3, bool rf_h0, bool rf_h1,
 		bool rf_h2>
 flag8_t nd::linalg::inplace::partial_pivoting_step(nd::matrix<T1, rf_h0> &lhs,
 		nd::iterator::Iterator *it, max_size_t ppcols, max_size_t column_index,
-		nd::matrix<T2, rf_h1> *rhsref, nd::matrix<T3, rf_h2> *perm) {
+		uflag8_t state, nd::matrix<T2, rf_h1> *rhsref,
+		nd::matrix<T3, rf_h2> *perm) {
 
 	max_size_t ndim = lhs.ndim();
 
@@ -289,7 +290,7 @@ flag8_t nd::linalg::inplace::psubstitution_step(nd::matrix<T1, rf_h0> &lhs,
 	if (pivot) {
 
 		is_valid = nd::linalg::inplace::partial_pivoting_step(lhs, it, pscols,
-				column_index, rhsref, perm);
+				column_index, 0, rhsref, perm);
 	}
 
 	// -------------------------------------------------------------------------------
@@ -486,7 +487,7 @@ flag8_t nd::linalg::inplace::gsubstitution_step(nd::matrix<T1, rf_h0> &lhs,
 	if (pivot) {
 
 		is_valid = nd::linalg::inplace::partial_pivoting_step(lhs, it, gscols,
-				column_index, rhsref, perm);
+				column_index, 0, rhsref, perm);
 	}
 
 	// -------------------------------------------------------------------------------
@@ -687,4 +688,97 @@ flag8_t nd::linalg::inplace::gsubstitution_step(nd::matrix<T1, rf_h0> &lhs,
 
 	// case: valid-step
 	return 1;
+}
+
+/* ==================================================================================== */
+
+template<typename T, bool rf_h>
+void nd::linalg::inplace::diag_add(nd::matrix<T, rf_h> &mat, T value,
+		max_t dshift) {
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_2d_iterator(
+			mat._m_coords());
+
+	// -------------------------------------------------------------------------------
+
+	DI3_MOVE_ALONG(it, 0);
+
+	max_size_t chunk_size = DI3_NITER2(it);
+	max_size_t n_chunk = DI3_NITER3(it);
+
+	big_size_t niter = chunk_size * n_chunk;
+
+	// -------------------------------------------------------------------------------
+
+	T *d = mat._m_begin();
+
+	// -------------------------------------------------------------------------------
+
+	for (big_size_t i = 0; i < niter; i++) {
+
+		d[it->index1d] += value;
+
+		DI3_NEXT(it);
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// [1]
+	nd::iterator::free_iterator(it);
+}
+
+template<typename T, bool rf_h>
+void nd::linalg::inplace::diag_factor_out(nd::matrix<T, rf_h> &mat,
+		max_t dshift) {
+
+	coords mcoords = mat._m_coords();
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_2d_iterator(mcoords);
+
+	// -------------------------------------------------------------------------------
+
+	DI3_MOVE_ALONG(it, dshift);
+
+	max_size_t chunk_size = DI3_NITER2(it);
+	max_size_t n_chunk = DI3_NITER3(it);
+
+	max_size_t ncols = mcoords.ncols();
+
+	// -------------------------------------------------------------------------------
+
+	T *d = mat._m_begin();
+
+	T scale_inv = 1.0;
+
+	// -------------------------------------------------------------------------------
+
+	for (max_size_t k = 0; k < n_chunk; k++) {
+
+		for (max_size_t i = 0; i < chunk_size; i++) {
+
+			scale_inv = 1.0 / d[it->index1d];
+
+			DI3_WAIT(it);
+
+			DI3_TOC(it, 0);
+
+			for (max_size_t j = 0; j < ncols; j++) {
+
+				d[it->index1d] *= scale_inv;
+
+				ITER_NEXT(it);
+			}
+
+			DI3_RELEASE(it);
+
+			DI3_NEXT(it);
+		}
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// [1]
+	nd::iterator::free_iterator(it);
 }

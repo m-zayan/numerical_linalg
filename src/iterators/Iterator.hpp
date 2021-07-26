@@ -250,6 +250,16 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 
 // ------------------------------------------------------
 
+#define ITER_FORWARD(it, i) do { \
+	it->index1d += (it->current[i] * it->strides[i]); \
+} while(0)
+
+#define ITER_BACKWARD(it, i) do { \
+	it->index1d -= (it->current[i] * it->strides[i]); \
+} while(0)
+
+// ------------------------------------------------------
+
 #define ITER1D_MUST_RESET(it) do { \
 	if(it->index1d >= it->niter){ \
 	  it->index1d = 0; \
@@ -503,7 +513,7 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 #define DI3_NEXT3(it) do { \
 	DI3_RESET_INDEX2(it); \
 	it->current[0]++; \
-	it->index1d += (it->strides[0] * it->current[0]); \
+	ITER_FORWARD(it, 0); \
 } while(0)
 
 // ------------------------------------------------------
@@ -515,6 +525,40 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 		DI3_NEXT2(it); \
 	} \
 	DI3_MUST_RESET(it); \
+} while(0)
+
+// ------------------------------------------------------
+
+/* Caching the current state of DI3 */
+#define DI3_WAIT(it) do { \
+	it->flipflop[2] = it->current[0]; \
+	it->flipflop[3] = it->current[1]; \
+	it->flipflop[4] = it->current[2]; \
+	it->aux1d[2] = it->index1d; \
+} while(0)
+
+/* Reset DI3 state */
+#define DI3_RELEASE(it) do { \
+	it->current[0] = it->flipflop[2]; \
+	it->current[1] = it->flipflop[3]; \
+	it->current[2] = it->flipflop[4]; \
+	it->index1d = it->aux1d[2]; \
+} while(0)
+
+// ------------------------------------------------------
+
+/* point-to <--> (k, rindex, i) */
+#define DI3_TOR(it, rindex) do { \
+	ITER_BACKWARD(it, 1); \
+	it->current[1] = rindex; \
+	ITER_FORWARD(it, 1); \
+} while(0)
+
+/* point-to <--> (k, i, cindex) */
+#define DI3_TOC(it, cindex) do { \
+	ITER_BACKWARD(it, 2); \
+	it->current[2] = cindex; \
+	ITER_FORWARD(it, 2); \
 } while(0)
 
 #endif /* SRC_ITERATORS_ITERATOR_HPP */

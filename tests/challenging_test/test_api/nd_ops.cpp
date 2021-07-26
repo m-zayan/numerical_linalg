@@ -77,21 +77,77 @@ void test_inv_1(shape_t shape, max_t max = 10) {
 	std::cout << "end\n";
 }
 
+void test_lu_1(shape_t shape, max_t max = 10) {
+
+	nd::matrix<double> mat = nd::random::uniform(1, max, shape);
+
+	std::cout << "start\n";
+
+	auto t_start = std::chrono::high_resolution_clock::now();
+
+	nd::composite<double> lu = nd::linalg::lu<double>(mat);
+
+	auto t_end = std::chrono::high_resolution_clock::now();
+
+	long double time = std::chrono::duration_cast<std::chrono::seconds>(
+			t_end - t_start).count();
+
+	std::cout << "Execution Time = " << time << " s" << ln;
+	std::cout << "\n=============================================\n";
+	std::cout << lu[0].shape() << '\n';
+
+	std::cout << "end\n";
+}
+
+void test_plu_1(shape_t shape, max_t max = 10) {
+
+	nd::matrix<double> mat = nd::random::uniform(1, max, shape);
+
+	std::cout << "start\n";
+
+	auto t_start = std::chrono::high_resolution_clock::now();
+
+	nd::composite<double> plu = nd::linalg::plu<double>(mat);
+
+	auto t_end = std::chrono::high_resolution_clock::now();
+
+	long double time = std::chrono::duration_cast<std::chrono::seconds>(
+			t_end - t_start).count();
+
+	std::cout << "Execution Time = " << time << " s" << ln;
+	std::cout << "\n=============================================\n";
+	std::cout << plu[0].shape() << '\n';
+
+	std::cout << "end\n";
+}
+
 void test_api::nd_ops() {
 
-	// about | O3: 1 s
+//  about | O3: 1 s
 	test_matmul( { 1000000, 2, 3, 3 });
 
-	// about | O3: 16 s
+//  about | O3: 16 s
 //	test_matmul({1000, 1000});
 
-	// about | O3 : 263 s
+//  about | O3 : 263 s
 //	test_inv_1({10, 1000, 1000});
 
-	// about | O3 : 4 s
+//  about | O3 : 4 s
 //	test_inv_1({100000, 10, 10});
 
-	// about | O3 : 3 s
+//  about | O3 : 3 s
 //	test_inv_1( { 1000000, 2, 3, 3 }, 1000000);
+
+//  about | O3 : 3 s
+//	test_lu_1({1000, 1000});
+
+//  about | O3 : 39 s
+//	test_lu_1({10, 1000, 1000});
+
+//  about | O3 : 5 s
+//	test_plu_1( { 1000, 1000 });
+
+//  about | O3 : 45 s
+//	test_plu_1( {10, 1000, 1000 });
 
 }

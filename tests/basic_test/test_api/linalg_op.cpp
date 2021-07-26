@@ -50,10 +50,60 @@ void test_lu(shape_t shape) {
 	nd::out::print_matrix(mat_);
 }
 
+void test_plu(shape_t shape) {
+
+	nd::matrix<int> mat = nd::random::uniform(-5, 10, shape);
+
+	nd::out::print_matrix(mat);
+
+	epline();
+
+	nd::composite<double> plu = nd::linalg::plu<double>(mat);
+
+	for (max_size_t i = 0; i < 3; i++) {
+
+		nd::out::print_matrix(plu[i]);
+		epline();
+	}
+
+	nd::matrix<double> mat_ = nd::linalg::matmul<double>(plu[0], plu[1]);
+
+	mat_ = nd::linalg::matmul<double>(mat_, plu[2]);
+
+	nd::out::print_matrix(mat_);
+}
+
+void test_ldu(shape_t shape) {
+
+	nd::matrix<int> mat = nd::random::uniform(-5, 10, shape);
+
+	nd::out::print_matrix(mat);
+
+	epline();
+
+	nd::composite<double> ldu = nd::linalg::ldu<double>(mat);
+
+	for (max_size_t i = 0; i < 3; i++) {
+
+		nd::out::print_matrix(ldu[i]);
+		epline();
+	}
+
+	nd::matrix<double> mat_ = nd::linalg::matmul<double>(ldu[0], ldu[1]);
+
+	mat_ = nd::linalg::matmul<double>(mat_, ldu[2]);
+
+	nd::out::print_matrix(mat_);
+}
+
 void test_api::linalg_op() {
 
 //	test_inv( {3, 4, 4 });
 
-	test_lu( {2, 3, 3 });
+//	test_lu( { 2, 3, 3 });
+
+//	test_plu( { 2, 3, 3 });
+
+	test_ldu( { 2, 3, 3 });
 }
 
