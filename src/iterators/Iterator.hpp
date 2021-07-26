@@ -397,6 +397,34 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 
 /* ################################################################################## */
 
+#define ITER_STEP_ATND(it, pcindex) do { \
+	it->current[it->iaxis] = (pcindex % it->shape[it->iaxis]); \
+	pcindex /= it->shape[it->iaxis]; \
+} while(0)
+
+#define ITER_ATND(it, pcindex) do { \
+	ITER_SET_IAXIS1(it, it->ndim - 1); \
+	for(; it->iaxis > 0; --it->iaxis){ \
+		ITER_STEP_ATND(it, pcindex); \
+	} \
+	ITER_STEP_ATND(it, pcindex); \
+}while(0)
+
+// ------------------------------------------------------
+
+#define ITER_1D2N(it) do { \
+	it->aux1d[3] = it->index1d; \
+	ITER_ATND(it, it->aux1d[3]); \
+} while(0)
+
+// ------------------------------------------------------
+
+#define ITER_ND21(it) do { \
+	ITER_MOVE_TO1D(it, it->current); \
+} while(0)
+
+/* ################################################################################## */
+
 /* --- [bidirectional] --- */
 
 #define BITER_IS_ROT(it, index1d) (it->bit[1] && it->aux1d[1] >= index1d)
@@ -537,12 +565,22 @@ inline void Iterator::reinterpret_none(big_size_t size) {
 	it->aux1d[2] = it->index1d; \
 } while(0)
 
-/* Reset DI3 state */
-#define DI3_RELEASE(it) do { \
+// ------------------------------------------------------
+
+#define DI3_RELEASE2D(it) do { \
 	it->current[0] = it->flipflop[2]; \
 	it->current[1] = it->flipflop[3]; \
 	it->current[2] = it->flipflop[4]; \
+} while(0)
+
+#define DI3_RELEASE1D(it) do { \
 	it->index1d = it->aux1d[2]; \
+} while(0)
+
+/* Reset DI3 state */
+#define DI3_RELEASE(it) do { \
+	DI3_RELEASE2D(it); \
+	DI3_RELEASE1D(it); \
 } while(0)
 
 // ------------------------------------------------------

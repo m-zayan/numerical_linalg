@@ -171,6 +171,46 @@ void test_diag_mask(shape_t shape, max_t dshift) {
 	std::cout << "\n==========================\n";
 }
 
+void test_upper_mask(shape_t shape, max_t dshift) {
+
+	nd::matrix<int> mat = nd::random::uniform<int>(1, 10, shape);
+
+	nd::out::print_matrix(mat);
+
+	std::cout << "\n==========================\n";
+
+	nd::matrix<double> result = nd::linalg::mask_upper<double>(mat, dshift);
+
+	std::cout << "shape :" << result.shape() << ", " << "strides :"
+			<< shape_t(result.strides()) << '\n';
+
+	std::cout << "\n---------------------\n";
+
+	nd::out::print_matrix(result);
+
+	std::cout << "\n==========================\n";
+}
+
+void test_lower_mask(shape_t shape, max_t dshift) {
+
+	nd::matrix<int> mat = nd::random::uniform<int>(1, 10, shape);
+
+	nd::out::print_matrix(mat);
+
+	std::cout << "\n==========================\n";
+
+	nd::matrix<double> result = nd::linalg::mask_lower<double>(mat, dshift);
+
+	std::cout << "shape :" << result.shape() << ", " << "strides :"
+			<< shape_t(result.strides()) << '\n';
+
+	std::cout << "\n---------------------\n";
+
+	nd::out::print_matrix(result);
+
+	std::cout << "\n==========================\n";
+}
+
 void test_api::opsv2_nd_matrix() {
 
 //	for (max_t i = -2; i <= 2; i++) {
@@ -187,5 +227,11 @@ void test_api::opsv2_nd_matrix() {
 
 //	test_diag2d({3, 3}, 0);
 
-	test_diag_mask( { 3, 3 }, 2);
+//	test_diag_mask( { 3, 3 }, 2);
+
+//	test_upper_mask( { 3, 3 }, 0);
+
+	test_lower_mask( { 3, 3 }, 0);
+
+
 }

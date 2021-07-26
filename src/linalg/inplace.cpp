@@ -415,7 +415,7 @@ flag8_t nd::linalg::inplace::psubstitution_step(nd::matrix<T1, rf_h0> &lhs,
 
 			// -------------------------------------------------------------
 
-			if (b != nullptr && state == 1) {
+			if (b != nullptr) {
 
 				b[index] = -cscale;
 			}
@@ -436,6 +436,12 @@ flag8_t nd::linalg::inplace::psubstitution_step(nd::matrix<T1, rf_h0> &lhs,
 
 				// elimination step
 				d[idx1] += (d[idx0] * cscale);
+
+				// interior-cache
+				if (state == 1 && idx1 == idx0) {
+
+					d[idx1] = -cscale;
+				}
 			}
 		}
 	}
@@ -774,6 +780,58 @@ void nd::linalg::inplace::diag_factor_out(nd::matrix<T, rf_h> &mat,
 			DI3_RELEASE(it);
 
 			DI3_NEXT(it);
+		}
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// [1]
+	nd::iterator::free_iterator(it);
+}
+
+/* ================================================================================= */
+
+template<typename T, bool rf_h>
+void nd::linalg::inplace::echelon(nd::matrix<T, rf_h> &mat, bool pivot) {
+
+	coords mcoords = mat._m_coords();
+	coords cview3d = mcoords.reinterpret_view3d(false);
+
+	// -------------------------------------------------------------------------------
+
+	if (mcoords.ndim < 2) {
+		throw nd::exception("nd::linalg::echelon(...),\n\t"
+				"nd::matrix<T, ...>::ndim() < 2");
+	}
+
+	// -------------------------------------------------------------------------------
+
+	// U
+	nd::matrix<T, false> uview = mat.set_new_coords(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	// [0]
+	nd::iterator::Iterator *it = nd::iterator::init_iterator(cview3d);
+
+	// -------------------------------------------------------------------------------
+
+	flag8_t state;
+
+	max_size_t ncols = cview3d.ncols();
+
+	// -------------------------------------------------------------------------------
+
+	// forward
+	for (max_size_t i = 0; i < ncols; i++) {
+
+		state = nd::linalg::inplace::psubstitution_step(uview, it, ncols, i,
+				pivot, 0);
+
+		if (state == -1) {
+			throw nd::exception("nd::linalg::echelon(...),\n\t"
+					"nd::matrix<T, ...> - Reduction has been failed | "
+					"Pivoting is required");
 		}
 	}
 

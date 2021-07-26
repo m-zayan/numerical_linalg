@@ -126,6 +126,21 @@ void test_lower(shape_t shape) {
 	epline();
 }
 
+void test_echelon(shape_t shape) {
+
+	nd::matrix<double> mat = nd::random::uniform(1, 100, shape);
+
+	nd::out::print_matrix(mat);
+
+	epline();
+
+	nd::linalg::inplace::echelon(mat);
+
+	nd::out::print_matrix(mat);
+
+	epline();
+}
+
 void test_api::linalg_op() {
 
 //	test_inv( {3, 4, 4 });
@@ -138,6 +153,8 @@ void test_api::linalg_op() {
 
 //	test_upper( {2, 3, 3 });
 
-	test_lower({2, 3, 3});
+//	test_lower({2, 3, 3});
+
+//	test_echelon( { 2, 3, 3 });
 }
 

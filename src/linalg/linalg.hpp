@@ -25,6 +25,14 @@ nd::matrix<RT> diag2d(const nd::matrix<T, rf_h> &mat, max_t dshift = 0);
 template<typename RT, typename T, bool rf_h>
 nd::matrix<RT> mask_diag(const nd::matrix<T, rf_h> &mat, max_t dshift = 0);
 
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> mask_upper(const nd::matrix<T, rf_h> &mat,
+		max_t dshift = 0);
+
+template<typename RT, typename T, bool rf_h>
+nd::matrix<RT> mask_lower(const nd::matrix<T, rf_h> &mat,
+		max_t dshift = 0);
+
 template<typename RT, typename T1, typename T2, bool rf_h0, bool rf_h1>
 nd::matrix<RT> augmented(const nd::matrix<T1, rf_h0> &m0,
 		const nd::matrix<T2, rf_h1> &m1);
@@ -133,7 +141,7 @@ flag8_t gsubstitution_step(nd::matrix<T1, rf_h0> &lhs,
 /* ================================================================================= */
 
 template<typename T, bool rf_h>
-void echelon(nd::matrix<T, rf_h> &mat);
+void echelon(nd::matrix<T, rf_h> &mat, bool pivot = false);
 
 /* ================================================================================= */
 
